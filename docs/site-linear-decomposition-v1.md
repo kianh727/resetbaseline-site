@@ -1,5 +1,18 @@
 # resetbaseline.com — Linear Decomposition v1
 
+> **Superseded in part.** `docs/site-execution-addendum-v1.md` is authoritative
+> over this document for: Linear project/milestone organization, issue creation
+> order and numbering, PR policy, and the four design review gates
+> (SITE-085…088).
+>
+> The "PROJECTS" section below and the project/issue-count tables in "SUMMARY"
+> describe sixteen Linear *projects*. Those sixteen groupings are preserved as
+> **milestones** inside three projects. Read the addendum first.
+>
+> Everything else here — all 84 issue scopes, acceptance criteria, tests,
+> verification requirements, the dependency graph, and the critical path —
+> stands unchanged.
+
 Derived from `docs/site-prd-v5.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
 
 **IDs are provisional decomposition IDs, not Linear IDs.**
