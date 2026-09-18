@@ -63,20 +63,29 @@ they are not the app's `BAS-###` tree. Where the PRD references `BAS-217`–`BAS
 (StoreKit and paywall) it is naming an external dependency that decides a config
 value (§11.4), not work that happens here.
 
-**There is exactly one seam, and it runs one way.** `@baseline/contracts` — the
-app's frozen contract package — is the closed vocabulary this site validates
-against. Every action verb, object type, enum, and authority tier in the provider
-layer and the authored scenarios traces to it. The site **consumes** that
-vocabulary; it never extends, amends, or works around it. A contract change should
-break this build (PRD §12, SITE-004).
+**There is exactly one seam, and it runs one way.** The app's frozen contract
+vocabulary — the 45 action types, object types, enums, and authority tiers — is what
+this site validates against. Every verb in the provider layer and the authored
+scenarios traces to it. The site **consumes** that vocabulary; it never extends,
+amends, or works around it. A contract change should break this build
+(PRD v7.2 §6.6, §12 DS-15, SITE-004).
 
-> **Known blocker, unresolved.** `@baseline/contracts` is a workspace package inside
-> the app monorepo (`packages/contracts`), not published to any registry. SITE-004
-> assumes a separate repository can import it and have CI fail on drift. **As things
-> stand, it cannot.** This is the decomposition's own unresolved question #1, and it
-> sits in front of the entire SITE tree. The mechanism — publish target, vendored
-> generated types with a drift check, or a git dependency — is an unmade decision.
-> Do not invent one. It is a §9 stop-and-report until it is decided.
+> **Resolved — no longer blocking.** This was previously recorded as an unresolved
+> blocker sitting in front of the entire SITE tree, on the assumption that SITE-004
+> had to import `@baseline/contracts` as a package. It does not. The site consumes
+> `contracts-manifest.json` — the app's `CONTRACT_MANIFEST` committed verbatim with
+> `captured_at` and the app commit SHA — and generates its types from that
+> (PRD v7.2 §6.6, decomposition open question 1).
+>
+> Four packaging blockers do exist in the app repo (`private: true`, `dist/`
+> gitignored and untracked, no `files` field, `tsconfig` extends outside the
+> package), with **zero code coupling**. Publishing properly is still worth doing
+> and is still Kian's decision, but it is informational here, not gating.
+>
+> **One app-repo change remains wanted, not required:** the app publishing its
+> manifest to a stable path on `main`, which the drift check's primary mechanism
+> reads. Without it SITE-004 ships on the staleness fallback — warn at 30 days,
+> fail at 60. Opening that `BAS` issue still requires asking first (§10, addendum §5).
 
 ---
 
@@ -281,8 +290,9 @@ STOP and report. Do not improvise, do not decide, do not silently resolve in cod
 - The issue requires **undefined product behavior**.
 - The work **contradicts an artifact**, or two artifacts contradict each other on a
   material point.
-- The work depends on the **`@baseline/contracts` packaging decision** (§2) or on any
-  other unfinished dependency.
+- The work depends on an **unfinished dependency**. The `@baseline/contracts`
+  packaging decision is no longer one of these — it was resolved by consuming
+  `contracts-manifest.json` (§2, PRD v7.2 §6.6).
 - The work would require **inventing a verb, object type, enum, or authority tier**
   not in the frozen contracts.
 - The work would **soften the determinism boundary** (§5) or a privacy invariant
@@ -342,12 +352,19 @@ Seven, from PRD §22. Any of these in a diff is a defect, not a tradeoff.
 
 ## 12. Current state
 
-The repository is initialized: the three artifacts and this file. **No code, no
-scaffold, no Linear project.** SITE-001 has not begun.
+The repository is initialized: the four artifacts and this file. **No code, no
+scaffold.** SITE-001 has not begun.
 
-The first real question in front of this repository is not SITE-001 — it is the
-`@baseline/contracts` packaging decision in §2, which SITE-004 depends on and which
-the entire tree sits behind.
+**Linear:** the `SITE` team does not exist yet. Thirteen empty projects named
+`SP-01`…`SP-13` were created on the **app's `BAS` team** by an earlier session and
+are orphans — they are not the structure the addendum specifies (three projects,
+sixteen milestones) and must be deleted before the population run. The orphan `site`
+label is likewise still present. Zero `SITE-*` issues exist.
+
+The `@baseline/contracts` packaging question is **resolved and no longer gating**
+(§2). What now stands in front of the population run is **PRE-1 item 4**, which is
+itself gated on the capture and reachability check — because v7.2 §0 means the
+issue set cannot be written until it is known which capabilities are reachable.
 
 ---
 
@@ -380,6 +397,10 @@ issues are created in strict sequential order, and decomposition `SITE-001`
 maps to Linear `SITE-1` positionally — Linear does not zero-pad.
 
 Never create, modify, move, close, reopen, or delete a `BAS-*` issue or an app
-project. The one sanctioned cross-team action is opening the
-`@baseline/contracts` packaging blocker described in addendum §5, which
+project. The one sanctioned cross-team action is opening the manifest-publication
+issue described in addendum §5 — related to SITE-004, not blocking it — which
 requires asking first.
+
+**Exception, already incurred.** The thirteen `SP-01`…`SP-13` projects on `BAS`
+are site artifacts created there in error (§12). Deleting them is sanctioned
+cleanup, not app work; no `BAS-*` issue is touched by it.

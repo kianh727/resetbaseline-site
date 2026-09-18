@@ -35,7 +35,7 @@ Governing principle, encoded in every priority and dependency below:
 **Purpose** Scaffold, design system, contract wiring, and the primitives every later project consumes.
 **Dependencies** None.
 **Entry** Repo created, Cloudflare Pages project provisioned.
-**Exit** A deployed empty shell with tokens, type scale, both candidate typefaces renderable, `@baseline/contracts` imported and breaking the build on schema drift, and reduced-motion + tier primitives available as hooks.
+**Exit** A deployed empty shell with tokens, type scale, both candidate typefaces renderable, `contracts-manifest.json` committed with types generated from it and the §6.6 drift check breaking the build on divergence, and reduced-motion + tier primitives available as hooks.
 **PRD** §14, §15, §16, §20 P0/1
 **Non-goals** No builder logic. No 3D. No copy beyond the hero headline used to compare typefaces.
 
@@ -1032,18 +1032,25 @@ SITE-001 scaffold
   → SITE-062 mesh → SITE-063 light → SITE-068 projection → SITE-071 stations
 ```
 
-**Longest chain: 29 issues**, walked across all 88 rather than counted off the block
-above. Everything not on it can parallelize.
+> **Longest chain: 29 issues — walked, not read.**
+>
+> **Do not recount this from the block above.** That block is a narrative
+> presentation of the critical path, not the dependency graph, and counting it
+> gives the wrong answer. This figure comes from walking every `Deps` edge across
+> all 88 issues. Two previous figures were derived by counting a presentation:
+> the "27" this line replaced, and a "36" proposed during the PRE-1 pass. Both
+> were wrong. **Re-derive from the `Deps` lines or not at all.**
+>
+> True longest path: SITE-001 → 004 → 020 → 021 → 022 → 025 → 035 → 037 → 039 →
+> 040 → 041 → 042 → 043 → 044 → 047 → 050 → 052 → 060 → **087** → 061 → 062 →
+> 067 → 068 → 070 → 071 → 072 → 073 → **088** → 074.
+>
+> Pre-gate the walked figure is 26. Of the four review gates only SITE-087 and
+> SITE-088 fall on the longest path; SITE-085 and SITE-086 add real edges that do
+> not lengthen it, because the path does not run through SITE-027 or SITE-053.
+> Depth to the P0 gate (SITE-061) is 20, up from 19.
 
-The block above is a narrative presentation, not the dependency graph. The true
-longest path is SITE-001 → 004 → 020 → 021 → 022 → 025 → 035 → 037 → 039 → 040 →
-041 → 042 → 043 → 044 → 047 → 050 → 052 → 060 → **087** → 061 → 062 → 067 → 068 →
-070 → 071 → 072 → 073 → **088** → 074.
-
-Of the four review gates only SITE-087 and SITE-088 fall on it. SITE-085 and
-SITE-086 add real edges that do not lengthen the longest path, because it does not
-run through SITE-027 or SITE-053. Depth to the P0 gate (SITE-061) is 20, up from 19.
-The pre-gate figure was 26, not the 27 previously documented.
+Everything not on the longest chain can parallelize.
 
 ### Dependency rules, encoded
 
