@@ -431,6 +431,16 @@ Part B (item 4) — new issues for §2's three blocks, §3, §7, §8, §9, §11,
 ### PRE-2 · Ban-list copy audit
 **Owner:** site session · Automated in CI from P0 onward, failing the build on any §10 banned term; plus a manual pre-launch review, because automation catches terms and not a section that *implies* a capability without naming it.
 
+**Second check, same job: no copy string names an app.** App selections are opaque tokens the app cannot read — an app-PRD MUST. Copy says *"3 apps blocked"* and never names one, because naming one is a claim the product cannot make true. The build fails on any match of a committed app-name list against any authored copy string, site-wide.
+
+Three things this check must get right, each of them a way the constraint fails in practice:
+
+- **It is site-wide, not Gate-scoped.** The failure mode is a later rewrite of a line that reads correctly today. A check that only looks at strings currently near Gate copy does not catch it, and a recorded note catches it even less — which is why this is a CI check rather than a paragraph.
+- **The list is committed and versioned**, and adding to it is a copy decision, not a lint tweak. It covers the apps a Gate is plausibly created against and their common short forms and rebrands; a name that becomes checkable only after it appears in copy is a check that already failed once.
+- **A match is a failure, never a warning.** The §10 term check fails the build; so does this. An allowlist entry for a legitimate use — the App Store, iOS, Apple as the platform — is written into the list as an explicit exception, not granted by suppressing the check at the call site.
+
+**Open, and not decided here:** where the app-name list comes from. A hand-maintained list in the site repo is the obvious start and the obvious thing to go stale. It is a §9 decision, not a session's.
+
 ---
 
 ## 15. Open items
