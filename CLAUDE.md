@@ -368,26 +368,12 @@ the change it describes.**
   Addendum §1.2 says delete it.
 - The addendum's three projects and its seventeen milestones **do not exist yet**.
 
-> **Blocker — the team key, unconfirmed.** Addendum §2 requires key `SITE`. The key
-> was observed as **`SIT`** (Linear derives it from the team name), a UI correction
-> was made on 2026-09-18, and **that correction could not be confirmed from a
-> session.**
->
-> No MCP verb returns a team's key: `get_team`, `list_teams`, `list_issue_statuses`
-> and `list_cycles` all omit it, and `list_projects` exposes it only via a project's
-> `teams[]` — and this team has no projects. So the key is inferred, not read.
->
-> Inference and its limit: `get_team` matches exact key or exact name. `BASE` does
-> not resolve, so there is no prefix matching at four characters; `SIT` resolving a
-> team *named* `SITE` is therefore best explained as a key match. Against that, the
-> confound is that `SIT` is also a three-character prefix. The stronger signal is
-> that `updatedAt` reads `2026-09-18T02:10:52.089Z` both before and after the
-> correction — unchanged to the millisecond, where a key edit should have moved it.
->
-> **Read the key directly in Linear (Settings → Teams → SITE → identifier) before
-> any issue is created.** The first issue is `SIT-1` if this is wrong, and renaming
-> a key after issues exist renumbers all of them. The team is empty, so the fix is
-> free now and expensive later.
+**Team key confirmed: `SITE`.** Corrected in the Linear UI on 2026-09-18 and confirmed
+by Kian. It had been derived as `SIT` from the team name; the correction was not
+confirmable from a session because no Linear MCP verb returns a team's key — `get_team`,
+`list_teams`, `list_issue_statuses` and `list_cycles` all omit it, and `list_projects`
+exposes it only via a project's `teams[]`, which an empty team has none of. **That gap
+still exists**, so a future key question is again a read-in-the-UI, not a query.
 
 The `@baseline/contracts` packaging question is **resolved and no longer gating**
 (§2). The capture and reachability check is **complete**, and its findings are what
@@ -397,24 +383,43 @@ it won't do" promoted to P0.
 **PRE-1 Part A is complete.** Items 1, 3, 5, 6, 7, 8 and 9 are applied; item 2 was
 verified a no-op.
 
-**R-2 has reported**, answered by the app-repo session. It was the app PRD §14–26 bodies
-and the onboarding spec (v7.3 §15.2), and it was the last gate on Part B. The capture
-check is also complete. **Two things remain in front of the Linear population run:**
+**R-2 has reported in full**, answered by the app-repo session, including the two pieces
+that were outstanding — the permission list and the export/delete specification. The
+capture check is also complete. **SP-17's entry criteria are satisfiable**, and no read
+now gates anything.
 
-1. **Item 4 (Part B) written against v7.3** — not against the shape Part B was originally
-   scoped to. It adds issues, so the counts in §13 are not final and nothing should be
-   populated against them.
-2. **The SITE team key confirmed** before any issue is created (see the blocker above).
+**Part B / item 4 is gated on one thing: Site Author's amendment.** It is not a session's
+to write. Two findings from R-2 require a product decision before item 4 can be scoped
+against v7.3:
 
-**Item 4 is not written yet, deliberately.** R-2 surfaced a handoff problem that may change
-the builder's shape, and it is Site Author's to resolve, not a session's: **app PRD §25 says
-Gate is "never proposed during onboarding,"** and the agent may only propose one after
-lighter rungs have already failed for that user — impossible on day one. A builder whose
-loop ends in *protection* therefore promises a beat the first run does not deliver. Until
-that is resolved, item 4 is premature.
+1. **The onboarding handoff.** App PRD §25 says Gate is **"never proposed during
+   onboarding,"** and the agent may only propose one after lighter rungs have already
+   failed for that user — impossible on day one. A builder whose loop ends in *protection*
+   therefore promises a beat the first run does not deliver. The builder's shape may have
+   to change.
+2. **FAQ 12 — export and delete.** They are **unbuilt, not unproven.** No export endpoint,
+   no deletion route in the API; `requestAccountDeletion`'s only callers are its own tests;
+   `SettingsView` renders "export data" and "delete account" as rows with no action
+   closure — inert labels. The app PRD requires both in V1 and scopes them as BAS-125, and
+   nothing implements them. **"Export and delete, both at launch" cannot ship** under
+   DS-18. A roadmap claim is supportable; the current answer is not. FAQ 12 is now blocked
+   on copy, not on a read.
 
-Other R-2 findings bearing on site copy, recorded so they are not re-derived:
+R-2 findings bearing on site copy, recorded so they are not re-derived:
 
+- **FAQ 3 — permissions, answerable.** App PRD §50: two OS permissions in V1.
+  **Notifications**, requested during onboarding at the Intensity screen, merged with the
+  accountability level. **FamilyControls / Screen Time**, requested only when the user
+  creates or accepts a Gate — *"not before and not on a poll."* Sign in with Apple on the
+  Account screen is the only auth method in beta. HealthKit and Calendar are V1.1.
+  **Microphone is never** — a permanent no, not a deferral. No camera, location, contacts,
+  health. The only entitlement is `com.apple.developer.family-controls`. The line worth
+  quoting: *"Maximum OS prompts during onboarding: one. No permission carousel exists
+  because there is nothing to stack."*
+- **Hard constraint on all Gate copy — an app-PRD MUST.** App selections are **opaque
+  tokens the app cannot read.** Copy says *"3 apps blocked"* and **never names an app.**
+  This binds every version of every Gate line, not just the current one. §2 Block 1's
+  *"the apps you named go quiet"* is fine as written; no revision of it may name one.
 - **Only §14 carries a literal Purpose line;** §15–26 open with their defining frame. The
   five primitives each open with a `Problem:` line, which is the most usable copy in the
   document — commitment *"an intention with no occasion"* · reminder *"the cue arrives too
@@ -430,6 +435,9 @@ Other R-2 findings bearing on site copy, recorded so they are not re-derived:
   valve… 'leave it inconclusive' offered as a first-class, guilt-free option."* The nightly
   check-in is **off** by default and the app PRD marks that settled.
 
+The Linear population run stays halted: item 4 adds issues, so the counts in §13 are not
+final and nothing should be populated against them.
+
 ---
 
 ## 13. Linear
@@ -443,7 +451,7 @@ on every context switch.
 |---|---|
 | Workspace | `baselineagent` |
 | App team | `Baseline` / `BAS` — out of bounds, see below |
-| Site team | name `SITE`, key **must be** `SITE` — unconfirmed, see §12 |
+| Site team | name `SITE`, key `SITE` — **confirmed** 2026-09-18 |
 | App repo | `kianh727/baselinev1` — out of bounds |
 | Site repo | `kianh727/resetbaseline-site` |
 
@@ -465,7 +473,7 @@ figures are not. Do not quote 88 as final, and do not begin the population run a
 it — recount after Part B.
 
 Creation order is load-bearing. See addendum §2 before any Linear write:
-the team key must be `SITE` and the team must be empty before the first issue,
+the team key is `SITE` and the team must be empty before the first issue,
 issues are created in strict sequential order, and decomposition `SITE-001`
 maps to Linear `SITE-1` positionally — Linear does not zero-pad.
 
