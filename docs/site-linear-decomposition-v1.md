@@ -1035,6 +1035,7 @@ Project SP-15 · P1 · Deps SITE-076
 | SP-14 | Camera, Scroll + Sections | P1 | 5 | SP-13 |
 | SP-15 | P1 Performance + Degradation | P1 | 4 | SP-12 |
 | SP-16 | Signature Polish | P2 | 6 | SP-14, SP-15 |
+| SP-17 | Website Sections | **P0** | pending item 4 | SP-01, SP-08 (§10 Join) |
 
 ### Issue count
 

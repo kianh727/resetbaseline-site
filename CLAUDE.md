@@ -397,13 +397,38 @@ it won't do" promoted to P0.
 **PRE-1 Part A is complete.** Items 1, 3, 5, 6, 7, 8 and 9 are applied; item 2 was
 verified a no-op.
 
-**The halt now sits at PRE-1 Part B / item 4**, and Part B is gated on **R-2**, which
-has not reported. R-2 is the app PRD §14–26 bodies and the onboarding spec (v7.3 §15.2).
-FAQ answers 3 and 12 depend on its permission list and export/delete specification, and
-SP-17's entry criteria require it before any copy is written. The capture check is
-complete and no longer gates anything. **The Linear population run stays halted** — Part
-B adds issues, so the counts in §13 are not final and nothing should be populated
-against them.
+**R-2 has reported**, answered by the app-repo session. It was the app PRD §14–26 bodies
+and the onboarding spec (v7.3 §15.2), and it was the last gate on Part B. The capture
+check is also complete. **Two things remain in front of the Linear population run:**
+
+1. **Item 4 (Part B) written against v7.3** — not against the shape Part B was originally
+   scoped to. It adds issues, so the counts in §13 are not final and nothing should be
+   populated against them.
+2. **The SITE team key confirmed** before any issue is created (see the blocker above).
+
+**Item 4 is not written yet, deliberately.** R-2 surfaced a handoff problem that may change
+the builder's shape, and it is Site Author's to resolve, not a session's: **app PRD §25 says
+Gate is "never proposed during onboarding,"** and the agent may only propose one after
+lighter rungs have already failed for that user — impossible on day one. A builder whose
+loop ends in *protection* therefore promises a beat the first run does not deliver. Until
+that is resolved, item 4 is premature.
+
+Other R-2 findings bearing on site copy, recorded so they are not re-derived:
+
+- **Only §14 carries a literal Purpose line;** §15–26 open with their defining frame. The
+  five primitives each open with a `Problem:` line, which is the most usable copy in the
+  document — commitment *"an intention with no occasion"* · reminder *"the cue arrives too
+  late, or not at all"* · timer *"starting is expensive; sessions run unbounded"* · gate
+  *"cue-driven distraction survives intention"* · tracker *"a direction with no feedback"*.
+- **§18 You, block 2** — *"What Baseline has noticed — cross-goal patterns only, max 3,
+  person-level tier only. Rare by design; the most differentiated thing the product can
+  show."*
+- **§19 Settings** — *"Six groups, deliberately thin. Design intent: users configure
+  Baseline by talking to it; Settings holds only what you shouldn't have to ask for."*
+- **Weekly review is §48**, filed jointly with the nightly check-in, which is why v7.3
+  §15.2 records it as not located. *"On by default. The trust engine and the batching
+  valve… 'leave it inconclusive' offered as a first-class, guilt-free option."* The nightly
+  check-in is **off** by default and the app PRD marks that settled.
 
 ---
 
