@@ -514,6 +514,75 @@ Each runs the complete demo — goal → transformation → plan → tune → pr
 
 ---
 
+## Q. Launch state, sections, and the determinism boundary
+
+Added by PRE-1 Part B against PRD v7.3. **Every eval here must fail against a stub that does nothing** (§12.4) before it is accepted — SITE-106 records the verdict.
+
+**SITE-EVAL-070 · `rescheduled` is displayed, never recorded** · `AUTO`
+*Risk* A blanket ban reads as "the word is forbidden" and a blanket permission reads as "it is a sixth outcome." Both are wrong, and the previous wording was the first.
+*Pass* No rendered **recorded** outcome is ever `rescheduled` — the recorded set is exactly `complete · partial · missed · cancelled_intentionally · unknown`. `rescheduled` may appear only as a **derived display state** for an occurrence that was moved and is unresolved, and a resolution always wins: moved then completed renders `complete`. **`pending` never appears at all.**
+*Fail* `rescheduled` listed alongside the five as something the system records · any appearance of `pending` · a moved-then-completed occurrence rendering as `rescheduled`.
+*Stub check* Passes trivially if no occurrence is rendered — the assertion must require a moved occurrence and a resolved one to exist.
+*PRD* v7.3 §6.3 · *Issues* SITE-028, SITE-030, SITE-104
+
+**SITE-EVAL-071 · No claim without a working capability — DS-18** · `AUTO` `VIS`
+*Risk* The failure this whole PRD exists to stop: copy written from the app PRD's inventory rather than from a device.
+*Pass* Every §2 Block 1 line, every §3 line, and every FAQ answer describing app behavior resolves a verdict row naming the capability, the date verified, and the verifying issue. **A PRD line is not evidence**, and a verdict citing one fails.
+*Fail* Any such line with no verdict row, or with a verdict whose evidence is a specification.
+*Stub check* Passes trivially against zero claims — the assertion must enumerate the rendered claims and require the count to be non-zero.
+*PRD* v7.3 §12.1 DS-18, §0.1 · *Issues* SITE-090, SITE-093, SITE-095, SITE-108
+
+**SITE-EVAL-072 · Roadmap entries are owned and undated — DS-18a** · `AUTO`
+*Risk* Block 2 becomes a feature carousel with soft dates, which is the ban list arriving by the side door.
+*Pass* Every Block 2 entry names a real owning issue, states **no date, quarter, or "soon"**, and appears only in Block 2 — never in the hero, FAQ, §3, share card, or metadata. Nothing post-V1 appears at all.
+*Fail* An entry with no owning issue · any date form · a Block 2 capability named in present tense anywhere else.
+*Stub check* Passes trivially on an empty Block 2 — the assertion must require the five specified entries to be present.
+*PRD* v7.3 §12.1 DS-18a, §10 · *Issues* SITE-091
+
+**SITE-EVAL-073 · The status section is dated and current — DS-18b** · `AUTO` `VIS`
+*Risk* §2 goes stale silently, which is worse than having no §2 — a dated lie is more convincing than an undated one.
+*Pass* §2 renders a visible date sourced from a **committed constant**, not a runtime clock. A change to what is true moves the line between blocks **in the same commit**.
+*Fail* The date derived from `now()` · a Block 1 line whose verdict has gone false · a Block 2 entry that has landed and not moved.
+*Stub check* A self-dating section always passes freshness; the assertion must prove the date is a build-time constant.
+*PRD* v7.3 §12.1 DS-18b, §3.3 · *Issues* SITE-089, SITE-108
+
+**SITE-EVAL-074 · No depicted Baseline UI names an app** · `AUTO`
+*Risk* v5 through v7.2 specified the gate object as `Instagram, TikTok blocked · 6:00–7:30am` — a UI state the app is structurally incapable of producing, because Screen Time returns opaque tokens. It would have shipped a screenshot of something that cannot exist.
+*Pass* The assembled gate object renders **a count and a window**, `3 apps · 6:00–7:30am`. No app name appears in any depicted Baseline UI — builder object, share card, §2, FAQ, metadata, or any future section. The Protect step's named chips are the site's own input affordance and legitimately carry names; **no chip name survives into the object**.
+*Fail* Any app name in a rendered Baseline surface, at any width, in any state.
+*Stub check* Passes trivially with no gate rendered and on an empty app-name list — the assertion must require an assembled gate, and the list must ship non-empty (SITE-107).
+*PRD* v7.3 §6.3a, §10 MUST · *Issues* SITE-039, SITE-040, SITE-107
+
+**SITE-EVAL-075 · Input classification is deterministic and pre-generation** · `AUTO`
+*Risk* Garbage reaches `/api/plan`, or a class is assigned by the model.
+*Pass* All seven classes — `empty · unreadable · out_of_scope · vague · multi_goal · bounded · actionable` — assigned identically client and server across the fixture suite. **Zero network requests** for `empty` and `unreadable`. No class originates from model output.
+*Fail* Any client/server divergence · any fetch on unusable input · a class derived from a generated field.
+*Stub check* A classifier returning one constant passes a weak parity test; the assertion must require every class to be exercised.
+*PRD* v7.3 §6.4, §4 · *Issues* SITE-102
+
+**SITE-EVAL-076 · The clarification beat asks once** · `AUTO` `VIS`
+*Risk* One question becomes a form, or a blocked build behind an unanswered question.
+*Pass* `vague` input raises **exactly one** question per session, enforced in the state machine rather than the UI. A second `vague` submission raises none. The build proceeds within **8s** with the answer withheld.
+*Fail* A second question in one session · a build blocked past 8s · a question raised by anything other than the `vague` class.
+*Stub check* Passes trivially if no question is ever raised — the assertion must require the first question to appear.
+*PRD* v7.3 §6.4 · *Issues* SITE-103
+
+**SITE-EVAL-077 · "Is this finished?" — Q4** · `FTU`
+*Risk* §2 reads as a finished product's marketing and the participant expects something that does not exist yet.
+*Pass* **5/6** recognise it as an early beta with things still being built.
+*Fail* A participant who thinks the product is complete. This is a comprehension failure in the safer direction than the reverse, and still a failure — it means §2 failed.
+*Stub check* n/a — `FTU`, judged by a human and recorded, never inferred.
+*PRD* v7.3 §12.2 Q4 · *Issues* SITE-061, SITE-089, SITE-091
+
+**SITE-EVAL-078 · Every eval fails against a stub — §12.4** · `AUTO`
+*Risk* The standing rule stays a paragraph. An eval suite that has never been run against nothing is a suite of unknown value.
+*Pass* Every automated eval has a recorded stub result showing it **fails** on an empty implementation. The three known exposures — SITE-EVAL-021, SITE-EVAL-027, SITE-EVAL-037 — are rewritten or recorded as verified non-exposures with evidence.
+*Fail* Any eval accepted with no stub result · any eval that passes against the stub and is kept as written.
+*Stub check* This eval is the stub check. Its own failure mode is passing when the suite is empty, so it asserts a non-zero eval count.
+*PRD* v7.3 §12.4, §0.3 · *Issues* SITE-106
+
+---
+
 ## P0 VALIDATION GATE PROTOCOL
 
 **Runs once, at SITE-060 and SITE-061. P1 does not begin until it passes.**
@@ -575,6 +644,20 @@ Every P0 PRD requirement was checked against the decomposition, and every meanin
 ### Evals with no implementation owner
 
 None remaining. Every eval names at least one decomposition issue.
+
+### DS criteria with no definition — **open, blocking the DS-15/16/17 evals**
+
+PRE-1 Part B was scoped to add "evals for DS-15 through DS-18." **DS-18, DS-18a and DS-18b are
+defined in v7.3 §12.1 and their evals are written above (SITE-EVAL-071, 072, 073).
+DS-11 through DS-17 are defined in no artifact in this repository, nor in v5 or v7.2 in git
+history.** v5 defines DS-1…DS-10 and stops. v7.3 §12.1 says *"DS-1…DS-17 stand"*, and DS-15 and
+DS-17 are cited — DS-15 at §12 for the contracts drift guard (SITE-004), DS-16 in v7.2 as
+forbidding unbacked claims, DS-17 only as a range endpoint — but none is stated.
+
+**No eval was written for DS-15, DS-16 or DS-17.** Inferring a gate's definition from a citation
+is what §7 of the constitution forbids, and a gate invented here would be verified against
+nothing. This is a stop-and-report under `CLAUDE.md` §9: the definitions are needed, or
+"DS-1…DS-17 stand" is a citation of provenance rather than of authority and should say so.
 
 ### Issues with no meaningful verification
 

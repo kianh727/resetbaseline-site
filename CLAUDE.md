@@ -380,30 +380,31 @@ The `@baseline/contracts` packaging question is **resolved and no longer gating*
 produced v7.3 — §2 rebuilt as a dated status section, "What's underneath" cut, "What
 it won't do" promoted to P0.
 
-**PRE-1 Part A is complete.** Items 1, 3, 5, 6, 7, 8 and 9 are applied; item 2 was
-verified a no-op.
+**PRE-1 is complete.** Part A items 1, 3, 5, 6, 7, 8 and 9 are applied; item 2 was
+verified a no-op. **Part B (item 4) is applied** — twenty issues, nine evals, the
+critical path re-walked over all 108 and unchanged at 29.
 
 **R-2 has reported in full**, answered by the app-repo session, including the two pieces
 that were outstanding — the permission list and the export/delete specification. The
 capture check is also complete. **SP-17's entry criteria are satisfiable**, and no read
 now gates anything.
 
-**Part B / item 4 is gated on one thing: Site Author's amendment.** It is not a session's
-to write. Two findings from R-2 require a product decision before item 4 can be scoped
-against v7.3:
+**Both R-2 findings are resolved in v7.3 and built into Part B:**
 
-1. **The onboarding handoff.** App PRD §25 says Gate is **"never proposed during
-   onboarding,"** and the agent may only propose one after lighter rungs have already
-   failed for that user — impossible on day one. A builder whose loop ends in *protection*
-   therefore promises a beat the first run does not deliver. The builder's shape may have
-   to change.
-2. **FAQ 12 — export and delete.** They are **unbuilt, not unproven.** No export endpoint,
-   no deletion route in the API; `requestAccountDeletion`'s only callers are its own tests;
-   `SettingsView` renders "export data" and "delete account" as rows with no action
-   closure — inert labels. The app PRD requires both in V1 and scopes them as BAS-125, and
-   nothing implements them. **"Export and delete, both at launch" cannot ship** under
-   DS-18. A roadmap claim is supportable; the current answer is not. FAQ 12 is now blocked
-   on copy, not on a read.
+1. **The onboarding handoff — ruled, §6.1b.** App PRD §25 constrains agent *proposal* of a
+   gate, not user creation, and the builder's fourth beat is the user naming apps. The
+   fourth beat stays; the wall gains one handoff line (SITE-105). **Conditional on the
+   §15.2 read** — if a new account cannot create a gate at all on day one, protection
+   leaves the builder and the wall moves to a timer or reminder.
+2. **FAQ 12 — rewritten, not held.** Export and delete are **unbuilt, not unproven**, so
+   the answer became a roadmap one and "Export and delete" became a §2 Block 2 entry owned
+   by BAS-125 (SITE-091, SITE-095).
+
+**One live defect Part B corrected.** v5 through v7.2 specified the builder's gate object as
+`Instagram, TikTok blocked · 6:00–7:30am` — a UI state the app is structurally incapable of
+producing, because Screen Time returns opaque tokens. SITE-040 now renders `3 apps ·
+6:00–7:30am`, SITE-EVAL-074 enforces it site-wide, and SITE-107 catches it in CI. **No
+depicted Baseline UI may name an app** (v7.3 §6.3a, §10 MUST).
 
 R-2 findings bearing on site copy, recorded so they are not re-derived:
 
@@ -435,8 +436,18 @@ R-2 findings bearing on site copy, recorded so they are not re-derived:
   valve… 'leave it inconclusive' offered as a first-class, guilt-free option."* The nightly
   check-in is **off** by default and the app PRD marks that settled.
 
-The Linear population run stays halted: item 4 adds issues, so the counts in §13 are not
-final and nothing should be populated against them.
+**The Linear population run is unblocked.** PRE-1 is complete, the counts in §13 are final,
+and the team key is confirmed. Two things to carry into it: the orphan `site` label still
+exists and addendum §1.2 says delete it, and creation order is load-bearing — the team must
+be empty and issues created in strict sequence for the positional mapping to hold.
+
+**One open item Part B could not close.** PRE-1 Part B was scoped to add *"evals for DS-15
+through DS-18."* DS-18, DS-18a and DS-18b are defined in v7.3 §12.1 and their evals are
+written (SITE-EVAL-071, 072, 073). **DS-11 through DS-17 are defined in no artifact here,
+nor in v5 or v7.2 in git history** — v5 defines DS-1…DS-10 and stops, and while v7.3 §12.1
+says *"DS-1…DS-17 stand"*, DS-15, DS-16 and DS-17 are only ever cited, never stated. No eval
+was written for them; inferring a gate's definition from a citation is what §7 forbids.
+Recorded in the evals document under *DS criteria with no definition*.
 
 ---
 
@@ -463,14 +474,12 @@ milestone's phase is the project it sits in.
 The SP decomposition is fully preserved; milestones are ordered and show
 progress, which projects do not.
 
-**Issue counts are pending.** The graph as it stands is 88 — the original 84 plus
-four design review gates (SITE-085…088) defined in addendum §3, split P0 = 64,
-P1 = 18, P2 = 6. That is a floor, not a total: **PRE-1 Part B (item 4) adds issues**
-for PRD v7.3 §2's three blocks, §3, §7, §8, §9, §11, the legal routes, input
-classification, the clarification beat, held content, and the DS-15 through DS-18
-evals, and SP-17 · Website Sections carries its own. **P2 = 6 is firm**; the P0 and P1
-figures are not. Do not quote 88 as final, and do not begin the population run against
-it — recount after Part B.
+**108 issues total: P0 = 84, P1 = 18, P2 = 6.** The original 84, plus four design
+review gates (SITE-085…088) defined in addendum §3, plus PRE-1 Part B's twenty
+(SITE-089…108). **Counts are final** — Part B is applied. Creation order runs
+001…084, then 085…088, then 089…108, in strict sequence throughout.
+
+**78 evals: SITE-EVAL-001…078.** Part B added section Q — SITE-EVAL-070…078.
 
 Creation order is load-bearing. See addendum §2 before any Linear write:
 the team key is `SITE` and the team must be empty before the first issue,

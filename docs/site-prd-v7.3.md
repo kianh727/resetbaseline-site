@@ -236,6 +236,48 @@ System time to tunable plan: **p50 ~2.2s, p95 ~4.6s.**
 
 **One boundary the capture report makes load-bearing.** The builder's occurrence fan-out is site-side math. The app does not currently generate occurrences. The builder may show the structure a commitment implies; **no copy anywhere may state that the app produces those occurrences today.** That claim lives in §2 Block 2 until it passes DS-18.
 
+### 6.1a Object metadata — the Problem lines
+
+Every plan object carries its type, its authority tier, and **the app PRD's own Problem line** as 11px metadata beneath it:
+
+```
+commitment · provisional
+Thesis block · weekdays 08:00–09:30
+an intention with no occasion
+```
+
+| Primitive | Problem line |
+|---|---|
+| Commitment | an intention with no occasion |
+| Reminder | the cue arrives too late, or not at all |
+| Timer | starting is expensive; sessions run unbounded |
+| Gate | cue-driven distraction survives intention |
+| Tracker | a direction with no feedback |
+
+Verbatim from the app PRD §22–26, which is the point — this is the product's own framing of why each primitive exists, and it is sharper than anything the site had.
+
+**Placement is deliberate.** These sit inside the builder, at the moment of highest attention, where an object appearing and one line explaining what it is for does the work a feature list would do badly. A section listing five primitives would imply five *working* primitives and walk straight back into what got "What's underneath" cut.
+
+**No DS-18 exposure.** A problem statement cannot be false about build state — *"an intention with no occasion"* is true whether or not occurrence generation works. This is the only explanatory content on the site immune to the launch-state principle, which is why it carries weight the sections can't.
+
+### 6.1b The onboarding handoff
+
+R-2 established that the app PRD §25 forbids Gate being **proposed** during onboarding: the agent may only suggest one after lighter rungs have failed, which is impossible on day one.
+
+The builder ends in protection and the wall fires on Activate of a gate, so a visitor completes a four-beat flow — goal, structure, tuning, protection — and the first app run walks them through three.
+
+**Ruling: keep the fourth beat, fix the handoff.** §25 constrains *proposal*, not *possibility*; `create_gate` sits on `NEVER_AUTO_FOR_AGENT` precisely because gates are user-authorized, and the builder's fourth beat is the user naming apps — an explicit directive, not an agent suggestion. The gap is discoverability, not capability.
+
+Cutting protection would remove the demo of the thing that most demonstrably works. "The apps you named go quiet" is §2 Block 1's strongest line, and it is the one V1 capability the capture report confirmed working end to end.
+
+**The wall gains one line, shown after submit:**
+
+> Your plan is saved. When you get in, you'll set the blocking up yourself — Baseline won't do it for you on day one.
+
+Honest, sets the expectation before first launch, and turns a divergence into an instruction. It is also the only place on the page where the handoff actually happens.
+
+**This ruling is conditional on one read:** that a user can create a gate on day one at all, by directive to the agent or through the `+` sheet. If gates are unreachable for a new account entirely, the fourth beat promises something impossible, protection is cut from the builder, and the wall moves to a timer or reminder. **Tracked in §15.2.**
+
 ### 6.2 Plan model — derived, not hand-listed
 
 Handles every `capability_type` the contracts define — exactly five: `commitment · reminder · timer · gate · tracker`. Generated from `contracts-manifest.json` (§6.6) with a layout rule per type. **A type without a layout rule fails the build.**
@@ -252,6 +294,20 @@ Handles every `capability_type` the contracts define — exactly five: `commitme
 **`rescheduled`** is a **derived display value**, not a stored outcome and not an action outcome. Nothing writes it; `displayOutcome` derives it when an occurrence is `pending` and was moved, and a resolution always wins — moved then completed is `complete`. The site **may** describe it as a state a user sees. It **must not** list it alongside the five resolvable values as something the system records.
 
 **Banned entirely:** `AuthorityDecision` values (`execute · confirm · forbidden`) — rendering them alongside `provisional` puts two meanings of one word on the page · `pending` · `sensitivity_class` values and anything keyed by them · reason codes, validation errors, internal event names · user-visible confidence numbers.
+
+### 6.3a Gate copy — app selections are opaque · **MUST**
+
+**Baseline cannot read which apps a user selects.** Screen Time returns opaque tokens. The app knows a count and nothing else, and its own copy says *"3 apps blocked"* and never names an app.
+
+**This binds every present and future revision of this document:**
+
+- **No Baseline UI depicted on this site may name a specific app.** Not in the builder's gate object, not in the share card, not in a screenshot, not in §2, not in the FAQ, not in a future section.
+- **The builder's gate object renders `3 apps · 6:00–7:30am`**, matching the app. The Protect step's named chips are the *site's own input affordance* and stay — the user picks recognisable names, and the object that lands shows what the app would show.
+- §2 Block 1's *"the apps you named go quiet"* is correct and stays. The user named them; Baseline didn't read them.
+
+**This was a live defect.** v5 through v7.2 specified the gate object rendering *"Instagram, TikTok blocked · 6:00–7:30am"* — a UI state the app is structurally incapable of producing. It would have shipped a screenshot of something that cannot exist.
+
+**And the constraint is a selling point, not a limitation.** Baseline cannot see which apps you chose. That belongs in FAQ 3's expanded copy and is stronger than any privacy assurance the site could otherwise make, because it's architectural rather than promised.
 
 ### 6.4 Input handling
 
@@ -301,7 +357,7 @@ Twelve questions, plain answers under 60 words, accordion with all answers in th
 
 1. What is Baseline, in one sentence?
 2. What platforms? — *iPhone at launch. Android is not committed.*
-3. What does it need access to? — *Screen Time for gates. Notifications. Sign in with Apple. Nothing else.*
+3. What does it need access to? — *Two OS permissions. Notifications, asked once during onboarding. Screen Time, asked only when you create your first Gate — not before. Sign in with Apple to make an account. Nothing else: no camera, location, contacts, health data, or microphone.*
 4. Does it read my calendar, email, or health data? — **No. No connectors at launch.**
 5. What does it cost? — *Nothing during beta. Paid when it ships — trial, no free tier.*
 6. Is there a free version? — *The beta is free. The shipping product isn't.*
@@ -310,11 +366,15 @@ Twelve questions, plain answers under 60 words, accordion with all answers in th
 9. What if I miss days? — *Nothing. No streaks, no score, no catch-up.*
 10. What does it know about me, and can I see it? — **Held with §4.** Restore when §4 promotes.
 11. How is this different from asking ChatGPT to plan my week?
-12. Can I get my data out? — *Export and delete, both at launch.*
+12. Can I get my data out? — **Answer changed. DS-18 failure.** Export and delete are **unbuilt**, not unproven: no export endpoint, no deletion route, `requestAccountDeletion`'s only callers are its own tests, and `SettingsView` renders both as rows with no action closure — inert labels. The V1 inventory specifies both; BAS-125 is the work. *"Export and delete, both at launch"* cannot ship. The supportable answer is a roadmap one: *"Not yet. The deletion cascade is specified and every foreign key to your account is `ON DELETE CASCADE`; the routes are being built."* **"Export and delete" also becomes a §2 Block 2 entry, owning issue BAS-125.**
 
-**Every answer describing app behavior carries a DS-18 verdict.** Question 12 in particular — export and delete must be verified working, not read off the inventory. Question 8's answer is true today; question 3's permission list must be verified against what the app actually requests.
+**Every answer describing app behavior carries a DS-18 verdict.** Questions 3 and 8 are verified true today. Question 12 is a verified **false**, which is why it was rewritten rather than held — a held answer implies a pending read, and there is nothing left to read.
 
-Question 4 must be an unqualified no.
+**Two things from the permission read worth using elsewhere.** The app PRD's own line — *"Maximum OS prompts during onboarding: one. No permission carousel exists because there is nothing to stack"* — belongs in §2 Block 1 or FAQ 3's expanded copy; it is a design stance, true by absence, and cannot regress. And **the microphone is a permanent no, not a deferral** — worth stating that way rather than as an omission.
+
+Question 4 must be an unqualified no. HealthKit and Calendar are V1.1 and therefore banned from the site entirely (§10), including Block 2.
+
+**Question 1 is written from the primitives' Problem lines (§6.1a), not from marketing language.** The app's own framing — an intention with no occasion, a cue that arrives too late, starting being expensive — is sharper than anything the site has, and it describes what Baseline is *for* without claiming what it currently does.
 
 ---
 
@@ -345,6 +405,8 @@ All v5 §19 bans stand.
 An entry leaves Block 2 by passing DS-18 and moving to Block 1. It never leaves because someone decides it's close.
 
 **Post-V1 tiers — V1.1, V2, Later — remain banned outright, including from Block 2.** V1 work is what the beta is becoming; V1.1 and beyond are not what anyone is joining.
+
+**Gate copy — MUST (§6.3a):** no Baseline UI depicted anywhere on this site may name a specific app. Screen Time returns opaque tokens; the app knows a count. `3 apps blocked`, never `Instagram, TikTok blocked`. Binds every future revision.
 
 **Site-specific:** no connector logos or integration strip · the site must not read as a web version of the app · nothing generated may read `artifact_divergences` · **no screenshot of iOS's default system shield, or any other Apple-supplied UI, presented as Baseline's.**
 
@@ -431,19 +493,6 @@ Part B (item 4) — new issues for §2's three blocks, §3, §7, §8, §9, §11,
 ### PRE-2 · Ban-list copy audit
 **Owner:** site session · Automated in CI from P0 onward, failing the build on any §10 banned term; plus a manual pre-launch review, because automation catches terms and not a section that *implies* a capability without naming it.
 
-**Second check, same job: no copy string names an app.** App selections are opaque tokens the app cannot read — an app-PRD MUST. Copy says *"3 apps blocked"* and never names one, because naming one is a claim the product cannot make true. The build fails on any match of a committed app-name list against any authored copy string, site-wide.
-
-Four things this check must get right, each of them a way the constraint fails in practice:
-
-- **It is site-wide, not Gate-scoped.** The failure mode is a later rewrite of a line that reads correctly today. A check that only looks at strings currently near Gate copy does not catch it, and a recorded note catches it even less — which is why this is a CI check rather than a paragraph.
-- **The list is committed and versioned**, and adding to it is a copy decision, not a lint tweak. It covers the apps a Gate is plausibly created against and their common short forms and rebrands; a name that becomes checkable only after it appears in copy is a check that already failed once.
-- **A match is a failure, never a warning.** The §10 term check fails the build; so does this. An allowlist entry for a legitimate use — the App Store, iOS, Apple as the platform — is written into the list as an explicit exception, not granted by suppressing the check at the call site.
-- **The list ships non-empty**, seeded with the apps most likely to appear in a draft: the social and video ones a writer reaches for. **An empty list fails nothing, and a check that passes on absence is §0.3's own rule turned on itself.** A first commit of the list that catches nothing is not a starting point; it is the defect this check exists to prevent, shipped as infrastructure.
-
-**Decided: hand-maintained in the site repo, with the staleness treatment.** Same shape as the contracts manifest (§6.6) and the same answer. The list carries a `captured_at`; CI **warns at 90 days and fails at 180**; the failure message says what to do. The thresholds are longer than §6.6's 30/60 deliberately — app names move slower than a contract does.
-
-**Not a fetched source.** There is no authoritative list of app names to fetch, and inventing one would be a mechanism nobody asked for. The honest version is the one stated plainly: this list is maintained by hand, it will go stale, and **the staleness is visible rather than silent.** That is the whole of what the treatment buys, and it is enough.
-
 ---
 
 ## 15. Open items
@@ -460,6 +509,7 @@ Four things this check must get right, each of them a way the constraint fails i
 
 - **R-2** — app PRD §14–26 bodies and the onboarding spec. Onboarding matters most: if the site's builder and the app's onboarding diverge in shape, the handoff from wall to first launch feels like two products.
 - **Weekly review** — in the V1 inventory, section not located. Needs a DS-18 verdict before appearing anywhere.
+- **Day-one gate reachability** — can a new account create a gate at all, by directive or through the `+` sheet? **The §6.1b ruling is conditional on this.** If no, the builder's fourth beat is cut and the wall moves to a timer or reminder.
 
 ### 15.3 Decisions
 
@@ -474,11 +524,12 @@ Four things this check must get right, each of them a way the constraint fails i
 
 §2's three blocks, §3's four refusals, twelve FAQ answers, §7, §9, and `docs/site-copy/roadmap-source.md`. Specified structure with example text; not final prose.
 
-### 15.5 Two findings for the app, not the site
+### 15.5 Findings for the app, not the site
 
-Surfaced by the capture check, neither a website problem:
+Surfaced by the capture check and the FAQ reads. None is a website problem:
 
 - **The own-words gate coach has no target and was unfiled until the capture report.** The app PRD specifies it in V1.
+- **`SettingsView` renders "export data" and "delete account" as rows with no action closure.** Inert labels that do nothing when tapped. Worse than absent — a user believes the control exists. BAS-125.
 - **Occurrence generation returns 200 while producing zero occurrences.** The user is told it worked. A commitment with no occurrences has no resolution cascade, no resolution card, and no adherence record — that reaches considerably further than this website.
 
 ---

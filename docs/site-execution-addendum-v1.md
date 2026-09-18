@@ -28,17 +28,18 @@ Reason: milestones are ordered and show progress; projects are not ordered. The 
 
 | Project | Milestones | Issues |
 |---|---|---|
-| **Website P0 — Interactive Builder** | SP-01 … SP-11, **SP-17** | pending item 4 |
-| **Website P1 — The Peak** | SP-12 … SP-15 | pending item 4 |
+| **Website P0 — Interactive Builder** | SP-01 … SP-11, **SP-17** | SITE-001 – SITE-061, SITE-085 – 087, SITE-089 – SITE-108 |
+| **Website P1 — The Peak** | SP-12 … SP-15 | SITE-062 – SITE-078, plus SITE-088 |
 | **Website P2 — Signature Polish** | SP-16 | SITE-079 – SITE-084 |
 
 **SP-17 is P0 despite its number.** Milestone numbering is append-only; phase is set by
 the project a milestone sits in, never by its number. SP-17 sits in Website P0.
 
-**Counts are pending PRE-1 item 4.** v7.3 moved §4 "What Baseline knows" from P0 to P1
-held content, replaced §2 with a status section, cut "What's underneath" entirely,
-promoted §3 "What it won't do" from P1 to P0, and added SP-17. DS-18 and §12.4 each need
-an owning issue. P2 = 6 is firm. Do not populate Linear against any other figure.
+**Counts are final. PRE-1 item 4 is applied.** v7.3 moved §4 "What Baseline knows" from P0
+to P1 held content, replaced §2 with a status section, cut "What's underneath" entirely,
+promoted §3 "What it won't do" from P1 to P0, and added SP-17. Part B added **SITE-089 …
+SITE-108** — twenty P0 issues — giving DS-18 and §12.4 their owning issues (SITE-108,
+SITE-106) and PRE-2 its CI job (SITE-107). **Populate Linear against these figures.**
 
 Each milestone's description is the corresponding SP block from the decomposition verbatim — purpose, dependencies, entry, exit, PRD refs, non-goals.
 
@@ -54,7 +55,7 @@ Delete the orphan `site` label left by the failed session. Team membership scope
 
 Linear auto-numbers issues on creation and does not zero-pad.
 
-- **Create SITE-001 through SITE-084 in strict sequential order**, then SITE-085 through SITE-088 last.
+- **Create SITE-001 through SITE-084 in strict sequential order**, then SITE-085 through SITE-088, then **SITE-089 through SITE-108** (PRE-1 Part B). Strict sequence throughout — the positional mapping holds for all 108.
 - **Create nothing else on the `SITE` team first.** A single scratch issue offsets every subsequent number by one.
 - Decomposition `SITE-001` maps to Linear `SITE-1`. `SITE-084` maps to `SITE-84`. The mapping is positional, not literal.
 - **Set the team key to `SITE` before creating anything.** Linear derives the key from the team name — "ResetBaseline Site" will likely produce `RES`. Renaming a key after issues exist renumbers all of them.
@@ -97,7 +98,7 @@ Project P1 · Milestone SP-14 · Blocks SITE-074 · Depends SITE-073
 *Failure* K-1 or K-3 fires — simplify the Peak or adjust geometry; plan readability wins.
 *PRD* §7, §17 K-1/K-3, SITE-EVAL-061, SITE-EVAL-062 · *Label* `design-review`
 
-**Total issues: 88 as the graph stands** — P0 = 64 · P1 = 18 · P2 = 6. **Pending, not final:** PRE-1 Part B adds issues and SP-17 carries its own (§1.1). Recount before the population run.
+**Total issues: 108.** P0 = 84 · P1 = 18 · P2 = 6. The original 84, plus the four design review gates (SITE-085…088), plus PRE-1 Part B's twenty (SITE-089…108).
 
 ---
 
