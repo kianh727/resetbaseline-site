@@ -1032,7 +1032,7 @@ SITE-001 scaffold
   → SITE-062 mesh → SITE-063 light → SITE-068 projection → SITE-071 stations
 ```
 
-> **Longest chain: 29 issues — walked, not read.**
+> **Longest chain: 29 issues — walked, not read. A floor, not a final figure.**
 >
 > **Do not recount this from the block above.** That block is a narrative
 > presentation of the critical path, not the dependency graph, and counting it
@@ -1049,6 +1049,14 @@ SITE-001 scaffold
 > SITE-088 fall on the longest path; SITE-085 and SITE-086 add real edges that do
 > not lengthen it, because the path does not run through SITE-027 or SITE-053.
 > Depth to the P0 gate (SITE-061) is 20, up from 19.
+>
+> **29 is a floor.** It is the walked length of the graph as it stands — the
+> original 84 plus the four review gates. PRE-1 Part B (item 4) adds issues for
+> PRD v7.3 §2's three blocks, §3, §7, §8, §9, §11, the legal routes, input
+> classification, the clarification beat, held content, and the DS-15 through
+> DS-18 evals. Those carry their own edges. **Re-walk after Part B lands**, by
+> the same method — from the `Deps` lines, not from the block above — and replace
+> this figure rather than adjusting it.
 
 Everything not on the longest chain can parallelize.
 

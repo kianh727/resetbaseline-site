@@ -22,7 +22,9 @@ Claude's Linear connector authenticates one workspace at a time, and both the ap
 
 ### 1.1 Projects and milestones
 
-The SP-01…SP-16 decomposition is **fully preserved**. It becomes three projects with sixteen milestones rather than sixteen projects.
+The SP-01…SP-16 decomposition is **fully preserved**. It becomes three projects with milestones rather than sixteen projects.
+
+**The milestone and issue counts in this section are pending.** SP-17 is added by PRE-1 Part A item 7, and PRE-1 Part B (item 4) adds issues for PRD v7.3 §2's three blocks, §3, §7, §8, §9, §11, the legal routes, input classification, the clarification beat, held content, and the DS-15 through DS-18 evals. The table below describes the graph as it stands, not as it will be populated. **Recount before the Linear population run.**
 
 Reason: milestones are ordered and show progress; projects are not ordered. The SP structure has always been a sequence. Three projects also make the P0 gate a visible state — the P1 project stays in Backlog until the P0 project is Completed — instead of a convention someone has to remember.
 
@@ -89,7 +91,7 @@ Project P1 · Milestone SP-14 · Blocks SITE-074 · Depends SITE-073
 *Failure* K-1 or K-3 fires — simplify the Peak or adjust geometry; plan readability wins.
 *PRD* §7, §17 K-1/K-3, SITE-EVAL-061, SITE-EVAL-062 · *Label* `design-review`
 
-**Total issues: 88.** P0 = 64 · P1 = 18 · P2 = 6.
+**Total issues: 88 as the graph stands** — P0 = 64 · P1 = 18 · P2 = 6. **Pending, not final:** PRE-1 Part B adds issues and SP-17 carries its own (§1.1). Recount before the population run.
 
 ---
 
