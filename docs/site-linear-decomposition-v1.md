@@ -142,6 +142,45 @@ Governing principle, encoded in every priority and dependency below:
 
 ---
 
+### SP-17 · Website Sections — **P0**
+
+**Project** Website P0 — Interactive Builder
+**Purpose** The sections that make this a website rather than a demo: §2 "Where Baseline
+is right now", §3 "What it won't do", §7 Pricing, §8 FAQ, §9 Who's building this,
+§10 Join, §11 Footer, plus `/pricing`, `/faq`, `/privacy`, `/terms`, metadata and the OG
+card.
+**Priority** P0
+**Dependencies** SP-01 (tokens, type scale, base layout). SP-08 for §10 Join, which
+renders the capture form SP-08 implements — the section is SP-17's, the capture is
+SP-08's. Otherwise parallelizable with the builder milestones; these sections share no
+code with the builder.
+**Entry criteria** Tokens, type scale and base layout merged. Capture check reported
+(complete). **R-2 reported** — FAQ answers 3 and 12 depend on the app PRD's permission
+list and export/delete specification, and no FAQ copy is written before it lands.
+**Exit criteria** Every P0 section renders at 1440px and 375px. Every claim describing
+app behavior carries a dated DS-18 verdict naming its verifying issue. Every §2 Block 2
+entry names a real owning issue and states no date (DS-18a). §2 carries a visible date
+and its blocks reflect current build state (DS-18b). All four routes render and are
+linked from the footer. No Apple-supplied UI appears as Baseline's.
+**PRD** v7.3 §3, §4, §7, §8, §9, §10, §12 DS-18 / DS-18a / DS-18b
+**Non-goals**
+- **§4 "What Baseline knows" is held content, not scheduled work.** It is gated on
+  belief accumulation working on a real account (v7.3 §15.1) and until then appears only
+  as a §2 Block 2 roadmap entry. It is not in SP-17's scope and it is not in any
+  milestone's scope while held — when its gate clears it lands in SP-14. Do not schedule
+  it.
+- §5 Day 1 → Day 30 and §6 Method are P1 and belong to SP-14.
+- **"What's underneath" does not exist.** It was cut in v7.3; its surviving rows moved
+  into §2 Block 1, §2 Block 2, and §3. Any issue or reference to it is stale.
+- No copy is written before R-2 reports. Held and roadmap content lives in
+  `docs/site-copy/roadmap-source.md`.
+
+**Milestone ordering note:** SP-17 is numbered after SP-16 because milestone numbering is
+append-only, but it is a **P0 milestone in the Website P0 — Interactive Builder project**
+and runs alongside SP-02…SP-10, not after SP-16.
+
+---
+
 ### SP-12 · Peak Geometry + Lighting — **P1**
 
 **Purpose** The mesh, the light rig, cursor authority, and the material that makes it read machined rather than photographed.

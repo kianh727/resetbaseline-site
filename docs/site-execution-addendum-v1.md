@@ -22,17 +22,23 @@ Claude's Linear connector authenticates one workspace at a time, and both the ap
 
 ### 1.1 Projects and milestones
 
-The SP-01…SP-16 decomposition is **fully preserved**. It becomes three projects with milestones rather than sixteen projects.
-
-**The milestone and issue counts in this section are pending.** SP-17 is added by PRE-1 Part A item 7, and PRE-1 Part B (item 4) adds issues for PRD v7.3 §2's three blocks, §3, §7, §8, §9, §11, the legal routes, input classification, the clarification beat, held content, and the DS-15 through DS-18 evals. The table below describes the graph as it stands, not as it will be populated. **Recount before the Linear population run.**
+The SP-01…SP-16 decomposition is **fully preserved**. It becomes three projects with milestones rather than sixteen projects, plus SP-17.
 
 Reason: milestones are ordered and show progress; projects are not ordered. The SP structure has always been a sequence. Three projects also make the P0 gate a visible state — the P1 project stays in Backlog until the P0 project is Completed — instead of a convention someone has to remember.
 
 | Project | Milestones | Issues |
 |---|---|---|
-| **Website P0 — Interactive Builder** | SP-01 … SP-11 | SITE-001 – SITE-061, plus SITE-085, 086, 087 |
-| **Website P1 — The Peak** | SP-12 … SP-15 | SITE-062 – SITE-078, plus SITE-088 |
+| **Website P0 — Interactive Builder** | SP-01 … SP-11, **SP-17** | pending item 4 |
+| **Website P1 — The Peak** | SP-12 … SP-15 | pending item 4 |
 | **Website P2 — Signature Polish** | SP-16 | SITE-079 – SITE-084 |
+
+**SP-17 is P0 despite its number.** Milestone numbering is append-only; phase is set by
+the project a milestone sits in, never by its number. SP-17 sits in Website P0.
+
+**Counts are pending PRE-1 item 4.** v7.3 moved §4 "What Baseline knows" from P0 to P1
+held content, replaced §2 with a status section, cut "What's underneath" entirely,
+promoted §3 "What it won't do" from P1 to P0, and added SP-17. DS-18 and §12.4 each need
+an owning issue. P2 = 6 is firm. Do not populate Linear against any other figure.
 
 Each milestone's description is the corresponding SP block from the decomposition verbatim — purpose, dependencies, entry, exit, PRD refs, non-goals.
 

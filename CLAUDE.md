@@ -366,8 +366,7 @@ the change it describes.**
   it purges. No `BAS-*` issue was touched.
 - The orphan `site` label **still exists** (`9b479485-c776-476e-a0f1-322e0040a9c7`).
   Addendum §1.2 says delete it.
-- The addendum's three projects and its milestones **do not exist yet**. The
-  milestone count is **pending** — see §13.
+- The addendum's three projects and its seventeen milestones **do not exist yet**.
 
 > **Blocker — the team key, unconfirmed.** Addendum §2 requires key `SITE`. The key
 > was observed as **`SIT`** (Linear derives it from the team name), a UI correction
@@ -395,13 +394,16 @@ The `@baseline/contracts` packaging question is **resolved and no longer gating*
 produced v7.3 — §2 rebuilt as a dated status section, "What's underneath" cut, "What
 it won't do" promoted to P0.
 
-What now stands in front of the population run is **PRE-1 Part A v2** (items 1, 3,
-5, 6, 7, 8, 9 — item 2 is a no-op), then **Part B / item 4**. Items 1, 3, 5, 6, 8
-and 9 have been applied. **Item 7 (the SP-17 milestone) has not**, and the Part A v2
-patch specifying it is not in this repository: its milestone name, project, entry,
-exit and dependencies are not recoverable from the applied text, and they were not
-invented here. Item 7 needs the patch resent before Part A can be called complete.
-Part B is gated only on Part A v2 landing, no longer on the capture check.
+**PRE-1 Part A is complete.** Items 1, 3, 5, 6, 7, 8 and 9 are applied; item 2 was
+verified a no-op.
+
+**The halt now sits at PRE-1 Part B / item 4**, and Part B is gated on **R-2**, which
+has not reported. R-2 is the app PRD §14–26 bodies and the onboarding spec (v7.3 §15.2).
+FAQ answers 3 and 12 depend on its permission list and export/delete specification, and
+SP-17's entry criteria require it before any copy is written. The capture check is
+complete and no longer gates anything. **The Linear population run stays halted** — Part
+B adds issues, so the counts in §13 are not final and nothing should be populated
+against them.
 
 ---
 
@@ -421,9 +423,10 @@ on every context switch.
 | Site repo | `kianh727/resetbaseline-site` |
 
 Structure: three projects (Website P0 — Interactive Builder, Website P1 — The
-Peak, Website P2 — Signature Polish) containing the milestones SP-01…SP-16, **plus
-SP-17 once PRE-1 Part A item 7 lands.** The milestone count is **pending** until it
-does.
+Peak, Website P2 — Signature Polish) containing seventeen milestones SP-01…SP-17.
+SP-17 · Website Sections is P0 and sits in Website P0 — Interactive Builder alongside
+SP-01…SP-11. Milestone numbering is append-only and does not indicate phase — a
+milestone's phase is the project it sits in.
 The SP decomposition is fully preserved; milestones are ordered and show
 progress, which projects do not.
 
@@ -432,8 +435,9 @@ four design review gates (SITE-085…088) defined in addendum §3, split P0 = 64
 P1 = 18, P2 = 6. That is a floor, not a total: **PRE-1 Part B (item 4) adds issues**
 for PRD v7.3 §2's three blocks, §3, §7, §8, §9, §11, the legal routes, input
 classification, the clarification beat, held content, and the DS-15 through DS-18
-evals, and SP-17 carries its own. Do not quote 88 as final, and do not begin the
-population run against it — recount after Part B.
+evals, and SP-17 · Website Sections carries its own. **P2 = 6 is firm**; the P0 and P1
+figures are not. Do not quote 88 as final, and do not begin the population run against
+it — recount after Part B.
 
 Creation order is load-bearing. See addendum §2 before any Linear write:
 the team key must be `SITE` and the team must be empty before the first issue,
