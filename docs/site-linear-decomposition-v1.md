@@ -10,8 +10,9 @@
 > **milestones** inside three projects. Read the addendum first.
 >
 > Everything else here — all 84 issue scopes, acceptance criteria, tests,
-> verification requirements, the dependency graph, and the critical path —
-> stands unchanged.
+> verification requirements, and the dependency graph of the original 84 issues —
+> stands unchanged. The four review gates in addendum §3 add four edges and the
+> critical path has been re-walked.
 
 Derived from `docs/site-prd-v7.2.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
 
@@ -224,14 +225,14 @@ Project SP-01 · P0 · Deps SITE-002
 *PRD* §14, §23 item 3
 *Non-goals* No body copy typesetting yet.
 
-**SITE-004 · Contracts package wiring and drift guard**
+**SITE-004 · Contracts manifest, generated types, and drift guard**
 Project SP-01 · P0 · Deps SITE-001
-*Scope* Import `@baseline/contracts`. Re-export `AgentEvent`, action verbs, object types, enums, authority tiers. Add a CI check that fails the build on contract drift.
-*Accept* Deliberately altering a contract type fails CI.
-*Tests* CI: typecheck against contracts. One negative test proving the guard fires.
+*Scope* Commit `contracts-manifest.json` to the site repo — the app's `CONTRACT_MANIFEST` verbatim, plus `captured_at` and the app repo commit SHA. Generate the site's plan-model types from it at build time. Add a CI drift check per PRD v7.2 §6.6: the primary mechanism fetches the manifest the app repo publishes to a stable path on `main` and fails the site build on any diff; the fallback uses staleness thresholds against `captured_at` — warn at 30 days, fail at 60.
+*Accept* Types generate from the manifest. A deliberately altered manifest fails CI. Every `capability_type` in the manifest has a layout rule; a type without one fails the build.
+*Tests* CI: type generation; one negative test proving the drift guard fires. Unit: layout-rule coverage across all `capability_type` values.
 *Verify* —
-*PRD* §12, §18.2
-*Non-goals* No provider implementation.
+*PRD* v7.2 §6.2, §6.6, §12 DS-15
+*Non-goals* No `@baseline/contracts` package import. No cross-repo build of the app — explicitly rejected in §6.6. **Nothing generated may read `artifact_divergences`**, which records stale counts (33 and 72) against current counts (45 and 76) in the same object.
 
 **SITE-005 · Base layout, nav, safe areas, overflow guards**
 Project SP-01 · P0 · Deps SITE-002, SITE-003
@@ -458,7 +459,7 @@ Project SP-05 · P0 · Deps SITE-004, SITE-020
 
 **SITE-028 · Five authored scenarios**
 Project SP-05 · P0 · Deps SITE-027
-*Scope* `thesis`, `gym`, `lsat`, `mornings`, `back` per §5, authored against frozen contracts. Every verb in the closed vocabulary; every enum real; occurrence counts from the real generator.
+*Scope* `thesis`, `gym`, `lsat`, `mornings`, `back` per §5, authored against frozen contracts. Every verb drawn from the 45 action types in `contracts-manifest.json`; every enum value real; occurrence counts from the real generator. Scenarios use only the five `capability_type` values — `commitment · reminder · timer · gate · tracker` — and only the five resolvable outcomes (`complete · partial · missed · cancelled_intentionally · unknown`).
 *Accept* All five validate against contract schema. Each demonstrates its stated distinct behavior.
 *Tests* Automated: schema validation of all five; assertion that each contains its signature behavior (veto, refusal, timer, gate-first, long-horizon).
 *Verify* **Play all five end to end and review.** These are demo scripts, not filler.
@@ -476,7 +477,7 @@ Project SP-05 · P0 · Deps SITE-028
 
 **SITE-030 · `/api/plan` route and prompt**
 Project SP-05 · P0 · Deps SITE-028
-*Scope* Edge route calling Claude. Constrained system prompt, few-shot on the five scenarios, closed action vocabulary, JSON only, `max_tokens: 1000`, 300-char input cap.
+*Scope* Edge route calling Claude. Constrained system prompt, few-shot on the five scenarios, action vocabulary restricted to the 45 types in `contracts-manifest.json`, JSON only, `max_tokens: 1000`, 300-char input cap.
 *Accept* **Total generated surface is one commitment title (≤48 chars) and one window selection from a closed set.** Nothing else.
 *Tests* Automated: prompt-output contract test over 30 varied inputs; assertion that no other field originates from the model.
 *Verify* —
@@ -1015,20 +1016,34 @@ SITE-001 scaffold
   → SITE-015 transformation frame → SITE-016 progressive fill
   → SITE-020 plan model → SITE-021 PlanLayout → SITE-022 FlatLayout
   → SITE-023 occurrence generator → SITE-025 route + marks
+  → SITE-026 objects → SITE-085 flat demo design review
   → SITE-027 provider interface → SITE-028 scenarios → SITE-029 StaticProvider
   → SITE-030 /api/plan → SITE-031 validation → SITE-032 timeout
   → SITE-033 fallback orchestration
   → SITE-037 live regeneration
   → SITE-040 gate assembly → SITE-042 activation trigger
   → SITE-043 wall → SITE-046 capture
-  → SITE-050 instrumentation
+  → SITE-050 instrumentation → SITE-052 funnel
+  → SITE-086 builder loop review
   → SITE-053 mobile pass → SITE-059 failure sweep
-  → SITE-060 DS verification → SITE-061 user study
+  → SITE-060 DS verification → SITE-087 pre-gate composition review
+  → SITE-061 user study
   ══════════ P1 GATE ══════════
   → SITE-062 mesh → SITE-063 light → SITE-068 projection → SITE-071 stations
 ```
 
-**Longest chain: 27 issues.** Everything not on it can parallelize.
+**Longest chain: 29 issues**, walked across all 88 rather than counted off the block
+above. Everything not on it can parallelize.
+
+The block above is a narrative presentation, not the dependency graph. The true
+longest path is SITE-001 → 004 → 020 → 021 → 022 → 025 → 035 → 037 → 039 → 040 →
+041 → 042 → 043 → 044 → 047 → 050 → 052 → 060 → **087** → 061 → 062 → 067 → 068 →
+070 → 071 → 072 → 073 → **088** → 074.
+
+Of the four review gates only SITE-087 and SITE-088 fall on it. SITE-085 and
+SITE-086 add real edges that do not lengthen the longest path, because it does not
+run through SITE-027 or SITE-053. Depth to the P0 gate (SITE-061) is 20, up from 19.
+The pre-gate figure was 26, not the 27 previously documented.
 
 ### Dependency rules, encoded
 
@@ -1043,6 +1058,13 @@ SITE-001 scaffold
 - **Flat rendering first-class** — SITE-022 is the reference implementation and is reviewed as a standalone demo; SITE-058 proves the full loop with WebGL off.
 - **Projection reuses the model** — SITE-068 asserts the builder module graph is unchanged on adapter swap.
 - **P2 never blocks** — SP-16 depends on SP-14 and SP-15 and gates nothing.
+- **Design review gates add four edges not present in the original 84** (addendum §3):
+  SITE-085 depends on SITE-026 and blocks SITE-027 ·
+  SITE-086 depends on SITE-052 and blocks SITE-053 ·
+  SITE-087 depends on SITE-060 and blocks SITE-061 ·
+  SITE-088 depends on SITE-073 and blocks SITE-074.
+  These must be created in Linear. The decomposition's original "unchanged graph"
+  language predates them and is corrected in item 6.
 
 ### Recommended implementation order
 
@@ -1078,7 +1100,7 @@ SITE-079 through SITE-084. Ships or gets cut when P0 and P1 pass (K-7). Explicit
 
 ### Unresolved decomposition questions
 
-1. **Does `@baseline/contracts` publish consumably today?** SITE-004 assumes the app's generated types can be imported by a separate repo. If not, an unplanned packaging issue precedes the entire tree.
+1. **`@baseline/contracts` packaging — resolved, no longer blocking.** The site consumes `contracts-manifest.json` rather than importing the package (PRD v7.2 §6.6). Four packaging blockers exist in the app repo (`private: true`, `dist/` gitignored and untracked, no `files` field, `tsconfig` extends outside the package) with **zero code coupling** — the package has no workspace-relative runtime imports. Publishing properly remains worth doing and remains Kian's decision; it is informational for this tree, not gating. **One app-repo change is still required for the drift check's primary mechanism** — the app publishing its manifest to a stable path on `main`. See §6.6 for the fallback if that change isn't made.
 2. **Six users for SITE-061 within a reasonable window** — the gate is only as good as recruitment. Sourcing is unspecified.
 3. **`raw_goal` retention policy** — §11.5 captures it and §10 excludes it from analytics, but the PRD sets no retention period. Likely needs a privacy-page line, which touches SITE-074.
 4. **Whether Tier B mobile gets the Peak at all** is PRD open decision 5, resolved by post-launch data — so SITE-077 may become obsolete. Built anyway; cheap to remove.

@@ -111,12 +111,12 @@ This preserves verification granularity while removing ceremony from twenty-minu
 
 ## 5. Cross-team dependency — the thing consolidation buys
 
-SITE-004 assumes `@baseline/contracts` can be imported by a separate repo. **This is unverified** and it sits upstream of the entire site tree (decomposition open question 1).
+SITE-004 no longer imports `@baseline/contracts` — it consumes `contracts-manifest.json` (PRD v7.2 §6.6), so the packaging question is resolved and is not gating this tree (decomposition open question 1). What remains is the drift check's primary mechanism, which needs the app repo to publish its manifest to a stable path on `main`.
 
 Because both teams now share a workspace, this becomes a real link rather than a note:
 
-1. Open a `BAS` issue: *"Publish `@baseline/contracts` consumably for external repos"* — describe the requirement, don't propose a mechanism.
-2. Mark it as **blocking SITE-004**, cross-team.
+1. Open a `BAS` issue: *"Publish `CONTRACT_MANIFEST` to a stable path on `main` for external consumers"* — describe the requirement, don't propose a mechanism.
+2. Mark it as **related to SITE-004**, cross-team. It does **not** block SITE-004: the issue ships with the staleness fallback in §6.6 if the app-repo change doesn't land.
 3. Surface it to Kian. **Do not resolve it independently and make no write toward `kianh727/baselinev1`.**
 
 ---
@@ -133,6 +133,6 @@ Because both teams now share a workspace, this becomes a real link rather than a
 
 ## 7. Explicitly unchanged
 
-The PRD in full. All 84 original issue scopes, acceptance criteria, tests, and verification requirements. The dependency graph and critical path. The P0 gate thresholds (5/6 wall, 4/6 tune, 5/6 comprehension) — **a failed gate revises the builder and never lowers the bar.** All 69 evals. Performance budgets. Motion spec. Copy and scene bans. Scope-kill rules K-1 through K-7. P2 blocking nothing.
+The PRD in full. All 84 original issue scopes, acceptance criteria, tests, and verification requirements. The dependency graph of the original 84 issues. The four review gates in §3 add four new edges; the critical path has been re-walked and the original "longest chain" figure was stale. The P0 gate thresholds (5/6 wall, 4/6 tune, 5/6 comprehension) — **a failed gate revises the builder and never lowers the bar.** All 69 evals. Performance budgets. Motion spec. Copy and scene bans. Scope-kill rules K-1 through K-7. P2 blocking nothing.
 
 **The builder is the product demo. The Peak is atmosphere. When they conflict, the builder wins.**

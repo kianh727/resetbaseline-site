@@ -192,7 +192,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 
 **SITE-EVAL-021 · Valid response path** · `AUTO`
 *Steps* 30 varied inputs through `/api/plan`.
-*Pass* All validate; commitment title ≤48 chars; window from the closed set; **no other field originates from the model**.
+*Pass* All validate; commitment title ≤48 chars; window from the closed set; action types restricted to the 45 in `contracts-manifest.json`; **no other field originates from the model**.
 *Fail* Any model-authored date, count, tier, refusal, or copy string.
 *PRD* §4, §12 · *Issues* SITE-030, SITE-031
 
@@ -233,7 +233,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 **SITE-EVAL-027 · Authored scenarios demonstrate distinct behaviors** · `VIS` `AUTO`
 *Risk* Five scenarios that all look like the same habit demo.
 *Steps* Run all five end to end.
-*Pass* Each visibly demonstrates its assigned behavior — `thesis` grounded-only refusal and long horizon · `gym` contention veto and anti-streak · `lsat` timer and explicit gate · `mornings` gate-first · `back` bounded refusal then process. All five validate against contracts.
+*Pass* Each visibly demonstrates its assigned behavior — `thesis` grounded-only refusal and long horizon · `gym` contention veto and anti-streak · `lsat` timer and explicit gate · `mornings` gate-first · `back` bounded refusal then process. All five validate against contracts. Every action verb is one of the 45 in `contracts-manifest.json`; every rendered outcome is one of the five resolvable values (`complete · partial · missed · cancelled_intentionally · unknown`) — `pending` must not appear, and `rescheduled` must not appear as a recorded outcome (PRD v7.2 §6.3 permits it only as a derived display state).
 *Fail* Two scenarios indistinguishable in output shape.
 *PRD* §5 · *Issues* SITE-028
 
