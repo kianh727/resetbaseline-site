@@ -12,21 +12,24 @@ do.
 
 ---
 
-## 1. Canonical artifacts
+## 1. Artifact precedence
 
-Three documents. They are the requirements. Nothing else is.
+1. `docs/site-prd-v5.md` — product truth
+2. `docs/site-execution-addendum-v1.md` — execution structure, authoritative over
+   the decomposition for Linear organization, issue numbering, PR policy, and the
+   design review gates. Silent on everything else.
+3. `docs/site-linear-decomposition-v1.md` — execution truth
+4. `docs/site-evals-v1.md` — verification truth
 
-| Tier | Artifact | Path | Governs |
-|---|---|---|---|
-| 1 | **Site PRD v5** | `docs/site-prd-v5.md` | **Product truth** — behavior, UX, scope, copy, acceptance criteria |
-| 2 | **Site Linear decomposition v1** | `docs/site-linear-decomposition-v1.md` | **Execution truth** — projects, issues, dependencies, sequencing |
-| 3 | **Site evals v1** | `docs/site-evals-v1.md` | **Verification truth** — what "done" is proved against |
+A lower artifact never overrides a higher one. A material contradiction between
+artifacts is a stop-and-report, never resolved in code.
 
-All three are stored verbatim as approved. They are amended deliberately, never
+The addendum is a tooling change only. It changes nothing about the website:
+same product story, builder, motion spec, conversion strategy, performance
+budgets, acceptance criteria, evals, gates, and quality bar.
+
+All four are stored verbatim as approved. They are amended deliberately, never
 edited in passing during implementation.
-
-**Where they conflict, the higher tier wins: PRD → decomposition → evals.** Each
-document says this of itself, and they agree.
 
 Two standing rules:
 
@@ -343,3 +346,38 @@ scaffold, no Linear project.** SITE-001 has not begun.
 The first real question in front of this repository is not SITE-001 — it is the
 `@baseline/contracts` packaging decision in §2, which SITE-004 depends on and which
 the entire tree sits behind.
+
+---
+
+## 13. Linear
+
+Both the app and the site live in the `baselineagent` workspace, separated by
+team. Claude's Linear connector authenticates one workspace at a time and both
+are in active development, so a separate site workspace would mean reconnecting
+on every context switch.
+
+| | |
+|---|---|
+| Workspace | `baselineagent` |
+| App team | `Baseline` / `BAS` — out of bounds, see below |
+| Site team | `ResetBaseline Site` / key `SITE` |
+| App repo | `kianh727/baselinev1` — out of bounds |
+| Site repo | `kianh727/resetbaseline-site` |
+
+Structure: three projects (Website P0 — Interactive Builder, Website P1 — The
+Peak, Website P2 — Signature Polish) containing sixteen milestones SP-01…SP-16.
+The SP decomposition is fully preserved; milestones are ordered and show
+progress, which projects do not.
+
+**88 issues total: P0 = 64, P1 = 18, P2 = 6.** The original 84 plus four design
+review gates (SITE-085…088) defined in addendum §3.
+
+Creation order is load-bearing. See addendum §2 before any Linear write:
+the team key must be `SITE` and the team must be empty before the first issue,
+issues are created in strict sequential order, and decomposition `SITE-001`
+maps to Linear `SITE-1` positionally — Linear does not zero-pad.
+
+Never create, modify, move, close, reopen, or delete a `BAS-*` issue or an app
+project. The one sanctioned cross-team action is opening the
+`@baseline/contracts` packaging blocker described in addendum §5, which
+requires asking first.
