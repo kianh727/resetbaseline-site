@@ -364,20 +364,41 @@ Seven, from PRD §22. Any of these in a diff is a defect, not a tradeoff.
 ## 12. Current state
 
 The repository is initialized: the four artifacts and this file. **No code, no
-scaffold.** SITE-001 has not begun.
+scaffold.** SITE-001 has not begun — but Linear is now fully populated and it is the
+next thing to start.
 
-**Linear — verified 2026-09-18.** This section is load-bearing for a fresh session
+**Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**
 
-- A site team **exists**, named `SITE` (`58f71935-70d1-49c0-83ce-7535d8ece6de`),
-  created by hand. It holds **zero issues**.
+- **The population run is complete.** Team `SITE`
+  (`58f71935-70d1-49c0-83ce-7535d8ece6de`) holds **108 issues, `SITE-1` … `SITE-108`,
+  contiguous with no gaps and nothing else** — verified by listing all 108 after the
+  run. The positional mapping held exactly: decomposition `SITE-001` → Linear
+  `SITE-1`, `SITE-084` → `SITE-84`, `SITE-108` → `SITE-108`.
+- **Three projects and seventeen milestones exist.** Website P0 — Interactive Builder
+  (SP-01…SP-11, SP-17) · Website P1 — The Peak (SP-12…SP-15) · Website P2 — Signature
+  Polish (SP-16). Each milestone's description is its SP block from the decomposition.
+- **Seven labels created** — `builder` `peak` `mobile` `analytics` `reliability`
+  `a11y` `design-review`. The orphan `site` label is **retired**
+  (`9b479485-c776-476e-a0f1-322e0040a9c7`); the MCP server has no delete verb, so
+  retired is as far as it goes and it stays visible on nothing.
 - The thirteen orphan `SP-01`…`SP-13` projects on the app's `BAS` team are
-  **trashed** — gone from the working views, recoverable from Linear's trash until
-  it purges. No `BAS-*` issue was touched.
-- The orphan `site` label **still exists** (`9b479485-c776-476e-a0f1-322e0040a9c7`).
-  Addendum §1.2 says delete it.
-- The addendum's three projects and its seventeen milestones **do not exist yet**.
+  **trashed**. No `BAS-*` issue was touched at any point.
+
+> **Two Linear behaviours worth knowing before the next write.**
+>
+> **A bare `#N` in an issue description auto-links to a pull request** — and in this
+> workspace it resolved into the **app** repository. Writing "Rejection #3" produced a
+> link to a `kianh727/baselinev1` PR. It was corrected on `SITE-42`. Never write a
+> bare `#N`; spell the number out.
+>
+> **A bare `BAS-NNN` auto-links to that app issue.** On `SITE-91` the `BAS-125`
+> identifier the PRD gives for export and delete resolved to a **picker/app-group
+> token-storage issue**, not export and delete. Either the PRD's identifier is wrong
+> or the app issue was renumbered. The reference is now inert text with a note to
+> verify it, because **DS-18a requires a real owning issue** and a wrong one fails it.
+> Wrap app identifiers in backticks.
 
 **Team key confirmed: `SITE`.** Corrected in the Linear UI on 2026-09-18 and confirmed
 by Kian. It had been derived as `SIT` from the team name; the correction was not
@@ -447,10 +468,18 @@ R-2 findings bearing on site copy, recorded so they are not re-derived:
   valve… 'leave it inconclusive' offered as a first-class, guilt-free option."* The nightly
   check-in is **off** by default and the app PRD marks that settled.
 
-**The Linear population run is unblocked.** PRE-1 is complete, the counts in §13 are final,
-and the team key is confirmed. Two things to carry into it: the orphan `site` label still
-exists and addendum §1.2 says delete it, and creation order is load-bearing — the team must
-be empty and issues created in strict sequence for the positional mapping to hold.
+**The Linear population run is done.** PRE-1 is complete, the counts in §13 are final, the
+team key is confirmed, and all 108 issues exist. **Implementation begins at `SITE-1`**, under
+the §8 issue execution protocol.
+
+**Two stale-scope issues were populated with a warning rather than silently.** `SITE-72`
+(Sections 2, 4, 5, 6) and `SITE-74` (Metadata, OG card, legal pages) were authored against
+the pre-v7.3 section map: they name "What you didn't see", place §3 and the legal routes at
+P1, and declare "no `/pricing`". v7.3 moved all of that to P0 in SP-17 (`SITE-89`…`SITE-101`).
+Both issues now open with a **SCOPE SUPERSEDED** block naming what moved and where, and both
+say *do not build from the text below*. **They need re-scoping or closing before they are
+picked up** — that is a product decision, not a session's. This is the §1 propagation rule
+firing in the decomposition exactly as it fired in `SITE-040`.
 
 **One open item Part B could not close.** PRE-1 Part B was scoped to add *"evals for DS-15
 through DS-18."* DS-18, DS-18a and DS-18b are defined in v7.3 §12.1 and their evals are
