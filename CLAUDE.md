@@ -366,18 +366,26 @@ scaffold.** SITE-001 has not begun.
   Addendum §1.2 says delete it.
 - The addendum's three projects and sixteen milestones **do not exist yet**.
 
-> **Blocker — the team key is wrong.** Addendum §2 requires key `SITE`; the
-> observed key is **`SIT`**. Linear derived it from the team name. `get_team`
-> resolves by exact key or exact name and returns neither, so this was established
-> indirectly: `BAS` resolves the app team (its key, not its name), `BASE` does not
-> resolve at all — so there is no prefix matching — and `SIT` resolves a team whose
-> name is `SITE`, which only a key match explains.
+> **Blocker — the team key, unconfirmed.** Addendum §2 requires key `SITE`. The key
+> was observed as **`SIT`** (Linear derives it from the team name), a UI correction
+> was made on 2026-09-18, and **that correction could not be confirmed from a
+> session.**
 >
-> **The first issue would be `SIT-1`, not `SITE-1`.** Renaming a key after issues
-> exist renumbers all of them, so this must be fixed while the team is still empty.
-> **Verify the key in the Linear UI and correct it to `SITE` before any issue is
-> created.** The MCP connector exposes no team-write verb, so this cannot be fixed
-> from a session.
+> No MCP verb returns a team's key: `get_team`, `list_teams`, `list_issue_statuses`
+> and `list_cycles` all omit it, and `list_projects` exposes it only via a project's
+> `teams[]` — and this team has no projects. So the key is inferred, not read.
+>
+> Inference and its limit: `get_team` matches exact key or exact name. `BASE` does
+> not resolve, so there is no prefix matching at four characters; `SIT` resolving a
+> team *named* `SITE` is therefore best explained as a key match. Against that, the
+> confound is that `SIT` is also a three-character prefix. The stronger signal is
+> that `updatedAt` reads `2026-09-18T02:10:52.089Z` both before and after the
+> correction — unchanged to the millisecond, where a key edit should have moved it.
+>
+> **Read the key directly in Linear (Settings → Teams → SITE → identifier) before
+> any issue is created.** The first issue is `SIT-1` if this is wrong, and renaming
+> a key after issues exist renumbers all of them. The team is empty, so the fix is
+> free now and expensive later.
 
 The `@baseline/contracts` packaging question is **resolved and no longer gating**
 (§2). The capture and reachability check is **complete**, and its findings are what
@@ -403,7 +411,7 @@ on every context switch.
 |---|---|
 | Workspace | `baselineagent` |
 | App team | `Baseline` / `BAS` — out of bounds, see below |
-| Site team | name `SITE`, key **must be** `SITE` — currently `SIT`, see §12 |
+| Site team | name `SITE`, key **must be** `SITE` — unconfirmed, see §12 |
 | App repo | `kianh727/baselinev1` — out of bounds |
 | Site repo | `kianh727/resetbaseline-site` |
 
