@@ -645,7 +645,7 @@ Every P0 PRD requirement was checked against the decomposition, and every meanin
 
 None remaining. Every eval names at least one decomposition issue.
 
-### DS criteria with no definition — **open, blocking the DS-15/16/17 evals**
+### DS criteria with no definition — **closed: a phantom range, recorded in PRD §12.1**
 
 PRE-1 Part B was scoped to add "evals for DS-15 through DS-18." **DS-18, DS-18a and DS-18b are
 defined in v7.3 §12.1 and their evals are written above (SITE-EVAL-071, 072, 073).
@@ -654,10 +654,12 @@ history.** v5 defines DS-1…DS-10 and stops. v7.3 §12.1 says *"DS-1…DS-17 st
 DS-17 are cited — DS-15 at §12 for the contracts drift guard (SITE-004), DS-16 in v7.2 as
 forbidding unbacked claims, DS-17 only as a range endpoint — but none is stated.
 
-**No eval was written for DS-15, DS-16 or DS-17.** Inferring a gate's definition from a citation
-is what §7 of the constitution forbids, and a gate invented here would be verified against
-nothing. This is a stop-and-report under `CLAUDE.md` §9: the definitions are needed, or
-"DS-1…DS-17 stand" is a citation of provenance rather than of authority and should say so.
+**No eval was written for DS-15, DS-16 or DS-17, and none should be until they are defined.**
+Inferring a gate's definition from a citation would produce a gate verified against nothing —
+the §0.3 failure in its purest form. **Ruled: "DS-1…DS-17 stand" is provenance, not authority**,
+and PRD v7.3 §12.1 now says so in the document itself. DS-11 through DS-17 are a phantom range;
+nothing may be gated on them while they remain undefined. If the intent behind DS-15 and DS-16
+matters, they are re-authored as new criteria in the PRD — never reconstructed here.
 
 ### Issues with no meaningful verification
 

@@ -432,7 +432,11 @@ An entry leaves Block 2 by passing DS-18 and moving to Block 1. It never leaves 
 
 ### 12.1 Demo success criteria
 
-DS-1…DS-17 stand. New:
+DS-1…DS-17 stand. **Read that line as provenance, not authority.** Only **DS-1 through DS-10** are defined anywhere — in v5 §18, and carried forward by §11. **DS-11 through DS-17 are a phantom range: no artifact in this repository, and no superseded PRD in git history, ever states them.** DS-15 and DS-16 are cited (DS-15 at §6.6 and §12.3 for the contracts drift guard; DS-16 in v7.2 as forbidding unbacked claims) and DS-17 appears only as the endpoint of this range, but a citation is not a definition and none is recoverable.
+
+**Consequence, stated so it is not rediscovered:** no eval was written for DS-15, DS-16 or DS-17, and none should be until they are defined. Inferring a gate's definition from a citation would produce a gate verified against nothing — the §0.3 failure in its purest form. If the intent behind DS-15 and DS-16 matters, they are re-authored here as new criteria; they are not reconstructed. **Nothing may be gated on DS-11 through DS-17** while they remain undefined.
+
+New, and real:
 
 **DS-18 · No claim without a working capability.** Every §2 Block 1 line, §3 line, and FAQ answer describing app behavior traces to a capability verified working on a device — recorded verdict, dated, naming the verifying issue. **A PRD line is not evidence.**
 
@@ -451,7 +455,7 @@ Thresholds: 5/6 wall · 4/6 tune · 5/6 on each live question.
 
 ### 12.3 Engineering
 
-v5 §18.2 in full, plus: every user-visible label traces to §6.3 · the drift check fails on divergence · input classification is deterministic and pre-generation · pricing renders both states by config · no section references anything on §10's lists · no Apple-supplied UI appears as Baseline's.
+v5 §18.2 in full, plus: every user-visible label traces to §6.3 · the drift check fails on divergence (cited above as DS-15, which §12.1 records as undefined) · input classification is deterministic and pre-generation · pricing renders both states by config · no section references anything on §10's lists · no Apple-supplied UI appears as Baseline's.
 
 ### 12.4 No criterion satisfiable by absence — standing
 
@@ -492,6 +496,21 @@ Part B (item 4) — new issues for §2's three blocks, §3, §7, §8, §9, §11,
 
 ### PRE-2 · Ban-list copy audit
 **Owner:** site session · Automated in CI from P0 onward, failing the build on any §10 banned term; plus a manual pre-launch review, because automation catches terms and not a section that *implies* a capability without naming it.
+
+**Second check, same job: no copy string names an app.** App selections are opaque tokens the app cannot read (§6.3a). Copy says *"3 apps blocked"* and never names one, because naming one is a claim the product cannot make true. The build fails on any match of a committed app-name list against any authored copy string, site-wide.
+
+Four things this check must get right, each of them a way the constraint fails in practice:
+
+- **It is site-wide, not Gate-scoped.** The failure mode is a later rewrite of a line that reads correctly today. A check that only looks at strings currently near Gate copy does not catch it, and a recorded note catches it even less — which is why this is a CI check rather than a paragraph.
+- **The list is committed and versioned**, and adding to it is a copy decision, not a lint tweak. It covers the apps a Gate is plausibly created against and their common short forms and rebrands; a name that becomes checkable only after it appears in copy is a check that already failed once.
+- **A match is a failure, never a warning.** The §10 term check fails the build; so does this. An allowlist entry for a legitimate use — the App Store, iOS, Apple as the platform — is written into the list as an explicit exception, not granted by suppressing the check at the call site.
+- **The list ships non-empty**, seeded with the apps most likely to appear in a draft: the social and video ones a writer reaches for. **An empty list fails nothing, and a check that passes on absence is §0.3's own rule turned on itself.** A first commit of the list that catches nothing is not a starting point; it is the defect this check exists to prevent, shipped as infrastructure.
+
+**Decided: hand-maintained in the site repo, with the staleness treatment.** Same shape as the contracts manifest (§6.6) and the same answer. The list carries a `captured_at`; CI **warns at 90 days and fails at 180**; the failure message says what to do. The thresholds are longer than §6.6's 30/60 deliberately — app names move slower than a contract does.
+
+**Not a fetched source.** There is no authoritative list of app names to fetch, and inventing one would be a mechanism nobody asked for. The honest version is the one stated plainly: this list is maintained by hand, it will go stale, and **the staleness is visible rather than silent.** That is the whole of what the treatment buys, and it is enough.
+
+Implemented by **SITE-107**.
 
 ---
 

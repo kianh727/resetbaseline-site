@@ -31,11 +31,22 @@ budgets, acceptance criteria, evals, gates, and quality bar.
 All four are stored verbatim as approved. They are amended deliberately, never
 edited in passing during implementation.
 
-Two standing rules:
+Three standing rules:
 
 - Where a lower tier is precise and a higher tier was general, the lower tier
   governs implementation detail — it may refine, never contradict.
 - **If an issue conflicts with the PRD, the issue is wrong.**
+- **A ruling in a tier-one artifact does not propagate downward by itself.** Amending
+  the PRD leaves every derived document still saying the old thing, and a stale issue
+  is indistinguishable from a current one to whoever picks it up. **Sweep the lower
+  tiers in the same pass as the ruling** — decomposition, evals, and this file — and
+  say which you checked.
+
+  Worked example, and the reason this is a rule: v7.3 §6.3a established that no
+  depicted Baseline UI may name an app, because Screen Time returns opaque tokens.
+  SITE-040's scope still read *"rendering as the protection band with app names and
+  window"* — the exact UI the app cannot produce — and it survived the ruling because
+  nobody swept. It was caught in the next pass, by grep, not by the amendment.
 
 A material contradiction between artifacts is a STOP condition (§9). Report it.
 Never resolve it in code.
