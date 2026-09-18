@@ -2,7 +2,7 @@
 
 **Authoritative over `docs/site-linear-decomposition-v1.md` for everything in this file. Silent on everything else — the decomposition stands unchanged.**
 
-Precedence: `site-prd-v5.md` → this addendum → `site-linear-decomposition-v1.md` → `site-evals-v1.md`
+Precedence: `site-prd-v7.2.md` → this addendum → `site-linear-decomposition-v1.md` → `site-evals-v1.md`
 
 **This is a tooling change. Nothing about the website changes** — same product story, same interactive builder, same motion spec, same conversion strategy, same performance budgets, same acceptance criteria, same evals, same gates, same quality bar.
 

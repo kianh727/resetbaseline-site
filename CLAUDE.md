@@ -14,7 +14,7 @@ do.
 
 ## 1. Artifact precedence
 
-1. `docs/site-prd-v5.md` — product truth
+1. `docs/site-prd-v7.2.md` — product truth
 2. `docs/site-execution-addendum-v1.md` — execution structure, authoritative over
    the decomposition for Linear organization, issue numbering, PR policy, and the
    design review gates. Silent on everything else.
@@ -40,8 +40,10 @@ Two standing rules:
 A material contradiction between artifacts is a STOP condition (§9). Report it.
 Never resolve it in code.
 
-The PRD is v5 and **replaces v4 entirely.** Nothing from v4 is a requirement. Where
-the decomposition or evals cite "v4 lineage," that is provenance, not authority.
+The PRD is v7.2 and **replaces v5, v6, v7, and v7.1 entirely.** Nothing from a
+superseded PRD is a requirement. Where the decomposition or evals cite earlier
+lineage, that is provenance, not authority. Superseded PRDs are not kept in the
+working tree; they remain in git history.
 
 ---
 

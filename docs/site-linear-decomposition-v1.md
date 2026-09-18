@@ -13,7 +13,7 @@
 > verification requirements, the dependency graph, and the critical path —
 > stands unchanged.
 
-Derived from `docs/site-prd-v5.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
+Derived from `docs/site-prd-v7.2.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
 
 **IDs are provisional decomposition IDs, not Linear IDs.**
 

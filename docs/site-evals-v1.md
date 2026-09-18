@@ -1,6 +1,6 @@
 # resetbaseline.com — Site Evals v1
 
-Verification truth, derived from `docs/site-prd-v5.md` and `docs/site-linear-decomposition-v1.md`. Where artifacts conflict, the PRD wins, then the decomposition, then this document.
+Verification truth, derived from `docs/site-prd-v7.2.md` and `docs/site-linear-decomposition-v1.md`. Where artifacts conflict, the PRD wins, then the decomposition, then this document.
 
 These are **website / product / interaction / conversion** evals. They do not recreate the app's agent eval infrastructure.
 
