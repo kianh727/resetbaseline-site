@@ -14,7 +14,7 @@
 > stands unchanged. The four review gates in addendum §3 add four edges and the
 > critical path has been re-walked.
 
-Derived from `docs/site-prd-v7.2.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
+Derived from `docs/site-prd-v7.3.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
 
 **IDs are provisional decomposition IDs, not Linear IDs.**
 
@@ -227,11 +227,11 @@ Project SP-01 · P0 · Deps SITE-002
 
 **SITE-004 · Contracts manifest, generated types, and drift guard**
 Project SP-01 · P0 · Deps SITE-001
-*Scope* Commit `contracts-manifest.json` to the site repo — the app's `CONTRACT_MANIFEST` verbatim, plus `captured_at` and the app repo commit SHA. Generate the site's plan-model types from it at build time. Add a CI drift check per PRD v7.2 §6.6: the primary mechanism fetches the manifest the app repo publishes to a stable path on `main` and fails the site build on any diff; the fallback uses staleness thresholds against `captured_at` — warn at 30 days, fail at 60.
+*Scope* Commit `contracts-manifest.json` to the site repo — the app's `CONTRACT_MANIFEST` verbatim, plus `captured_at` and the app repo commit SHA. Generate the site's plan-model types from it at build time. Add a CI drift check per PRD v7.3 §6.6: the primary mechanism fetches the manifest the app repo publishes to a stable path on `main` and fails the site build on any diff; the fallback uses staleness thresholds against `captured_at` — warn at 30 days, fail at 60.
 *Accept* Types generate from the manifest. A deliberately altered manifest fails CI. Every `capability_type` in the manifest has a layout rule; a type without one fails the build.
 *Tests* CI: type generation; one negative test proving the drift guard fires. Unit: layout-rule coverage across all `capability_type` values.
 *Verify* —
-*PRD* v7.2 §6.2, §6.6, §12 DS-15
+*PRD* v7.3 §6.2, §6.6, §12 DS-15
 *Non-goals* No `@baseline/contracts` package import. No cross-repo build of the app — explicitly rejected in §6.6. **Nothing generated may read `artifact_divergences`**, which records stale counts (33 and 72) against current counts (45 and 76) in the same object.
 
 **SITE-005 · Base layout, nav, safe areas, overflow guards**
@@ -1107,7 +1107,7 @@ SITE-079 through SITE-084. Ships or gets cut when P0 and P1 pass (K-7). Explicit
 
 ### Unresolved decomposition questions
 
-1. **`@baseline/contracts` packaging — resolved, no longer blocking.** The site consumes `contracts-manifest.json` rather than importing the package (PRD v7.2 §6.6). Four packaging blockers exist in the app repo (`private: true`, `dist/` gitignored and untracked, no `files` field, `tsconfig` extends outside the package) with **zero code coupling** — the package has no workspace-relative runtime imports. Publishing properly remains worth doing and remains Kian's decision; it is informational for this tree, not gating. **One app-repo change is still required for the drift check's primary mechanism** — the app publishing its manifest to a stable path on `main`. See §6.6 for the fallback if that change isn't made.
+1. **`@baseline/contracts` packaging — resolved, no longer blocking.** The site consumes `contracts-manifest.json` rather than importing the package (PRD v7.3 §6.6). Four packaging blockers exist in the app repo (`private: true`, `dist/` gitignored and untracked, no `files` field, `tsconfig` extends outside the package) with **zero code coupling** — the package has no workspace-relative runtime imports. Publishing properly remains worth doing and remains Kian's decision; it is informational for this tree, not gating. **One app-repo change is still required for the drift check's primary mechanism** — the app publishing its manifest to a stable path on `main`. See §6.6 for the fallback if that change isn't made.
 2. **Six users for SITE-061 within a reasonable window** — the gate is only as good as recruitment. Sourcing is unspecified.
 3. **`raw_goal` retention policy** — §11.5 captures it and §10 excludes it from analytics, but the PRD sets no retention period. Likely needs a privacy-page line, which touches SITE-074.
 4. **Whether Tier B mobile gets the Peak at all** is PRD open decision 5, resolved by post-launch data — so SITE-077 may become obsolete. Built anyway; cheap to remove.

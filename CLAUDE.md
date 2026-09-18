@@ -14,7 +14,7 @@ do.
 
 ## 1. Artifact precedence
 
-1. `docs/site-prd-v7.2.md` — product truth
+1. `docs/site-prd-v7.3.md` — product truth
 2. `docs/site-execution-addendum-v1.md` — execution structure, authoritative over
    the decomposition for Linear organization, issue numbering, PR policy, and the
    design review gates. Silent on everything else.
@@ -40,7 +40,7 @@ Two standing rules:
 A material contradiction between artifacts is a STOP condition (§9). Report it.
 Never resolve it in code.
 
-The PRD is v7.2 and **replaces v5, v6, v7, and v7.1 entirely.** Nothing from a
+The PRD is v7.3 and **replaces v5, v6, v7, v7.1, and v7.2 entirely.** Nothing from a
 superseded PRD is a requirement. Where the decomposition or evals cite earlier
 lineage, that is provenance, not authority. Superseded PRDs are not kept in the
 working tree; they remain in git history.
@@ -68,14 +68,14 @@ vocabulary — the 45 action types, object types, enums, and authority tiers —
 this site validates against. Every verb in the provider layer and the authored
 scenarios traces to it. The site **consumes** that vocabulary; it never extends,
 amends, or works around it. A contract change should break this build
-(PRD v7.2 §6.6, §12 DS-15, SITE-004).
+(PRD v7.3 §6.6, §12 DS-15, SITE-004).
 
 > **Resolved — no longer blocking.** This was previously recorded as an unresolved
 > blocker sitting in front of the entire SITE tree, on the assumption that SITE-004
 > had to import `@baseline/contracts` as a package. It does not. The site consumes
 > `contracts-manifest.json` — the app's `CONTRACT_MANIFEST` committed verbatim with
 > `captured_at` and the app commit SHA — and generates its types from that
-> (PRD v7.2 §6.6, decomposition open question 1).
+> (PRD v7.3 §6.6, decomposition open question 1).
 >
 > Four packaging blockers do exist in the app repo (`private: true`, `dist/`
 > gitignored and untracked, no `files` field, `tsconfig` extends outside the
@@ -292,7 +292,7 @@ STOP and report. Do not improvise, do not decide, do not silently resolve in cod
   material point.
 - The work depends on an **unfinished dependency**. The `@baseline/contracts`
   packaging decision is no longer one of these — it was resolved by consuming
-  `contracts-manifest.json` (§2, PRD v7.2 §6.6).
+  `contracts-manifest.json` (§2, PRD v7.3 §6.6).
 - The work would require **inventing a verb, object type, enum, or authority tier**
   not in the frozen contracts.
 - The work would **soften the determinism boundary** (§5) or a privacy invariant
@@ -355,16 +355,40 @@ Seven, from PRD §22. Any of these in a diff is a defect, not a tradeoff.
 The repository is initialized: the four artifacts and this file. **No code, no
 scaffold.** SITE-001 has not begun.
 
-**Linear:** the `SITE` team does not exist yet. Thirteen empty projects named
-`SP-01`…`SP-13` were created on the **app's `BAS` team** by an earlier session and
-are orphans — they are not the structure the addendum specifies (three projects,
-sixteen milestones) and must be deleted before the population run. The orphan `site`
-label is likewise still present. Zero `SITE-*` issues exist.
+**Linear — verified 2026-09-18.**
+
+- A site team **exists**, named `SITE` (`58f71935-70d1-49c0-83ce-7535d8ece6de`),
+  created by hand. It holds **zero issues**.
+- The thirteen orphan `SP-01`…`SP-13` projects on the app's `BAS` team are
+  **trashed** — gone from the working views, recoverable from Linear's trash until
+  it purges. No `BAS-*` issue was touched.
+- The orphan `site` label **still exists** (`9b479485-c776-476e-a0f1-322e0040a9c7`).
+  Addendum §1.2 says delete it.
+- The addendum's three projects and sixteen milestones **do not exist yet**.
+
+> **Blocker — the team key is wrong.** Addendum §2 requires key `SITE`; the
+> observed key is **`SIT`**. Linear derived it from the team name. `get_team`
+> resolves by exact key or exact name and returns neither, so this was established
+> indirectly: `BAS` resolves the app team (its key, not its name), `BASE` does not
+> resolve at all — so there is no prefix matching — and `SIT` resolves a team whose
+> name is `SITE`, which only a key match explains.
+>
+> **The first issue would be `SIT-1`, not `SITE-1`.** Renaming a key after issues
+> exist renumbers all of them, so this must be fixed while the team is still empty.
+> **Verify the key in the Linear UI and correct it to `SITE` before any issue is
+> created.** The MCP connector exposes no team-write verb, so this cannot be fixed
+> from a session.
 
 The `@baseline/contracts` packaging question is **resolved and no longer gating**
-(§2). What now stands in front of the population run is **PRE-1 item 4**, which is
-itself gated on the capture and reachability check — because v7.2 §0 means the
-issue set cannot be written until it is known which capabilities are reachable.
+(§2). The capture and reachability check is **complete**, and its findings are what
+produced v7.3 — §2 rebuilt as a dated status section, "What's underneath" cut, "What
+it won't do" promoted to P0.
+
+What now stands in front of the population run is **PRE-1 Part A v2** (items 1, 3,
+5, 6, 7, 8, 9 — item 2 is a no-op), then **Part B / item 4**. Items 1, 3, 5 and 6
+have been applied; 7, 8 and 9 have not, and the Part A v2 patch specifying them is
+not in this repository. Part B is gated only on Part A v2 landing, no longer on the
+capture check.
 
 ---
 
@@ -379,7 +403,7 @@ on every context switch.
 |---|---|
 | Workspace | `baselineagent` |
 | App team | `Baseline` / `BAS` — out of bounds, see below |
-| Site team | `ResetBaseline Site` / key `SITE` |
+| Site team | name `SITE`, key **must be** `SITE` — currently `SIT`, see §12 |
 | App repo | `kianh727/baselinev1` — out of bounds |
 | Site repo | `kianh727/resetbaseline-site` |
 

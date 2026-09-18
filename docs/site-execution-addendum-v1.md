@@ -2,7 +2,7 @@
 
 **Authoritative over `docs/site-linear-decomposition-v1.md` for everything in this file. Silent on everything else — the decomposition stands unchanged.**
 
-Precedence: `site-prd-v7.2.md` → this addendum → `site-linear-decomposition-v1.md` → `site-evals-v1.md`
+Precedence: `site-prd-v7.3.md` → this addendum → `site-linear-decomposition-v1.md` → `site-evals-v1.md`
 
 **This is a tooling change. Nothing about the website changes** — same product story, same interactive builder, same motion spec, same conversion strategy, same performance budgets, same acceptance criteria, same evals, same gates, same quality bar.
 
@@ -111,7 +111,7 @@ This preserves verification granularity while removing ceremony from twenty-minu
 
 ## 5. Cross-team dependency — the thing consolidation buys
 
-SITE-004 no longer imports `@baseline/contracts` — it consumes `contracts-manifest.json` (PRD v7.2 §6.6), so the packaging question is resolved and is not gating this tree (decomposition open question 1). What remains is the drift check's primary mechanism, which needs the app repo to publish its manifest to a stable path on `main`.
+SITE-004 no longer imports `@baseline/contracts` — it consumes `contracts-manifest.json` (PRD v7.3 §6.6), so the packaging question is resolved and is not gating this tree (decomposition open question 1). What remains is the drift check's primary mechanism, which needs the app repo to publish its manifest to a stable path on `main`.
 
 Because both teams now share a workspace, this becomes a real link rather than a note:
 
