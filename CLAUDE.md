@@ -1036,6 +1036,70 @@ not invented here: they are the site's most sensitive sentences, covering medica
 mental-health, legal and financial situations, and §5 puts refusal copy outside anything a
 session generates.
 
+**SP-04 is started. `SITE-20` and `SITE-21` are done to their boundary, and the boundary is
+SITE-004.**
+
+- **`SITE-20` · the plan semantic model.** `Plan`, `PlanNode`, `Occurrence`, `Window` and the
+  five detail shapes, all pure structure with no consumers yet — the bundle is unchanged at
+  102.5 KB.
+- **The contract vocabulary is not in the file, and could not be.** §6.2 requires the five
+  `capability_type` values *"generated from `contracts-manifest.json`… derived, not
+  hand-listed"*, and SITE-004 is blocked because the delivered manifest carries no object
+  vocabulary. Hand-listing them is the one thing §6.2 forbids by name, and it would decouple
+  the site from the contract **silently** — the failure mode is a site that keeps building
+  after the app's vocabulary moves. So `CapabilityType` and `AuthorityTier` are **opaque
+  aliases**: the model is parameterised over them, every structure is complete and typed, and
+  SITE-004 lands by narrowing two lines. Nothing downstream is written against a placeholder.
+- **Two source scans, because two of the issue's constraints are about what the model does not
+  contain**, and a constraint of that shape cannot be tested by calling anything.
+  - **No spatial or completion vocabulary in `lib/plan/model.ts`** — twenty-one words across
+    two families. Spatial, because §6's invariant holds only while the model has not learned
+    the metaphor: a changed visual costs one adapter, or costs a rewrite, and which one depends
+    entirely on this. Completion, because §10 bans progress and completeness meters and §4
+    promises no scores and no completeness meters — a model field is where that leaks in.
+  - **No file hand-lists a contract axis.** Two or more values from one axis is a hand-list;
+    one is not. **The first version flagged `lib/builder/rows.ts`**, which names `'commitment'`
+    as §3.4's transformation-block row key — a row label sharing a word with a capability, not
+    an enumeration. §6.2 forbids restating a *closed set*, and a check that called one word a
+    set would have been argued down the first time it fired.
+  - **Both proven negatively against the real file**, not only against synthetic strings:
+    an `elevation` field and a two-value `Cap` union each exit 1, naming the file and the words.
+- **`Occurrence` carries no outcome and no ordinal**, and both omissions are the constraint
+  doing its job rather than an oversight. No outcome: the builder's plan is prospective, §6.1
+  forbids any copy claiming the app generates occurrences today, and §6.3 bans rendering
+  `pending` outright. No ordinal: *"3 of 12"* is a completeness meter with better manners.
+- **`Plan.nodes` asserts no order.** A stored order is the first half of a layout.
+- **`Gate.appCount` is a number**, so naming an app is not a thing the type can express
+  (§6.3a MUST).
+- **`SITE-21` · `PlanLayout`.** `anchorFor(node)` returning `Anchor | null`, and nothing else.
+  `null` is a real answer — a node outside a projected frustum, or a capability a composition
+  does not draw — because throwing would make a routine case an exception and a default would
+  put an object where nobody chose. The stub-satisfies-the-interface test passes against almost
+  anything, so the suite also asserts that anchoring **does not mutate the node**, that two
+  adapters answer differently about the same unchanged node, and that **the model does not
+  import the layout** — the direction is what makes EVAL-063 hold and it breaks with one
+  import that type-checks fine.
+
+**Three things found in SP-04 that are reports, not decisions.**
+
+1. **`SITE-21`'s scope is `anchorFor(node)`, and SITE-025 renders a mark per occurrence.**
+   Occurrences are not nodes. Nothing in §6 or the decomposition says how one is anchored.
+   Built exactly as scoped; the gap is SITE-022/025's to resolve and is §4's *"anything the
+   issue does not specify is undefined behavior"* rather than a session's call.
+2. **PRD v7.3 §6.5 cites *"§4's table"* as governing the determinism boundary, and v7.3 §4 has
+   no table** — it is *"§3 — What it won't do"*. The table lives in the superseded v5 §4, and §1
+   says nothing from a superseded PRD is a requirement. **This file's §5 points at the same
+   hole.** The *rule* survives in §6.5's own list, so nothing is blocked; the *citation*
+   resolves to nothing, which is the DS-15 shape Kian already ruled on — a reader follows it,
+   finds nothing, and cannot tell whether the boundary is unjustified or the definition is
+   missing.
+3. **Recurrence-rule selection is unassigned in v7.3.** §6.5 ruled the model's surface is three
+   fields and recurrence is not one of them; §6.5's own may-never-touch list says *recurrence
+   expansion*, which is the computation rather than the choice. This file's §5 still says
+   *"The LLM selects a recurrence rule from the closed set"*. The closed set itself is
+   enumerated in no artifact. It bites at **SITE-023**, not here — `SITE-20` holds expanded
+   occurrences and never a rule — so no enum was invented.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**
