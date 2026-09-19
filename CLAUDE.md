@@ -419,10 +419,13 @@ ES modules fetches — counting it would measure 38.6 KB nobody downloads. **Mea
 100.2 KB, 19.8 KB remaining.** SITE-078 still owns the remaining §16 budgets; its non-goals
 now say so.
 
-**`/tokens` is a development-only route.** `app/tokens/page.dev.tsx`, with `dev.tsx` in
-`pageExtensions` only outside production — so it exists under `npm run dev` and is never
+**`/tokens` and `/type` are development-only routes.** `page.dev.tsx`, with `dev.tsx` in
+`pageExtensions` only outside production — so they exist under `npm run dev` and are never
 built into the export. Absent rather than built-and-pruned: a prune step is a thing to
 forget, and forgetting it ships a URL nobody designed on the marketing site.
+`scripts/check-dev-routes.mjs` derives the list from the source tree rather than naming
+paths, because the first version named `out/tokens` alone and `/type` would have arrived
+unguarded one commit later.
 
 **Both gates were proven negatively.** Forcing `dev.tsx` into the production extensions put
 `/tokens` back in `out/` and the assertion exited 1. Installing `zod` and `framer-motion`
@@ -432,7 +435,42 @@ unchanged.
 
 **`SITE-2` is done** — the nine §14 tokens, declared once as Tailwind theme values and
 aliased under the bare names, with the `--veto` confinement policed by both a lint rule and
-a file scan. **Next in sequence is `SITE-3`** (type scale and the typeface decision).
+a file scan.
+
+**`SITE-3` is done in code and open on its decision.** The §14 type scale, the metadata
+primitive, and `/type` — the side-by-side comparison harness — are built and tested;
+`docs/typeface-decision.md` is the record §23 item 3 asks for.
+
+Display and section-head carry §14's clamps verbatim. §14 gives lead and body as ranges
+(18–22px, 16–17px) rather than clamps, so the interpolation was this issue's to choose:
+both are `intercept + slope·vw`, landing on the range minimum at exactly 375px and the
+maximum at exactly 1440px, so the scale is settled at both verification widths rather than
+caught mid-interpolation at either. A bare `1.5vw` would have left lead at 21.6px at 1440
+and never reached §14's 22. **Line heights are not in §14 and were set here** — 0.92
+display, 0.96 section, 1.45 lead, 1.6 body — because the browser's 1.5 on a 140px headline
+contradicts "density against scale" outright. Recorded as decisions, not defaults.
+
+**The typeface decision could not be made, and was not faked.** §14 and §23 item 3 both
+require it *compared at display scale on real type*. Neither candidate's files are
+obtainable from a session: PP Neue Montreal is a commercial per-domain licence, and Satoshi
+is free but Fontshare is denied by this environment's network proxy (`403` on `CONNECT`,
+confirmed against the proxy's own status endpoint) and is on no npm registry. **No
+substitute face was rendered in their place and no verdict was recorded from description**
+— a face judged from memory is §0.1's failure mode exactly. The one axis decidable without
+seeing them is licence cost, which is not the axis §14 names.
+
+Everything around the decision is built, so landing it is four `.woff2` files in
+`public/fonts/`, a look at `/type` at both widths, and one line: `--font-candidate`. Until
+then the site renders in the system stack — not a third candidate and not a default anybody
+chose, but the absence of a decision, visible as such. A test enforces that nothing outside
+`/type` names either family, so the decision cannot be made by accident in a component.
+
+`/type` verified at 1440px, 375px and 320px: zero horizontal overflow at all three, columns
+stacking below `lg`. The harness reports which families the browser actually loaded, because
+two identical columns otherwise read as "these faces are alike" when the truth is "neither
+file is present".
+
+**Next in sequence is `SITE-4`** (contracts manifest, generated types, drift guard).
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as

@@ -15,7 +15,7 @@
  *   - `:root` under the bare names §14 uses, so a stylesheet or an inline
  *     style can reference `var(--void)` as the PRD writes it.
  *
- * The type scale is SITE-003. No component styling here (SITE-002 non-goal).
+ * The type scale is SITE-003, below. No component styling here.
  */
 
 @theme {
@@ -34,6 +34,81 @@
   --color-veto: #c4614f;
 }
 
+/*
+ * SITE-003 · Type scale.
+ *
+ * PRD §14 (v5, carried forward unchanged by v7.3 §11): "enormous display type
+ * against very small, very precise metadata, hairline rules, real
+ * measurements. Density against scale, not scale alone."
+ *
+ * Display and section-head carry their clamps verbatim from §14's table.
+ * Lead and body are given there as ranges (18–22px, 16–17px) rather than
+ * clamps, so the interpolation between the two ends is this issue's to choose
+ * — a refinement of a general higher tier, never a contradiction of it
+ * (CLAUDE.md §1). Both are interpolated across the two verification widths:
+ * exactly the range minimum at 375px and exactly the maximum at 1440px, so
+ * the scale is settled at both widths rather than caught mid-interpolation at
+ * either. That is why they are `intercept + slope·vw` and not a bare `vw` —
+ * a bare `1.5vw` would land lead at 21.6px at 1440 and never reach §14's 22.
+ *
+ * Weight and tracking come from §14's Treatment column exactly. Line heights
+ * are not in §14 and are set here, recorded as decisions rather than defaults:
+ * display and section-head are set tight because a 140px headline at the
+ * browser's 1.5 would break the "density against scale" intent outright; lead
+ * and body keep a reading measure.
+ *
+ * Asserted by tests/type.test.mjs against an independent transcription of the
+ * §14 table.
+ */
+@theme {
+  /* §14 verbatim. */
+  --text-display: clamp(40px, 8vw, 140px);
+  --text-display--font-weight: 500;
+  --text-display--letter-spacing: -0.04em;
+  --text-display--line-height: 0.92;
+
+  /* §14 verbatim. */
+  --text-section: clamp(32px, 5vw, 88px);
+  --text-section--font-weight: 500;
+  --text-section--letter-spacing: -0.035em;
+  --text-section--line-height: 0.96;
+
+  /* §14 range 18–22px, interpolated 375 → 1440. */
+  --text-lead: clamp(18px, 16.59px + 0.376vw, 22px);
+  --text-lead--font-weight: 400;
+  --text-lead--line-height: 1.45;
+
+  /* §14 range 16–17px, max 62ch, interpolated 375 → 1440. */
+  --text-body: clamp(16px, 15.65px + 0.094vw, 17px);
+  --text-body--font-weight: 400;
+  --text-body--line-height: 1.6;
+
+  /* §14 verbatim: 11px, +0.06em. Not fluid — precise small type stays precise. */
+  --text-meta: 11px;
+  --text-meta--font-weight: 400;
+  --text-meta--letter-spacing: 0.06em;
+  --text-meta--line-height: 1.3;
+
+  /* §14: body is measured, max 62ch. `max-w-measure`. */
+  --container-measure: 62ch;
+}
+
+/*
+ * The metadata primitive.
+ *
+ * §14's metadata row is three properties that always travel together — 11px,
+ * +0.06em, --bone-38 — so it is one named thing rather than three utilities
+ * to remember in the right combination. "Metadata is always real: dates,
+ * occurrence counts, durations, authority tiers. Never decorative numbers."
+ */
+@utility metadata {
+  font-size: var(--text-meta);
+  font-weight: var(--text-meta--font-weight);
+  letter-spacing: var(--text-meta--letter-spacing);
+  line-height: var(--text-meta--line-height);
+  color: var(--color-bone-38);
+}
+
 :root {
   --void: var(--color-void);
   --surface: var(--color-surface);
@@ -44,6 +119,18 @@
   --bone-38: var(--color-bone-38);
   --edge: var(--color-edge);
   --veto: var(--color-veto);
+
+  /*
+   * SITE-003 · The typeface seam.
+   *
+   * One variable, one place to change when the decision lands. The two
+   * candidates are PP Neue Montreal (licensed) and Satoshi (free); neither
+   * ships yet, so this resolves to the system stack. `--font-candidate` is
+   * what the comparison harness sets per column.
+   */
+  --font-system: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-display: var(--font-candidate, var(--font-system));
 }
 
 html {
@@ -56,4 +143,13 @@ body {
   overflow-x: clip;
   background: var(--void);
   color: var(--bone);
+
+  /*
+   * The typeface is undecided (§14, §23 item 3: "decided at P0 item 1,
+   * compared at display scale"). Until it is, the site renders in the system
+   * stack — not in a guess at one of the two candidates. `--font-display` is
+   * the single seam the decision lands on; the comparison harness overrides
+   * it per column and nothing else in the codebase names a family.
+   */
+  font-family: var(--font-display);
 }
