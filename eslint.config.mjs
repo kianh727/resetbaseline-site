@@ -7,6 +7,29 @@ const __dirname = dirname(__filename)
 
 const compat = new FlatCompat({ baseDirectory: __dirname })
 
+/*
+ * SITE-024 · Where the settling spring may be imported.
+ *
+ * v5 §8.1, carried forward unchanged by v7.3 §11: one spring, used **only when
+ * structure lands into place**, and "banned everywhere else — if a section
+ * header uses it, the signature is gone. This is the rule most likely to erode
+ * across a long build."
+ *
+ * A rule most likely to erode is exactly the one that needs a machine rather
+ * than a reviewer, so the ban is the default and this is the exception list.
+ * Adding a path here is a decision about the site's one signature motion; it is
+ * not a way to make a lint error go away.
+ *
+ * The list is deliberately narrow and names the issues that own each entry.
+ * SITE-025 lands occurrence marks; SITE-026 lands the plan objects. Nothing
+ * else lands structure today.
+ */
+const SETTLE_ALLOWLIST = [
+  'lib/motion/settle.ts', // the primitive itself
+  'components/plan/**', // SITE-025, SITE-026 — structure landing into place
+  'tests/**', // the suite that polices the rule necessarily names it
+]
+
 const eslintConfig = [
   {
     ignores: ['.next/**', 'out/**', 'node_modules/**', 'next-env.d.ts'],
@@ -28,6 +51,16 @@ const eslintConfig = [
             { name: '@studio-freight/lenis', message: 'Scroll is native (PRD §7.5). See SITE-070.' },
             { name: 'locomotive-scroll', message: 'Scroll is native (PRD §7.5). See SITE-070.' },
             { name: 'smooth-scrollbar', message: 'Scroll is native (PRD §7.5). See SITE-070.' },
+          ],
+          patterns: [
+            {
+              group: ['**/lib/motion/settle', '**/lib/motion/settle.ts', '@/lib/motion/settle'],
+              message:
+                'The settling spring is used only when structure lands into place ' +
+                '(v5 §8.1 via PRD v7.3 §11, SITE-024). If a section header uses it, ' +
+                'the signature is gone. Add the path to SETTLE_ALLOWLIST only if it ' +
+                'is structure landing.',
+            },
           ],
         },
       ],
@@ -74,6 +107,28 @@ const eslintConfig = [
     ],
     rules: {
       'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    /*
+     * SITE-024 · The settling spring's allowlist. The scroll-library ban is
+     * restated because this block replaces `no-restricted-imports` wholesale
+     * for these files, and dropping it here would open a hole in SITE-070's
+     * ban at exactly the paths that animate.
+     */
+    files: SETTLE_ALLOWLIST,
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            { name: 'lenis', message: 'Scroll is native (PRD §7.5). See SITE-070.' },
+            { name: '@studio-freight/lenis', message: 'Scroll is native (PRD §7.5). See SITE-070.' },
+            { name: 'locomotive-scroll', message: 'Scroll is native (PRD §7.5). See SITE-070.' },
+            { name: 'smooth-scrollbar', message: 'Scroll is native (PRD §7.5). See SITE-070.' },
+          ],
+        },
+      ],
     },
   },
 ]

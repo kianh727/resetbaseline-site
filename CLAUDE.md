@@ -1167,6 +1167,45 @@ It does not say what a **timer** or a **tracker** is instead, and it does not sa
 undefined behavior. STOP"*, not a session's call. Struck through in the decomposition and in
 Linear rather than deleted, so nobody reads the old scope and builds it.
 
+**`SITE-24` is done — the settling spring, hand-rolled.**
+
+- **§8.1 is not in the working tree.** v7.3 §11 carries *"Motion (v5 §8)"* forward unchanged,
+  and §1 keeps superseded PRDs in git history only, so the config this issue's accept measures
+  against — `{ stiffness: 260, damping: 24, mass: 0.9 }`, from `{ opacity: 0, scale: 0.94, y: 8 }` —
+  had to be recovered from `9568a9a:docs/site-prd-v5.md`. **It is a requirement by explicit
+  carry-forward, not by lineage**, so it governs. But a requirement readable only from git
+  history is the third citation problem in two days, after DS-15 and §4's table. **Reported, not
+  fixed** — inlining v5 §8 into v7.3 is a §10 amendment and Kian's call.
+- **The spring is integrated, not approximated by an eased duration.** ζ ≈ 0.78, underdamped, so
+  it overshoots and settles back — **and the overshoot is the signature.** A cubic-bezier fitted
+  to the same duration looks close and never overshoots, which is the one property worth keeping:
+  it is the difference between structure *landing* and structure *arriving*.
+- **The curve is asserted on the numbers, not on an animation.** `settleProgress()` is pure and
+  exported for that reason; a test that could only watch a browser play it would be asserting
+  the browser. It asserts the overshoot exists, that the target is crossed **exactly once** —
+  more crossings is a wobble, and "it landed" and "it is springy" are different products — and
+  that the duration falls in a range a 260/24/0.9 spring must produce rather than against a
+  literal the implementation also uses.
+- **Keyframes for WAAPI, not a CSS `linear()` easing.** `linear()` expresses the curve in one
+  declaration and is tidier, but needs Chrome 113 / Safari 17.2 / Firefox 112 — and **375px is
+  the primary target, which means older iOS.** Same curve, wider delivery.
+- **`reducedMotion` is a parameter, not a media query read here.** SITE-006 owns the detection;
+  reading it again would be two derivations of one fact that can disagree silently (§0.3c).
+  Under reduced motion the element is placed at its settled state immediately — not faded, not
+  shortened — because the structure must still be there.
+- **`settle()` returns the `Animation`.** Every builder animation is interruptible (EVAL-016),
+  and an interruptible animation whose handle is discarded is not interruptible.
+- **The lint rule is proven in both directions, by running eslint rather than by reading the
+  config.** A probe importing the spring from `components/` exits 1 naming SITE-024; a probe in
+  the allowlisted `components/plan/**` exits 0. **The second half matters as much as the first** —
+  a ban that also blocks its legitimate consumers passes the negative test perfectly and is
+  discovered at SITE-025. Both probes removed.
+- **The allowlist block restates the scroll-library ban**, because a flat-config block replaces
+  `no-restricted-imports` wholesale for its files, and omitting it would open a hole in
+  SITE-070's ban at exactly the paths that animate.
+
+**Bundle 105.0 kB of 120** — decimal now, and the spring has no consumers yet.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**
