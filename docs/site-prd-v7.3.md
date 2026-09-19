@@ -432,11 +432,24 @@ An entry leaves Block 2 by passing DS-18 and moving to Block 1. It never leaves 
 
 ### 12.1 Demo success criteria
 
-DS-1…DS-17 stand. **Read that line as provenance, not authority.** Only **DS-1 through DS-10** are defined anywhere — in v5 §18, and carried forward by §11. **DS-11 through DS-17 are a phantom range: no artifact in this repository, and no superseded PRD in git history, ever states them.** DS-15 and DS-16 are cited (DS-15 at §6.6 and §12.3 for the contracts drift guard; DS-16 in v7.2 as forbidding unbacked claims) and DS-17 appears only as the endpoint of this range, but a citation is not a definition and none is recoverable.
+**The demo success criteria are DS-1 through DS-10, plus DS-18, DS-18a and DS-18b. There are no others.**
 
-**Consequence, stated so it is not rediscovered:** no eval was written for DS-15, DS-16 or DS-17, and none should be until they are defined. Inferring a gate's definition from a citation would produce a gate verified against nothing — the §0.3 failure in its purest form. If the intent behind DS-15 and DS-16 matters, they are re-authored here as new criteria; they are not reconstructed. **Nothing may be gated on DS-11 through DS-17** while they remain undefined.
+| Range | Status |
+|---|---|
+| **DS-1 … DS-10** | **Real.** Defined in v5 §18 and carried forward by §11. Each is a gate, verified individually with documented evidence. |
+| **DS-11 … DS-17** | **A reference to nothing.** No artifact in this repository, and no superseded PRD in git history, ever states them. |
+| **DS-18 · DS-18a · DS-18b** | **Real.** Defined below. |
 
-New, and real:
+Earlier revisions of this document opened this section with *"DS-1…DS-17 stand."* **That line was provenance, not authority, and it is withdrawn here** — it cited eleven gates of which seven were never written. DS-15 and DS-16 appear as citations (DS-15 at §6.6 and §12.3 for the contracts drift guard; DS-16 in v7.2 as forbidding unbacked claims) and DS-17 only as the endpoint of the range, but **a citation is not a definition** and none is recoverable.
+
+**Consequences, stated so this is not rediscovered:**
+
+- **Nothing may be gated on DS-11 through DS-17.** A gate with no definition cannot be failed, which makes it worse than absent — it reads as passed.
+- **No eval was written for DS-15, DS-16 or DS-17, and none should be until they are defined.** Inferring a gate's definition from a citation would produce a gate verified against nothing, which is §0.3 in its purest form.
+- **If the intent behind DS-15 or DS-16 matters, they are re-authored here as new criteria.** They are not reconstructed from the places that cite them.
+- Where another document still writes *"DS-1…DS-17"*, read it as **DS-1…DS-10** and correct it on sight (§1's propagation rule).
+
+The three that are new, and real:
 
 **DS-18 · No claim without a working capability.** Every §2 Block 1 line, §3 line, and FAQ answer describing app behavior traces to a capability verified working on a device — recorded verdict, dated, naming the verifying issue. **A PRD line is not evidence.**
 

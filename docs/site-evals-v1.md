@@ -645,21 +645,26 @@ Every P0 PRD requirement was checked against the decomposition, and every meanin
 
 None remaining. Every eval names at least one decomposition issue.
 
-### DS criteria with no definition — **closed: a phantom range, recorded in PRD §12.1**
+### DS criteria — the range is withdrawn, not pending
 
-PRE-1 Part B was scoped to add "evals for DS-15 through DS-18." **DS-18, DS-18a and DS-18b are
-defined in v7.3 §12.1 and their evals are written above (SITE-EVAL-071, 072, 073).
-DS-11 through DS-17 are defined in no artifact in this repository, nor in v5 or v7.2 in git
-history.** v5 defines DS-1…DS-10 and stops. v7.3 §12.1 says *"DS-1…DS-17 stand"*, and DS-15 and
-DS-17 are cited — DS-15 at §12 for the contracts drift guard (SITE-004), DS-16 in v7.2 as
-forbidding unbacked claims, DS-17 only as a range endpoint — but none is stated.
+**The demo success criteria are DS-1 … DS-10, plus DS-18, DS-18a and DS-18b. There are no
+others.** PRE-1 Part B was scoped to add *"evals for DS-15 through DS-18"*; DS-18, DS-18a and
+DS-18b are defined in v7.3 §12.1 and their evals are written above (SITE-EVAL-071, 072, 073).
+
+**DS-11 through DS-17 are a reference to nothing** — no artifact in this repository, and no
+superseded PRD in git history, ever states them. v5 defines DS-1…DS-10 and stops. PRD v7.3
+§12.1 previously opened with *"DS-1…DS-17 stand"*; **that line is withdrawn in the PRD
+itself**, because it cited eleven gates of which seven were never written. DS-15 and DS-16
+appear only as citations (DS-15 at §6.6 and §12.3 for the contracts drift guard, DS-16 in v7.2
+as forbidding unbacked claims) and DS-17 only as a range endpoint — **a citation is not a
+definition.**
 
 **No eval was written for DS-15, DS-16 or DS-17, and none should be until they are defined.**
 Inferring a gate's definition from a citation would produce a gate verified against nothing —
-the §0.3 failure in its purest form. **Ruled: "DS-1…DS-17 stand" is provenance, not authority**,
-and PRD v7.3 §12.1 now says so in the document itself. DS-11 through DS-17 are a phantom range;
-nothing may be gated on them while they remain undefined. If the intent behind DS-15 and DS-16
-matters, they are re-authored as new criteria in the PRD — never reconstructed here.
+the §0.3 failure in its purest form. **Nothing may be gated on DS-11 through DS-17**: a gate
+with no definition cannot be failed, which makes it worse than absent, because it reads as
+passed. If the intent behind DS-15 or DS-16 matters, they are re-authored as new criteria in
+the PRD — never reconstructed here.
 
 ### Issues with no meaningful verification
 

@@ -237,7 +237,8 @@ the evidence for one; it may never mark one passed on its own reasoning.
 
 **DS-1 through DS-10 (PRD §2) are gates, not aspirations**, and each is verified
 individually with documented evidence. DS-3 and DS-4 are verified from instrumented
-data, never estimates.
+data, never estimates. **DS-18, DS-18a and DS-18b are gates too** (PRD v7.3 §12.1,
+SITE-108). **DS-11 through DS-17 do not exist** — nothing may be gated on them.
 
 **The P0 validation gate (SITE-060, SITE-061) decides whether Peak work may begin.**
 Six participants, thresholds: **5/6 reach the wall unprompted · 4/6 tune without
@@ -429,8 +430,12 @@ now gates anything.
    §15.2 read** — if a new account cannot create a gate at all on day one, protection
    leaves the builder and the wall moves to a timer or reminder.
 2. **FAQ 12 — rewritten, not held.** Export and delete are **unbuilt, not unproven**, so
-   the answer became a roadmap one and "Export and delete" became a §2 Block 2 entry owned
-   by BAS-125 (SITE-091, SITE-095).
+   the answer became a roadmap one and "Export and delete" became a §2 Block 2 entry
+   (`SITE-91`, `SITE-95`). **Its owning identifier is unverified.** v7.3 names `BAS-125`;
+   in Linear that identifier resolves to a picker/app-group token-storage issue. Kian is
+   confirming it from the app side. **Until he does, that Block 2 entry does not ship** —
+   DS-18a requires a real owning issue, and a wrong one fails it. `SITE-91` carries the
+   reference as inert text with the note; leave it that way.
 
 **One live defect Part B corrected.** v5 through v7.2 specified the builder's gate object as
 `Instagram, TikTok blocked · 6:00–7:30am` — a UI state the app is structurally incapable of
@@ -472,22 +477,34 @@ R-2 findings bearing on site copy, recorded so they are not re-derived:
 team key is confirmed, and all 108 issues exist. **Implementation begins at `SITE-1`**, under
 the §8 issue execution protocol.
 
-**Two stale-scope issues were populated with a warning rather than silently.** `SITE-72`
-(Sections 2, 4, 5, 6) and `SITE-74` (Metadata, OG card, legal pages) were authored against
-the pre-v7.3 section map: they name "What you didn't see", place §3 and the legal routes at
-P1, and declare "no `/pricing`". v7.3 moved all of that to P0 in SP-17 (`SITE-89`…`SITE-101`).
-Both issues now open with a **SCOPE SUPERSEDED** block naming what moved and where, and both
-say *do not build from the text below*. **They need re-scoping or closing before they are
-picked up** — that is a product decision, not a session's. This is the §1 propagation rule
-firing in the decomposition exactly as it fired in `SITE-040`.
+**The two stale-scope issues are re-scoped, not closed.** `SITE-72` and `SITE-74` were
+authored against the pre-v7.3 section map. Ruled: the work behind them still exists, only the
+section map was stale.
 
-**One open item Part B could not close.** PRE-1 Part B was scoped to add *"evals for DS-15
-through DS-18."* DS-18, DS-18a and DS-18b are defined in v7.3 §12.1 and their evals are
-written (SITE-EVAL-071, 072, 073). **DS-11 through DS-17 are defined in no artifact here,
-nor in v5 or v7.2 in git history** — v5 defines DS-1…DS-10 and stops, and while v7.3 §12.1
-says *"DS-1…DS-17 stand"*, DS-15, DS-16 and DS-17 are only ever cited, never stated. No eval
-was written for them; inferring a gate's definition from a citation is what §7 forbids.
-Recorded in the evals document under *DS criteria with no definition*.
+- **`SITE-72` is now "§6 Method — four principles, collapsed."** §2 and §3 went to P0 in SP-17,
+  §10 Join to `SITE-97`, "What's underneath" was cut outright, and §5 has its own issue
+  (`SITE-73`). §6 is the one P1 section no other issue owned.
+- **`SITE-74` is now "Favicon set and theme-color."** Metadata and the OG card went to
+  `SITE-100`, the legal routes to `SITE-99`. The icon set is what no P0 issue claims.
+
+Neither turned out empty, so neither was closed. Two open questions are flagged on `SITE-74`
+rather than decided: the favicon is arguably P0 since it is visible on first load, and its
+`SITE-88` gate is probably vestigial now that the issue is an icon set. Both are graph and
+priority decisions, not a session's.
+
+**The DS phantom range is closed, by withdrawal rather than by definition.** **The demo
+success criteria are DS-1 … DS-10, plus DS-18, DS-18a and DS-18b. There are no others.**
+DS-11 through DS-17 are a reference to nothing — no artifact here, and no superseded PRD in
+git history, ever states them. v7.3 §12.1 previously opened with *"DS-1…DS-17 stand"*; that
+line is **withdrawn in the PRD itself**, because it cited eleven gates of which seven were
+never written.
+
+**Nothing may be gated on DS-11 through DS-17.** A gate with no definition cannot be failed,
+which makes it worse than absent — it reads as passed. No eval was written for DS-15, DS-16
+or DS-17 and none should be until they are defined; if their intent matters they are
+re-authored in the PRD as new criteria, never reconstructed from the places that cite them.
+Where any document still writes *"DS-1…DS-17"*, read it as **DS-1…DS-10** and correct it on
+sight.
 
 ---
 
