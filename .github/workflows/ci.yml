@@ -1,0 +1,59 @@
+name: CI
+
+# SITE-001. This file is what CLAUDE.md §7 means by "the sweep is the CI job
+# list, not a number". Adding a check here adds it to the sweep; nothing else
+# does. Later issues extend it — SITE-004 the contracts drift guard, SITE-057
+# the overflow and touch-target audit, SITE-078 the performance budgets,
+# SITE-106 the eval-stub run, SITE-107 the ban-list check.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch cancels the first; the last commit is the
+# one whose result matters.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  check:
+    name: typecheck · lint · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` fails on a lockfile that disagrees with package.json, which is
+      # the point — an out-of-date lockfile should stop the build.
+      - run: npm ci
+
+      # Each step runs bare and its exit status is the result. Never pipe a
+      # check through a filter: a pipeline reports whether the filter
+      # succeeded, so a failing check whose output happens not to match looks
+      # exactly like a passing one (CLAUDE.md §7).
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # The static export is what Cloudflare Pages serves. If `out/` is missing
+      # the build silently stopped being an export, and every later deploy
+      # would serve the previous one.
+      - name: Assert static export produced out/
+        run: test -d out && test -f out/index.html

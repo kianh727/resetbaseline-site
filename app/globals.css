@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/*
+ * SITE-001 establishes the stylesheet entry point only.
+ * Design tokens are SITE-002; the type scale is SITE-003. Nothing is defined here.
+ */
+
+html {
+  /* Native scroll. No smooth-scroll override, here or anywhere (PRD §7.5, SITE-070). */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  /* Zero horizontal scroll at 320px is a P0 acceptance criterion (SITE-005, SITE-057). */
+  overflow-x: clip;
+}
