@@ -594,7 +594,46 @@ build — reports, not the work. Both clauses satisfied as written. If a gate ev
 who has not been in the conversation at all, that is a real staffing problem, and it is hit at
 `SITE-085` rather than solved in advance.
 
-**Next in sequence is `SITE-4`** (contracts manifest, generated types, drift guard).
+**`SITE-4` is started and blocked on one input, by design rather than by surprise.** Its scope
+opens *"commit `contracts-manifest.json` — the app's `CONTRACT_MANIFEST` verbatim, plus
+`captured_at` and the app repo commit SHA."* That content has never been in this repo or its
+history and exists only in `kianh727/baselinev1`. Everything else in the issue — the type
+generator, the layout-rule coverage check, the drift guard's negative test — operates **on**
+that file, so none of it can be built first. **No manifest was fabricated to build against**:
+inventing the action-type vocabulary is a §9 stop, a drift guard tested against an invented
+manifest verifies nothing (§0.1), and `placeholder` is a §11 rejection outright.
+
+**Two rulings, 2026-09-19 (Kian).**
+
+- **The app session commits `contracts-manifest.json` directly into this repo**, with
+  `captured_at` and the SHA already filled in. **This site does not read the app tree** —
+  the boundary holds in both directions. `docs/contracts-manifest-delivery.md` is the
+  delivery spec: path, envelope, the `artifact_divergences` exclusion, and what the site does
+  with it.
+- **Kian raises the manifest-publication request app-side himself.** No cross-team write was
+  made from here. **§6.6's primary mechanism is pending his action, not unclaimed** — and
+  SITE-004 ships on the staleness fallback regardless, which is already ruled wanted rather
+  than required.
+
+**What of SITE-4 is built.** §6.6's staleness fallback, which reads the envelope only and
+therefore did not need the contract vocabulary to exist: `scripts/manifest-staleness.mjs` is a
+pure `evaluate(parsed, now)` with **warn at 30 days, fail at 60**, and `scripts/check-manifest.mjs`
+wraps it. **Absence is a failure, not a pass** — a staleness check that returns ok with no
+manifest goes green on exactly the state it exists to catch. Thresholds are tested at their
+exact boundaries against a fixed `now`, because a test whose verdict depends on the day it runs
+will one day change its answer without the code changing.
+
+**It is deliberately not in the CI sweep yet.** Wiring it in before the manifest lands would
+paint CI red for a pending dependency everyone already knows about, which is noise rather than
+signal. **It joins the sweep in the same commit as the manifest**, and its logic is exercised
+now by `tests/manifest-staleness.test.mjs` (7 tests). Confirmed failing correctly against the
+current absent state: exit 1.
+
+**Still owed before SITE-4 can finish:** the manifest itself. On arrival — wire the check into
+CI, generate the plan-model types, add the layout-rule-per-`capability_type` coverage check that
+fails the build on an uncovered type, and the negative test proving an altered manifest fails.
+
+**Next in sequence is `SITE-5`** if SITE-4 stays blocked — SP-01's remaining foundation work.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as

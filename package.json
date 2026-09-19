@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test 'tests/**/*.test.mjs'",
     "check:bundle": "node scripts/check-bundle.mjs",
-    "check:dev-routes": "node scripts/check-dev-routes.mjs"
+    "check:dev-routes": "node scripts/check-dev-routes.mjs",
+    "check:manifest": "node scripts/check-manifest.mjs"
   },
   "dependencies": {
     "next": "15.5.25",
