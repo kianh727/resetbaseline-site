@@ -1498,11 +1498,25 @@ milestone's phase is the project it sits in.
 The SP decomposition is fully preserved; milestones are ordered and show
 progress, which projects do not.
 
-**113 issues total: P0 = 90, P1 = 17, P2 = 6.** The original 84, plus four design
+**115 issues total: P0 = 92, P1 = 17, P2 = 6.** The original 84, plus four design
 review gates (SITE-085…088) defined in addendum §3, plus PRE-1 Part B's twenty
-(SITE-089…108), plus **SITE-109…113**, all created 2026-09-19. Creation order runs
-001…084, then 085…088, then 089…108, then 109…113, in strict sequence throughout;
+(SITE-089…108), plus **SITE-109…115**, all created 2026-09-19. Creation order runs
+001…084, then 085…088, then 089…108, then 109…115, in strict sequence throughout;
 the mapping stays positional and append-only.
+
+**SITE-114 and SITE-115 are §6.1c's, and they are two issues rather than one on purpose.**
+`SITE-115` is the workspace transition; `SITE-114` is the `workspace` state in the machine's
+table, and **115 is blocked on 114**. Hand-adding a state to *that* table is the risk:
+SITE-12's test asserts `walled` is produced by exactly one event **exhaustively over every
+state × event pair**, which is what proves Rejection 3. A new state multiplies the pair space,
+and adding it as a side effect of building a transition is how a pair gets missed and the wall
+becomes reachable by something that is not an activation attempt.
+
+**Neither is folded into SITE-7 or SITE-8, which carry scope-change notes instead.** Both are
+merged and both met their accept criteria as written; §6.1c gives each a second state those
+criteria do not describe. **A merged issue that silently acquires a second state is how an
+accept criterion stops describing the thing**, so the change is recorded on the issue rather
+than absorbed by it.
 
 **The five added 2026-09-19, and why they are five issues rather than one.** The copy
 gap surfaced four separate times — the hero H1, the chip strings, the five refusals,
