@@ -364,9 +364,41 @@ Seven, from PRD §22. Any of these in a diff is a defect, not a tradeoff.
 
 ## 12. Current state
 
-The repository is initialized: the four artifacts and this file. **No code, no
-scaffold.** SITE-001 has not begun — but Linear is now fully populated and it is the
-next thing to start.
+**`SITE-1` is done. The repository builds, exports statically, and has CI.** Next.js
+15.5.25 App Router, React 19, TypeScript strict, Tailwind v4, `output: 'export'`.
+Pinned to the 15 line because the issue specifies Next 15; 16.x is out of scope.
+
+**`.github/workflows/ci.yml` is the sweep** §7 refers to — typecheck, lint, build,
+each run bare, plus an assertion that `out/index.html` exists so a build that silently
+stops being an export fails rather than serving the previous deploy. **Green on
+`1311f02`, 43s.** Adding a check there adds it to the sweep; nothing else does.
+
+Three decisions recorded rather than left implicit:
+
+- **tsconfig goes past `strict`** to `noUncheckedIndexedAccess` and
+  `exactOptionalPropertyTypes`. The plan model, occurrence math and event schema all
+  depend on index access and optional fields being honest; adopting these later is
+  expensive.
+- **`next.config.ts` states `ignoreBuildErrors: false` and `ignoreDuringBuilds: false`
+  explicitly**, though both already default that way, so a future change has to be
+  deliberate rather than a default drifting.
+- **The scroll-library import ban is already in the eslint config.** SITE-070 owns the
+  full ban and its negative test; this was the earliest point it could exist.
+
+**`SITE-1`'s deploy acceptance is not met.** *"`main` deploys automatically; PR
+previews resolve"* needs the Cloudflare Pages project, which is SP-01's **Entry**
+criterion — a precondition assumed done before the issue starts, and not verifiable
+from a session. Build command `npm run build`, output directory `out`, Node 22. **No
+deploy was fabricated and no secret was hardcoded.**
+
+Two figures worth carrying: the framework baseline is already **103 kB gzip First Load
+JS before any product code**, against a 145 KB core budget — a real risk for SITE-76
+and SITE-78. And **the budget itself is contradicted**: PRD v7.3 §11 says core ≤145 KB,
+while SITE-76 and SP-15's exit say ≤120 KB. The PRD wins per §1, and 120 is stricter so
+building to it satisfies both, but the decomposition currently contradicts tier one.
+
+**Next in sequence is `SITE-2`** (design tokens and Tailwind theme), which depends only
+on `SITE-1`.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
