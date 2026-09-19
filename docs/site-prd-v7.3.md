@@ -370,6 +370,25 @@ The band is **charcoal and translucent, geometrically level, and bleeds off both
 
 **Lit marks are scheduled days. Dark marks are unscheduled days** — dark and neutral, **never crossed out, never rust, never styled as disabled.** An unscheduled day means nothing was placed there, not that something was missed.
 
+#### A primitive with no recurrence has no band
+
+**Amended 2026-09-19 (Kian).** *"Nothing else ever gets a band"* is the operative clause and it is stated positively here, because **an unstated exclusion reads as an oversight and the next author fills it.**
+
+**A band is emitted only for a recurring window and for protection.** By name:
+
+- **A timer gets no band.** It is a duration with no recurrence — §6.1a's Problem line is *"starting is expensive; sessions run unbounded."* No window, no band.
+- **A tracker gets no band.** It is a direction with no occasion — *"a direction with no feedback."* No window, no band.
+
+**This is the grammar working, not a hole in it.** A band means *a recurring time window*; a primitive that has no recurring window has nothing for a band to mean. **Do not invent a band variant for either.** What a timer and a tracker look like instead is a real open question and is **not a band**; it is tracked on SITE-026 and is Kian's to rule.
+
+#### The band does not animate in
+
+**Amended 2026-09-19 (Kian).** **A band has no entrance animation and no draw-on.** It is present from the first paint of the plan.
+
+A route stroke drawing itself was a thing **coming into existence over time**, which is what made it a completeness meter in motion as well as in composition. **A recurring window is not a thing that happens; it is a thing that is the case.** Nothing about it arrives.
+
+**Marks may appear as their occurrences resolve** — that is where SITE-025's beat lives, and it survives intact. The band is the frame those marks land in, and it is already there when they do.
+
 #### Why the last rule is a MUST and not a preference
 
 It is **§4 rendered in visual grammar.** §4 promises no completeness meters and **cannot regress and cannot be wrong**. A dark mark styled as a gap regresses that promise **in pixels while the copy still reads correctly** — the section says the right thing and the most dominant element on the page contradicts it. That failure is invisible to every copy check the site has.
@@ -382,7 +401,7 @@ If any component can render a band from anything other than the recurrence model
 
 #### Gate
 
-Five questions, added to §12.4a's checklist under the same reviewer constraint — **not the implementer, has not watched the build.** Each is a yes/no; **any single yes rejects the work.**
+**Six** questions, added to §12.4a's checklist under the same reviewer constraint — **not the implementer, has not watched the build.** Each is a yes/no; **any single yes rejects the work.**
 
 **The review set MUST include at least one frame where most marks are dark**, and the gate's output **MUST state which frame carried the sparse case.** A set of frames showing full or near-full weeks **cannot fail the dark-mark rule, because the condition it measures never occurs** — §12.4 applied to a design gate rather than to an eval.
 
@@ -531,7 +550,58 @@ An entry leaves Block 2 by passing DS-18 and moving to Block 1. It never leaves 
 
 ## 11. Carried forward unchanged
 
-**The Peak** (v5 §7, P1) · **Motion** (v5 §8) · **Type and tokens** (v5 §14) · **Mobile** (v5 §9) · **Degradation** (v5 §15, the builder never degrades) · **Providers** (v5 §12) · **The wall** (v5 §11) · **Scope-kill rules** K-1…K-8.
+**The Peak** (v5 §7, P1) · **Motion** (**inlined at §11.1**) · **Type and tokens** (v5 §14) · **Mobile** (v5 §9) · **Degradation** (v5 §15, the builder never degrades) · **Providers** (v5 §12) · **The wall** (v5 §11) · **Scope-kill rules** **K-1…K-7**.
+
+**Corrected 2026-09-19: the range was written K-1…K-8, and there is no K-8.** v5 §17 defines K-1 through K-7 and stops. This is the DS-11…DS-17 shape at a smaller scale — a range citing a rule that was never written, which cannot be failed and therefore reads as passed. `CLAUDE.md` §4 had it right at K-1…K-7 throughout.
+
+**Everything else on this line is still carried by reference to a document that is not in the working tree**, which is the problem §11.1 fixes for Motion. The remaining seven, and three more cited outside this list, are audited and awaiting a ruling before they are inlined.
+
+### 11.1 Motion — v5 §8, carried forward and now inlined
+
+**Amended 2026-09-19 (Kian).** §11 carried this forward *by reference* to a document §1 removes from the working tree. **A requirement readable only from git history is the same failure as §6.5's citation to a superseded table** — the reader follows the pointer, finds nothing, and cannot tell whether the requirement is missing or they are. SITE-024 had to recover the spring constants from `9568a9a:docs/site-prd-v5.md` to build against them.
+
+**The text below is v5 §8 verbatim. It is a requirement of this document, not provenance.**
+
+#### Motion — v5 §8, inlined verbatim
+
+##### 8.1 The signature: settling
+
+One spring, used **only** when structure lands into place.
+
+```
+spring: { stiffness: 260, damping: 24, mass: 0.9 }
+from:   { opacity: 0, scale: 0.94, y: 8 }
+```
+
+Match the app's sheet spring if it differs. **Banned everywhere else** — if a section header uses it, the signature is gone. This is the rule most likely to erode across a long build.
+
+##### 8.2 Timing
+
+| Element | Motion |
+|---|---|
+| Route draw | 450ms stroke-reveal *(shortened from v4's 900ms — it was serial time before comprehension)* |
+| Occurrence fan-out | 45ms stagger, settling spring, ~600ms. **Interruptible; controls enable before it finishes.** |
+| Occurrence regenerate | Exit 120ms, re-enter 30ms stagger. **Under 400ms total** (DS-4). |
+| Refusal beats | **No spring.** Opacity 300ms, `--veto` left rule, 400ms hold *(reduced from 600ms)*. The system stopping must not look like the system producing. |
+| Transformation block fills | Per-row opacity 200ms. No stagger — rows fill as sources resolve, not on a schedule. |
+| The wall | Dim 240ms, content fades up. No scale, no bounce. A boundary, not an event. |
+| Section reveals | Opacity 0→1, 400ms, ease-out, 20% entry, once. No slide, no stagger, no hover lift. |
+
+**Removed from v4:** the 38ms/token read-back stream. It is an AI-transcript pattern, it is serial time before comprehension, and §3.4 replaces it with structured fields that fill.
+
+##### 8.3 Reduced motion
+
+Light sweep stops at the hero angle, cursor authority off. Grain renders statically. Camera snaps between stations. Builder renders final states; no autoplay, no self-typing. **The site must be fully comprehensible with every animation disabled.**
+
+**Two lines above are superseded by §6.3b, and are kept struck rather than deleted so the supersession is visible at the point of the old requirement:**
+
+- ~~*Route draw · 450ms stroke-reveal*~~ — **§6.3b: a band has no entrance animation and no draw-on.** The 450ms belongs to the marks resolving inside a band that is already there. A stroke drawing itself is a thing coming into existence over time, which is the completeness meter in motion.
+- The **occurrence fan-out** row stands unchanged — 45ms stagger, settling spring, ~600ms, interruptible, controls enabling before it finishes. That is the beat §6.3b preserves.
+
+**One line above is now stricter than it reads.** *"Section reveals — opacity 0→1, 400ms, ease-out, 20% entry, once. No slide, no stagger, no hover lift"* is compatible with §10's ban list and with §12.4a tell 6 (*fade-and-slide-up on every section*) **only because it forbids the slide.** Read it as the ban, not as a licence to animate every section.
+
+
+### 11.2 Budgets
 
 | Metric | Ceiling |
 |---|---|
@@ -577,11 +647,17 @@ Three consequences, binding:
 
 | Range | Status |
 |---|---|
-| **DS-1 … DS-10** | **Real.** Defined in v5 §18 and carried forward by §11. Each is a gate, verified individually with documented evidence. |
+| **DS-1 … DS-10** | **Real.** Defined in **v5 §2** — see the correction below. Each is a gate, verified individually with documented evidence. |
 | **DS-11 … DS-17** | **A reference to nothing.** No artifact in this repository, and no superseded PRD in git history, ever states them. |
 | **DS-18 · DS-18a · DS-18b** | **Real.** Defined below. |
 
 Earlier revisions of this document opened this section with *"DS-1…DS-17 stand."* **That line was provenance, not authority, and it is withdrawn here** — it cited eleven gates of which seven were never written. DS-15 and DS-16 appeared only as citations (DS-15 at §6.6 and §12.3 for the contracts drift guard; DS-16 in v7.2 as forbidding unbacked claims) and DS-17 only as the endpoint of the range, but **a citation is not a definition** and none is recoverable. **Ruled 2026-09-19 (Kian): every one of those citations is struck.** A citation to a withdrawn gate is worse than no citation — a reader follows it, finds nothing, and cannot tell whether the check is unjustified or the definition is merely missing. The checks they pointed at are real and keep their own justification; what is removed is the pointer to a gate that was never written.
+
+**Corrected 2026-09-19: this table previously read *"Defined in v5 §18 and carried forward by §11."* Both halves were wrong.**
+
+They are defined in **v5 §2**, not §18 — v5 §18.1 says only *"All of §2 (DS-1 through DS-10), verified individually"*, which is a pointer, not the definitions. And **§11 carries forward neither v5 §2 nor v5 §18**, so the ten gates this document calls real are carried forward by nothing and are in the working tree nowhere.
+
+**That is sharper than the phantom range it was written to close.** DS-11…DS-17 read as passed because they had no definition to fail. DS-1…DS-10 have definitions, and they are one `git show` away from anyone who thinks to look — and a citation pointing at the wrong section of a removed document is what stops them looking. **Flagged for the inlining ruling; the definitions are not inlined here** because §11's carry-forward list is being audited as a whole rather than one section at a time.
 
 **Consequences, stated so this is not rediscovered:**
 
@@ -638,7 +714,7 @@ Ten tells. **Each is a yes/no. Any single yes rejects the work** — the reviewe
 
 #### The band grammar questions — added 2026-09-19 (Kian)
 
-**Five more, from §6.3b. Same rule: each a yes/no, any single yes rejects.** They are not a second gate and not weighed against the ten — the checklist is fifteen questions with one disqualifying answer each.
+**Six more, from §6.3b. Same rule: each a yes/no, any single yes rejects.** They are not a second gate and not weighed against the ten — the checklist is **sixteen** questions with one disqualifying answer each.
 
 | | Question |
 |---|---|
@@ -647,12 +723,15 @@ Ten tells. **Each is a yes/no. Any single yes rejects the work** — the reviewe
 | 13 | Does lavender appear as fill anywhere — a stripe, a block, a painted region? |
 | 14 | Does any dark mark read as a gap, an absence, a miss, or a disabled control? |
 | 15 | Does any element suggest the dark marks should be filled? |
+| 16 | Does any band draw itself in, grow, extend, or arrive? |
 
 **The review set MUST include at least one frame where most marks are dark, and the gate's output MUST state which frame carried the sparse case.**
 
 That requirement is the gate's own §12.4. A set of frames showing full or near-full weeks **cannot fail question 14 or 15**, because the condition they measure never occurs — the reviewer answers no to both, honestly, and the gate reports a pass it never tested. **Naming the sparse frame in the output is what makes an untested pass visible at the time**, rather than a year later when a dark mark ships reading as a miss.
 
-**Applies equally at SITE-087 and SITE-088.** The same fifteen questions, the same rule, the same staffing constraint.
+**Question 16 is the motion half of question 12.** A band that is level and endless in a screenshot, and draws itself in when the plan lands, is a completeness meter that a still frame cannot catch — the composition passes and the thing the visitor actually sees does not. It is asked separately because a review of screenshots answers 12 and cannot answer 16.
+
+**Applies equally at SITE-087 and SITE-088.** The same sixteen questions, the same rule, the same staffing constraint.
 
 **What this gate cannot catch.** It catches *tells*, not dullness. Work can pass all ten and still be inert — correctly composed, correctly restrained, and not worth looking at. §12.4a is a floor that removes the specific ways this work fails by default; clearing it is not evidence that the work is good.
 

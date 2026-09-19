@@ -1159,13 +1159,45 @@ The grammar is in §5 of this file. Three things about it that matter more than 
   recurrence and is **not a prop a component may pass**. The shape of that is being agreed
   before it is built, per the instruction.
 
-**What §6.3b does not say, and what therefore stopped rather than being decided.** The grammar
-assigns a band to a recurring window and to protection, and **nothing else ever gets a band**.
-It does not say what a **timer** or a **tracker** is instead, and it does not say what the
-450ms reveal is now that a route stroke is superseded. Both are recorded as undefined on
-`SITE-25` and `SITE-26` and are Kian's to rule — §4's *"anything the issue does not specify is
-undefined behavior. STOP"*, not a session's call. Struck through in the decomposition and in
-Linear rather than deleted, so nobody reads the old scope and builds it.
+**Both gaps §6.3b left are ruled (2026-09-19, Kian), and both are the grammar working.**
+
+- **A timer and a tracker get no band.** A band means a recurring time window; a timer is a
+  duration with no recurrence and a tracker is a direction with no occasion — §6.1a's own
+  Problem lines. Neither has a window, so *"nothing else ever gets a band"* applies to both, and
+  §6.3b now **states the exclusion positively and by name**, because an unstated exclusion reads
+  as an oversight and the next author fills it. **Do not invent a band variant for either.**
+  What they get instead is open, **not blocking**: SITE-26's gate half builds now and the rest
+  waits on **a visual treatment that is not a band** — the distinction is the ruling.
+- **The band does not animate in. It is already there.** A route stroke drawing itself was a
+  thing **coming into existence over time**, which made it a completeness meter in motion as
+  well as in composition. **A recurring window is not a thing that happens; it is a thing that
+  is the case.** The band is present from first paint of the plan; what reveals is the marks
+  inside it as occurrences land, so SITE-25's beat survives — it moved from the frame to the
+  marks. **§12.4a gains question 16** — *does any band draw itself in, grow, extend, or
+  arrive?* — asked separately from question 12 because **a review of screenshots answers 12 and
+  cannot answer 16.** The checklist is sixteen.
+
+**v5 §8 is inlined into v7.3 at §11.1, verbatim** (ruled 2026-09-19). §11 carried it forward by
+reference to a document §1 removes from the working tree, which is the same failure as §6.5's
+citation to a superseded table — SITE-024 had to recover the spring constants from
+`9568a9a:docs/site-prd-v5.md` to build against them. The two lines §6.3b supersedes are struck
+in place rather than deleted, so the supersession is visible at the point of the old requirement.
+
+**The §11 audit found two more defects, and the second is worse than the phantom it sits next to.**
+
+1. **There is no K-8.** §11's list read *"Scope-kill rules K-1…K-8"*; v5 §17 defines K-1 through
+   K-7 and stops. **The DS-11…DS-17 shape at a smaller scale** — a range citing a rule never
+   written, which cannot be failed and therefore reads as passed. Corrected in the PRD; this
+   file's §4 had it right at K-1…K-7 throughout.
+2. **§12.1 cited DS-1…DS-10 as *"Defined in v5 §18 and carried forward by §11"*, and both
+   halves were wrong.** They are defined in **v5 §2** — §18.1 only points at §2 — and **§11
+   carries forward neither v5 §2 nor v5 §18.** So **the ten gates this repository treats as
+   binding are carried forward by nothing and are in the working tree nowhere.** That is sharper
+   than the phantom range §12.1 was written to close: DS-11…DS-17 read as passed because they
+   had no definition, while DS-1…DS-10 have definitions one `git show` away from anyone who
+   thinks to look — and a citation pointing at the wrong section of a removed document is what
+   stops them looking. Citation corrected; **the definitions are not inlined**, pending the
+   ruling on the audit below.
 
 **`SITE-24` is done — the settling spring, hand-rolled.**
 
