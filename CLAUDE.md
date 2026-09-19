@@ -930,6 +930,54 @@ the site's strongest claim.
   `SITE-20` strictly to semantics** — occurrences, recurrence, windows, authority tiers, never
   position or completion.
 
+**SP-03 is started. `SITE-13`, `SITE-14` and `SITE-102` are done** — the three deterministic
+pieces §4's table names, all pure functions with fixture suites and no consumers yet, so the
+bundle is unchanged at 101.0 KB.
+
+- **`SITE-13` · the date-phrase parser.** Every date is **noon-anchored local**, because a date
+  at midnight can shift a day across a DST transition and the calendar day the visitor sees
+  must be the one stored. Four phrase families, extended to their obvious members — all twelve
+  months, `days|weeks|months`, `month|quarter|year` — which refines what the issue names rather
+  than adding a fifth family. Month arithmetic clamps: "in 1 month" from 31 Jan is 28 Feb, not
+  3 March, so the deadline never lands in a month the visitor did not name.
+- **The fixture suite found a real bug.** *"by February 30"* failed the explicit-date rule and
+  then **fell through to the bare-month rule, returning 28 February** — the parser silently
+  correcting an impossible date into a plausible one and showing it as understanding, which is
+  precisely what *"ambiguous phrasing returns null rather than guessing"* forbids. Rules now
+  distinguish *did not match* from *matched something impossible*, and the second aborts the
+  whole parse.
+- **`SITE-14` · the domain classifier**, five bounded domains, erring toward bounded because the
+  two errors are not symmetric: a false positive is an odd demo, a false negative builds a
+  training plan around an injury. **Fixtures caught three gaps**, all false negatives — "hurt my
+  back" matched nothing, "saving for retirement" needed a following noun, and eviction sat in
+  finance when a landlord evicting you is legal.
+- **The parity check is structural, not behavioural, and that is §0.3b applied the same day.**
+  SITE-014 asks that client and server produce identical output. There is **one**
+  implementation imported by both, so comparing it against itself could not fail. The test
+  instead asserts that **nothing outside `lib/parse/domain.ts` names the tiers** — a second
+  implementation is the only thing that can drift, so that is what it looks for.
+- **`SITE-102` · input classification**, seven classes. **Evaluation order is not the declared
+  order**: `bounded` is tested immediately after readability, ahead of `vague` and `multi_goal`,
+  because *"I want to get healthy after my surgery"* is both — and if `vague` won, the site
+  would ask a clarifying question about a medical situation it has already decided not to
+  advise on. §6.4 lists the classes; it does not order the tests.
+
+**`SITE-17` is blocked, and the premise that it was not is worth recording.** The ruling said the
+five refusals are "§3 verbatim and already authored in v7.3". They are two different artifacts.
+**v7.3 §4 (the site's §3) carries four lines** — no streaks · no completeness meters · silence is
+never failure · it refuses what it shouldn't guess at — which are the *website section*, and
+§15.4 calls them *"specified structure with example text; not final prose"* and puts them inside
+`SITE-109`. **SITE-17 needs five per-domain builder refusals**, one each for injury, medical,
+mental health, finance and legal, and §4's determinism table says so explicitly: *"refusal copy —
+authored, per domain. Never generated. Five variants, one per bounded domain."*
+
+**Exactly one of the five exists**, the injury refusal, authored verbatim in v5 §3.4 and carried
+forward — *"I'm not going to program around an injury I can't see. I'd be guessing, and you'd
+follow it."* with its built-instead pair. **The other four are not in any artifact.** They were
+not invented here: they are the site's most sensitive sentences, covering medical,
+mental-health, legal and financial situations, and §5 puts refusal copy outside anything a
+session generates.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**
