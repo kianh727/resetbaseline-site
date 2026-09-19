@@ -1687,6 +1687,48 @@ animates at all, which is §0.3 with the motion as the missing thing. Proven bot
 the reduced-motion rule exits 1, and **removing the animation entirely exits 1 naming the
 vacuous case.**
 
+**SP-05's provider seam is built — the interface, validation, the timeout and the five-mode
+fallback. Not the route, and not the authored scenarios.**
+
+- **Validation is per-field, and that is the point** (§6.5). A validator returning one verdict
+  for the response would force all three fields to fall back together, which §6.5 forbids by
+  name. §6.4's five constraints are asserted as **five separate rejections from one valid base**,
+  so a constraint that stopped being checked fails on its own line rather than being masked by
+  another that still is.
+- **No repair, no coercion.** A 49-character title is rejected, not trimmed to 48. **Repairing a
+  model response is the model's authority widening by the back door** — the repaired value is one
+  nothing specified and nobody chose.
+- **All five failure modes are asserted as five.** A test checking one and assuming the rest
+  passes on a `catch` that swallows everything into a single path, which is the same
+  implementation and wrong for a different reason.
+- **Post-abort immutability has its own test, against a provider that ignores the signal.** An
+  `AbortSignal` stops the *fetch*, not the promise chain already scheduled behind it — so the
+  case that matters is a late resolve, and it is the one a naive implementation gets wrong.
+- **A positive control**: a provider inside the budget is used as-is with no fallback recorded.
+  Without it every other assertion is satisfied by a seam that always falls back, which is §0.3
+  at the orchestrator.
+
+**The authored clarification set is empty, and the empty case is defined rather than dead.**
+`AUTHORED_CLARIFICATIONS` is typed and empty pending `SITE-112`; **no session drafts it.** §6.4
+already specifies what happens when the beat cannot run — *"never blocks past 8s; on timeout the
+build proceeds on the original input"* — and the empty set takes that same path: the plan builds
+from what the visitor wrote, with no question and no error. **A generic stand-in question was
+the tempting alternative and is the one §6.4 argues against**: its whole case for generating the
+question is that an authored one is keyword-selected and demonstrates a form rather than *it asks
+once*. A single generic fallback is that failure with no keyword matching to excuse it. A test
+asserts the set is empty **so that SITE-112 landing fails it**, which is the point — copy
+arriving is a change somebody should notice.
+
+**Not built, and why.** `SITE-030`'s route needs the prompt and the five authored scenarios;
+`SITE-029`'s `StaticProvider` needs those scenarios, which are `SITE-028` and are copy. The seam
+takes the static source as an **injected provider**, so both land without touching the
+orchestration.
+
+**One reminder the constitution already carried and I still tripped.** §7 records that Node's
+type stripping means **no parameter properties in code a test imports**. `ProviderFailure` was
+written with one and the suite refused to parse it. The constraint is in the file that governs
+this repository and it was still worth a comment at the point it bites.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**
