@@ -1,11 +1,16 @@
 /*
- * SITE-001 ships the deployable shell and nothing else.
+ * SITE-007 · The fold.
  *
- * Non-goals, from the issue: no routes beyond `/`, no content. The fold
- * composition is SITE-007, the input is SITE-008, and the builder state
- * machine is SITE-012. This file exists so the export has a route to emit.
+ * Everything below the fold — §2, §3, pricing, FAQ — belongs to SP-17 and is
+ * not on this page yet.
  */
 
+import Hero from '@/components/hero'
+
 export default function Home() {
-  return <main />
+  return (
+    <main>
+      <Hero />
+    </main>
+  )
 }

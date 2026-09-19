@@ -44,6 +44,18 @@ Generalised: **a criterion satisfiable by the absence of the thing it measures i
 
 The site's own artifacts are exposed. `SITE-EVAL-021`'s *"all validate"* passes on zero requests. `SITE-EVAL-027`'s *"each demonstrates its assigned behavior"* passes if the assertion is presence-of-render rather than presence-of-behavior. **Standing rule at §12.4.**
 
+#### 0.3a A second shape — the guard that hides what it guards
+
+**Recorded 2026-09-19 (Kian). Distinct from the above, and it will recur.**
+
+§9 requires `overflow-x: clip` on the root, as a safety net against a stray horizontal overflow. SITE-005's overflow check read `scrollWidth` on the shipped page — and passed a deliberate 1200px-wide element at a 320px viewport. **`clip` removes the overflow from `scrollWidth`.** The guard the PRD requires was hiding the defect from the test written to find that defect.
+
+Generalised: **anything that suppresses a symptom also suppresses its detection.** A measurement taken downstream of a guard measures the guard.
+
+This is not the absence shape. There, the thing being measured does not exist. Here it exists, is wrong, and is invisible — which is worse, because the check is green and specific and pointed straight at it.
+
+The consequence is a habit, not a rule that can be written once: **a check that runs downstream of a mitigation must neutralise the mitigation before measuring, and say in its own output that it did.** SITE-005's check now lifts the clip, reports both numbers — unclipped is the layout truth and fails the build, as-shipped says whether a scrollbar is actually visible — and names the widest offending element. The same question applies to every retry, fallback, catch block, default value and CSS guard this site adds: *if this were broken, would the thing that protects it also hide it?*
+
 ### 0.4 Consequences applied in this document
 
 - **§2 is no longer a day.** It becomes a dated status section — §3 below.
@@ -554,6 +566,12 @@ Every automated eval must **fail on an empty implementation.** Before an eval is
 Known exposure to audit first: **SITE-EVAL-021** (*"all validate"* passes on zero requests) · **SITE-EVAL-027** (*"each demonstrates its assigned behavior"* passes if the assertion is presence-of-render) · **SITE-EVAL-037** (event sequence assertion passes if no events are expected).
 
 **This audit runs before the eval suite is trusted for anything, including SITE-085's design review gate.**
+
+**Ruled 2026-09-19 (Kian): SITE-106 is a standing gate, not a one-time audit.** It is **re-run at each design review and before the P0 gate** — the same trigger as `CLAUDE.md` §1's fourth-rule reconciliation, for the same reason.
+
+The reason is that SITE-106 sat at SP-01 with one dependency, and its accept read *"every eval in the suite has a recorded stub result."* **At SP-01 almost no evals are implemented, so that criterion was satisfiable by there being nearly nothing to satisfy it.** The audit written to catch criteria satisfiable by absence had one at its own node. Running it once at SP-01 and closing it would have been §0.3 one level up.
+
+**What the gate does and does not establish.** `scripts/check-eval-stubs.mjs` reads the eval *definitions* and fails CI when any eval lacks a `*Stub check*` line, or when an automated eval answers `n/a` — an answer that is correct only for a `VIS` or `FTU` eval, where the verdict is a human's. That makes the question unskippable. **It does not establish that any eval was actually run against a stub**, because it reads the document and not the code. A green gate is evidence the question was answered, never evidence the answer is true.
 
 This rule exists because the same failure was found in the app's own acceptance criteria the same day it was written. It is not hypothetical.
 

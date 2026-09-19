@@ -1,0 +1,33 @@
+/*
+ * SITE-007 · Fold layout and hero headline.
+ *
+ * Left-aligned and vertically centered (§3.2). The headline is the **LCP
+ * element and has no entrance animation** — §16 puts the Peak out of the LCP
+ * path entirely, and an animated headline would make the largest paint depend
+ * on a timeline rather than on the document.
+ *
+ * Server component apart from the input, so the fold's text is in the HTML the
+ * browser parses first rather than arriving with hydration.
+ *
+ * The chips (SITE-010) sit beneath the input and are not built yet, which is
+ * why this issue's *"no scroll to see headline, input and chips"* criterion is
+ * only half-verifiable today. The fold reserves room for them rather than
+ * being laid out as though they will never exist.
+ */
+
+import AskInput from '@/components/ask-input'
+import { HEADLINE } from '@/lib/copy/hero'
+
+export default function Hero() {
+  return (
+    <section className="page-x flex min-h-[70svh] flex-col justify-center gap-8 py-12">
+      {/*
+        * `text-balance` keeps a short headline from breaking to a single
+        * trailing word. No italic or coloured accent on any one word (§19).
+        */}
+      <h1 className="max-w-[18ch] text-balance text-display text-bone">{HEADLINE}</h1>
+
+      <AskInput />
+    </section>
+  )
+}

@@ -281,6 +281,20 @@ Eval types: `AUTO` automated regression · `VIS` visual/manual acceptance · `FT
 first-time-user comprehension · `PERF` performance measurement · `ANLY`
 analytics/conversion measurement.
 
+**Two failure shapes are catalogued, and both are habits rather than one-time checks.**
+
+1. **A criterion satisfiable by the absence of the thing it measures is measuring the
+   container** (PRD §0.3). Ask of every check: *does this pass against a stub that does
+   nothing?*
+2. **A guard that suppresses a symptom also suppresses its detection** (PRD §0.3a, recorded
+   2026-09-19). `overflow-x: clip` is required by §9 as a safety net, and it removed the
+   overflow from `scrollWidth` — so SITE-005's overflow check passed a deliberate 1200px
+   element at a 320px viewport. The guard the PRD requires was hiding the defect from the test
+   written to find it. **A check downstream of a mitigation must neutralise the mitigation
+   before measuring, and say in its output that it did.** Ask of every retry, fallback, catch
+   block, default value and CSS guard: *if this were broken, would the thing protecting it
+   also hide it?*
+
 **Subjective design quality is not pretended to be automatable.** `VIS` and `FTU`
 verdicts are judged by a human and **recorded, not inferred.** A session may prepare
 the evidence for one; it may never mark one passed on its own reasoning.
@@ -309,6 +323,15 @@ Per-issue definition of done:
 - **Never weaken an eval to make an implementation pass.** A failing release-blocking
   eval means the implementation is wrong.
 - No `TODO` representing an undecided product question
+
+**Logic tests are TypeScript, run directly by `node --test`.** Node 22's native type stripping
+runs `.ts` test files with no ts-node, no build step and no test dependency; `tsconfig` carries
+`allowImportingTsExtensions` because stripping requires the explicit `.ts` specifier. **This is
+the standing mechanism, not a detail of the issue that discovered it** (SITE-006). It is
+recorded here so the next suite that needs it — SITE-023's DST-safe occurrence math with its
+40+ fixtures above all — finds a decision already made, rather than making a test-tooling
+choice under deadline pressure with a fixture suite half-written. Type stripping means no
+enums, no namespaces, no parameter properties in code a test imports.
 
 **Run every check bare, and read its exit status.** Never pipe a check through
 `head`, `tail`, `grep`, or anything that replaces its exit code with the filter's,
@@ -675,6 +698,8 @@ and landscape."*** Headless Chromium reports every safe-area inset as 0 because 
 notch, so what was verified is that the tokens resolve, the calc holds, and the gutter is
 correct at every width — not that the nav clears a notch. **That verdict needs a device and
 is Kian's to record** (§7: `VIS` verdicts are judged by a human and recorded, never inferred).
+**Ruled 2026-09-19: he records it. `SITE-5` is not marked done until he does** — its code is
+complete and its acceptance is not.
 
 **`SITE-6` is done.** `useReducedMotion()` and `useRenderTier()`, with §15's ladder as a pure
 function.
@@ -764,8 +789,67 @@ true.
 gate re-run at each design review and before the P0 gate — the same trigger as §1's fourth-rule
 reconciliation, for the same reason. Awaiting a ruling; the CI gate is in effect either way.
 
-**Next in sequence: SP-01 is complete except `SITE-4`**, which resumes the moment the manifest
-lands. SP-02 (Ask Baseline hero) is the next milestone and depends only on SP-01.
+**SP-01 is complete except `SITE-4`** (blocked on the manifest) and **`SITE-5`'s device
+verdict**, which is Kian's to record.
+
+**SP-02 is started. `SITE-7`, `SITE-8` and `SITE-12` are done** — structure, input, state
+machine. `SITE-9`, `SITE-10` and `SITE-11` are not, and are flagged below.
+
+- **`SITE-12` · the state machine.** A pure reducer with an explicit table; `next()` returns
+  `null` for a transition that is not in it, so **no state is reachable by side effect**.
+  `walled` is produced by exactly one event, and the test asserts that **exhaustively over
+  every state × event pair** rather than checking the one transition that is meant to reach it
+  — testing the intended path would confirm activation works while saying nothing about
+  whether anything else gets there, which is the half §11.1 and Rejection 3 care about. A
+  second test asserts the wall *is* reachable, because "only by activation" is satisfied
+  perfectly by a wall that never opens.
+- **`SITE-7` · the fold.** LCP asserted to be the `H1` at both widths, measured through a
+  `PerformanceObserver` registered before navigation. Headline and input both sit above the
+  fold with no page scroll at 1440px and 375px.
+- **`SITE-8` · the input.** Rules live in `lib/ask-input.ts` as pure functions, so the
+  thresholds are tested at exactly 1, 2 and 300 characters. Whitespace is not input — a field
+  of spaces enables nothing. The cap applies on change rather than by `maxLength` alone, so a
+  5000-character paste is capped by the same rule as typing. `Run` is a labelled button, not an
+  arrow (§19), and is 44px tall.
+
+**The H1 is one string in one place** — `lib/copy/hero.ts`. All three of Kian's candidates live
+there; `CURRENT` selects one and `HEADLINE` exports it. No component names a candidate and no
+test asserts the text, so swapping costs one identifier. **`'You already decided. This is the
+part after.'` is rendered, and that is a rendering choice rather than the decision** — it is the
+only candidate that answers *"how is this different from writing my goal down?"* in the headline
+itself, which is SITE-EVAL-002's question. The decision is Kian's and is open.
+
+**Not built, and why.** `SITE-9` (autotype), `SITE-10` (twelve chips) and `SITE-11` (rotation)
+all need **chip content that does not exist**. `SITE-10` needs twelve strings tagged to the five
+§5 archetypes; `SITE-11`'s constraint is defined over `back`, `thesis` and `lsat`. `SITE-109`'s
+scope does not cover them — it lists §2, §3, the FAQ, §7, §9 and the roadmap source. **The chips
+and the hero headline are copy with no owning issue**, which is the same gap §15.4's ruling
+closed one item over. Flagged, not decided.
+
+**Where the mountain decision actually bites.** The route-up-the-mountain reading as a progress
+bar with a summit date is not only a visual problem: §10 bans *"progress or completeness
+meters"* outright, and §3's own copy promises *"no streaks, no scores, and no completeness
+meters"* — the section v7.3 §4 calls the most differentiating content on the site and says
+**cannot regress and cannot be wrong**. The most dominant element on the page was contradicting
+the site's strongest claim.
+
+- **It does not bite SP-02 or SP-03 at all.** Structure, input, state machine, classification,
+  the transformation block and the refusal path are logic and copy. None of them names a
+  visual.
+- **It bites first and hardest at `SITE-22` (`FlatLayout`)**, which *is* the ascending route
+  with dated occurrence marks. `SITE-22` is the reference implementation and §3 of this file
+  says a great builder with a simplified Peak is launchable — so this is the P0 critical path,
+  not decoration.
+- **`SITE-20` and `SITE-21` are the insulation, and they land before the decision is needed.**
+  §6's invariant — one semantic plan model, never coupled to a renderer, layout an adapter
+  behind `PlanLayout`, swapping adapters changes zero builder code (EVAL-063) — means a changed
+  visual language costs one adapter **provided the model never learns the metaphor.** The
+  danger is `SITE-20` acquiring elevation, summit or progress concepts; if the model is shaped
+  by the route, the change stops being an adapter swap.
+- **So the runway is SP-03 plus `SITE-20` and `SITE-21`.** The decision is not blocking until
+  `SITE-22`. **Recommendation: prioritise it to land before `SITE-22` starts, and hold
+  `SITE-20` strictly to semantics** — occurrences, recurrence, windows, authority tiers, never
+  position or completion.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as

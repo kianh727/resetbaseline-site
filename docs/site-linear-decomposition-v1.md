@@ -301,6 +301,10 @@ Project SP-01 · P0 · Deps SITE-001
 *PRD* v7.3 §12.4, §0.3
 *Non-goals* **This audit runs before the eval suite is trusted for anything, including SITE-085.** It does not rewrite the three exposures itself where the rewrite belongs to their owning issue — it establishes the verdict and opens the work.
 
+**Ruled 2026-09-19 (Kian): this is a standing gate, not a one-time audit.** Re-run at each design review and before the P0 gate, the same trigger as `CLAUDE.md` §1's fourth-rule reconciliation.
+
+**The gate reads the document, not the code.** It establishes that every eval has answered how it fails against a stub. **It does not establish that any eval was actually run against a stub.** Nobody may read the green gate as proof that stubs were run — that half is open, is not papered over, and is only discharged eval by eval as each one is implemented.
+
 **SITE-107 · Ban-list CI check — terms, app names, staleness**
 Project SP-01 · P0 · Deps SITE-001
 *Scope* PRE-2 automated from P0 onward. One job, three checks, each failing the build: **(a)** any §10 banned term in authored copy; **(b)** any match of the committed app-name list against any authored copy string, **site-wide, not gate-scoped** — Screen Time returns opaque tokens and no depicted Baseline UI may name an app (§6.3a MUST); **(c)** staleness of the app-name list against its `captured_at`, warning at 90 days and failing at 180, with a failure message that says what to do.
