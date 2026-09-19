@@ -421,10 +421,32 @@ An entry leaves Block 2 by passing DS-18 and moving to Block 1. It never leaves 
 | LCP, mobile 4G | 1.8s |
 | CLS | 0.05 |
 | INP | 200ms |
-| Core bundle, gzip | 145 KB |
+| Core bundle, gzip | **120 KB** |
 | Scene bundle, gzip, lazy | 140 KB, excluded |
 | `/api/plan` timeout | 4000ms hard |
 | Lighthouse mobile | ≥ 90 |
+
+**The core bundle ceiling is 120 KB, and it is a dependency ban rather than a coding-discipline target.** The decomposition and SP-15's exit already said 120; this table said 145. **120 wins** — it is stricter, so it satisfies both, and the two artifacts now agree rather than one deferring to the other.
+
+What that number actually costs, **measured on the SITE-001 scaffold, all gzip, all marginal over the framework floor**:
+
+| | Cost | Running total |
+|---|---|---|
+| **Framework floor** — React 19 + Next 15 App Router, before one line of product code | **103 KB** | 103 KB |
+| A hand-written interactive client component (state, callbacks, memo, 30-day date math, list rendering) | **0.4 KB** | — |
+| `date-fns`, four functions, tree-shaken | 6.5 KB | 109 KB |
+| `zod` | 24.1 KB | 127 KB |
+| `framer-motion` | 40.5 KB | 143 KB |
+
+**The framework floor is 103 KB and is not reducible without leaving React.** That leaves roughly 17 KB. At 0.4 KB per component the builder's own code fits — twenty-five to thirty-five client modules land around 10–20 KB. **What does not fit is a runtime dependency.** Any one of the three above spends a quarter to the whole of the remaining budget.
+
+Three consequences, binding:
+
+- **No animation library.** The settling spring (§8.1, SITE-024) is one signature spring, hand-rolled on the Web Animations API or CSS. `framer-motion` costs a third of the entire budget for it.
+- **No client-side schema validator.** Model-response validation (SITE-031) happens on the `/api/plan` edge route, server-side, where bundle size does not count. `zod` in the client spends 24 KB to validate something the client never receives unvalidated.
+- **No date library.** SITE-023 already specifies hand-rolled DST-safe recurrence math with a 40+ fixture suite, so a library would be redundant with the issue's own spec as well as expensive.
+
+**Open, and recommended rather than ruled: the budget gate should exist before the builder is built, not after it.** SITE-078 enforces these budgets in CI at P1 — after every builder issue has landed. A ceiling first checked at the end is a criterion satisfiable by the absence of the thing it measures (§0.3), and a dependency that breaks the budget would be discovered at SITE-076 rather than in the PR that added it. **Pulling the bundle-size check forward to the first product commit is a process change awaiting a ruling; it is not yet in effect.**
 
 ---
 

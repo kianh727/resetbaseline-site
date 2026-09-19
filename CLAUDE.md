@@ -391,11 +391,26 @@ criterion — a precondition assumed done before the issue starts, and not verif
 from a session. Build command `npm run build`, output directory `out`, Node 22. **No
 deploy was fabricated and no secret was hardcoded.**
 
-Two figures worth carrying: the framework baseline is already **103 kB gzip First Load
-JS before any product code**, against a 145 KB core budget — a real risk for SITE-76
-and SITE-78. And **the budget itself is contradicted**: PRD v7.3 §11 says core ≤145 KB,
-while SITE-76 and SP-15's exit say ≤120 KB. The PRD wins per §1, and 120 is stricter so
-building to it satisfies both, but the decomposition currently contradicts tier one.
+**The bundle budget is 120 KB gzip, and it is a dependency ban rather than a
+coding-discipline target.** v7.3 §11 said 145 KB while SITE-76 and SP-15's exit said 120;
+ruled 120, and §11 is amended so the artifacts agree rather than one deferring to the other.
+
+Measured on this scaffold, gzip, marginal over the framework floor: **the floor is 103 KB**
+(React 19 + Next 15 App Router, before any product code, not reducible without leaving
+React). A hand-written interactive component costs **0.4 KB**. `date-fns` tree-shaken to four
+functions costs **6.5 KB**, `zod` **24.1 KB**, `framer-motion` **40.5 KB**.
+
+So roughly 17 KB remains, the builder's own modules fit inside it at that per-component cost,
+and **a single runtime dependency does not.** Binding, per §11: no animation library (the
+settling spring is hand-rolled on WAAPI/CSS), no client-side schema validator (validation is
+server-side on `/api/plan`), no date library (SITE-023 already specifies hand-rolled DST-safe
+math with its own fixture suite).
+
+**Recommended, not ruled:** pull the bundle-size CI check forward to the first product commit.
+SITE-078 enforces it at P1, after every builder issue has landed — a ceiling first checked at
+the end is a criterion satisfiable by the absence of the thing it measures (§0.3), and a
+dependency that breaks the budget would surface at SITE-076 rather than in the PR that added
+it. **Awaiting a ruling; not in effect.**
 
 **Next in sequence is `SITE-2`** (design tokens and Tailwind theme), which depends only
 on `SITE-1`.
