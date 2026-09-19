@@ -353,6 +353,39 @@ Handles every `capability_type` the contracts define — exactly five: `commitme
 
 **And the constraint is a selling point, not a limitation.** Baseline cannot see which apps you chose. That belongs in FAQ 3's expanded copy and is stronger than any privacy assurance the site could otherwise make, because it's architectural rather than promised.
 
+### 6.3b Band grammar — closed visual vocabulary · **MUST**
+
+**Ruled 2026-09-19 (Kian).** This is the visual vocabulary §6 has been missing. It has the same status as §6.3's closed value lists: a closed set, not a style note.
+
+**It supersedes any description of a route, path, summit or ascent anywhere in this repository.** Any prompt-set or visualisation document is mood reference only and is **not authoritative on structure, copy or behaviour.**
+
+#### The grammar
+
+> A **horizontal band** across the mountain face always means a **recurring time window**.
+> **Marks inside the band** always mean **the days it occupies**.
+> A **second, denser band below** always means **protection**.
+> **Nothing else ever gets a band.**
+
+The band is **charcoal and translucent, geometrically level, and bleeds off both frame edges** — no left end, no right end. **Lavender appears only as a thin lit line on its upper boundary and on active marks. Never as fill.**
+
+**Lit marks are scheduled days. Dark marks are unscheduled days** — dark and neutral, **never crossed out, never rust, never styled as disabled.** An unscheduled day means nothing was placed there, not that something was missed.
+
+#### Why the last rule is a MUST and not a preference
+
+It is **§4 rendered in visual grammar.** §4 promises no completeness meters and **cannot regress and cannot be wrong**. A dark mark styled as a gap regresses that promise **in pixels while the copy still reads correctly** — the section says the right thing and the most dominant element on the page contradicts it. That failure is invisible to every copy check the site has.
+
+#### Enforcement — construction, not convention
+
+**A band must be derivable only from a recurrence. It is not a prop a component may pass.**
+
+If any component can render a band from anything other than the recurrence model, the grammar is a convention, and a convention decays at the first author who has not read this section. **Build it so the failure mode does not exist rather than banning it in prose.**
+
+#### Gate
+
+Five questions, added to §12.4a's checklist under the same reviewer constraint — **not the implementer, has not watched the build.** Each is a yes/no; **any single yes rejects the work.**
+
+**The review set MUST include at least one frame where most marks are dark**, and the gate's output **MUST state which frame carried the sparse case.** A set of frames showing full or near-full weeks **cannot fail the dark-mark rule, because the condition it measures never occurs** — §12.4 applied to a design gate rather than to an eval.
+
 ### 6.4 Input handling
 
 Seven deterministic classes, pre-generation, so garbage never reaches `/api/plan`: `empty · unreadable · out_of_scope · vague · multi_goal · bounded · actionable`.
@@ -387,7 +420,15 @@ The LLM's entire output surface is:
 
 **Each of the three validates and falls back independently.** A title that fails its constraint does not discard a valid window; a clarification question that fails validation does not discard a valid title. There is no all-or-nothing response.
 
-**What the model still may never touch**, unchanged and non-exhaustive only in the sense that §4's table governs: parsed deadlines · **domain and input classification** · the refusal decision · refusal copy · recurrence expansion · occurrence dates or counts · tuning · contention vetoes · route layout · authority tiers · product capabilities · **every other line of copy on the site.**
+**Three fields is the whole surface. There is no fourth.** Anything the site renders that is not one of the three above is deterministic, and this list is the boundary itself rather than a pointer to one:
+
+parsed deadlines · **domain and input classification** · the refusal decision · refusal copy · **recurrence-rule selection** · recurrence expansion · occurrence dates or counts · tuning · contention vetoes · route layout · authority tiers · product capabilities · **every other line of copy on the site.**
+
+**Amended 2026-09-19 (Kian) — the citation, and what it was hiding.** This paragraph previously read *"non-exhaustive only in the sense that §4's table governs."* **§4 of this document is "What it won't do" and contains no table.** The table it meant is v5 §4, and §1 declares v5 superseded entirely. A citation pointing at a superseded document is worse than no citation: the reader follows it, finds nothing, and cannot tell whether the boundary is unjustified or the definition is missing. The boundary is therefore **stated inline here, with no cross-reference**, because it already survived in this list.
+
+**Amended 2026-09-19 (Kian) — recurrence-rule selection is deterministic, from the parse.** It was previously described as the LLM selecting a rule from a closed set while code computed the dates. **That would be a fourth generated field**, and the determinism claim the entire site rests on would be false while reading true — the surface would say three and behave as four. The parse chooses the rule; the model never sees it. The old wording survived because the may-never-touch list named *recurrence expansion*, which is the **computation** and not the **choice**, so the gap read as covered.
+
+> **Open defect, not resolvable here.** §6.4 and §6.5 now specify a deterministic rule choice **over a closed set that no artifact enumerates.** It is a copy-and-spec gap of the same shape as §6.4's fallback question set, and it is Kian's. It bites at SITE-023. **No session may enumerate it** — inventing the set would be §9's *"inventing an enum not in the frozen contracts"* wearing a different hat.
 
 The third field is a widening of one beat's copy, not a softening of the boundary. Classification decides *whether* the clarification beat runs; the model only writes the sentence once that decision is already made.
 
@@ -497,12 +538,14 @@ An entry leaves Block 2 by passing DS-18 and moving to Block 1. It never leaves 
 | LCP, mobile 4G | 1.8s |
 | CLS | 0.05 |
 | INP | 200ms |
-| Core bundle, gzip | **120 KB** |
+| Core bundle, gzip | **120 kB** — decimal, 120,000 bytes |
 | Scene bundle, gzip, lazy | 140 KB, excluded |
 | `/api/plan` timeout | 4000ms hard |
 | Lighthouse mobile | ≥ 90 |
 
-**The core bundle ceiling is 120 KB, and it is a dependency ban rather than a coding-discipline target.** The decomposition and SP-15's exit already said 120; this table said 145. **120 wins** — it is stricter, so it satisfies both, and the two artifacts now agree rather than one deferring to the other.
+**The core bundle ceiling is 120 kB, and it is a dependency ban rather than a coding-discipline target.** The decomposition and SP-15's exit already said 120; this table said 145. **120 wins** — it is stricter, so it satisfies both, and the two artifacts now agree rather than one deferring to the other.
+
+**The unit is decimal kB, ruled 2026-09-19 (Kian).** `scripts/check-bundle.mjs` divided by 1024 and labelled the result `KB` while Next's build output divides by 1000, so the same five chunks read 102.5 in one place and 105 in the other — **one artifact, two divisors, and no way to compare the gate against the 103 kB framework floor this table records**, which is Next's number. A dependency ban whose ceiling and floor are in different units is not a ban anybody can reason about. The gate is **120,000 bytes**, which **tightens it by 2,880** from the accidental `120 * 1024`: those bytes were a property of the tool, not a grant.
 
 What that number actually costs, **measured on the SITE-001 scaffold, all gzip, all marginal over the framework floor**:
 
@@ -522,7 +565,7 @@ Three consequences, binding:
 - **No client-side schema validator.** Model-response validation (SITE-031) happens on the `/api/plan` edge route, server-side, where bundle size does not count. `zod` in the client spends 24 KB to validate something the client never receives unvalidated.
 - **No date library.** SITE-023 already specifies hand-rolled DST-safe recurrence math with a 40+ fixture suite, so a library would be redundant with the issue's own spec as well as expensive.
 
-**Ruled, and in effect: the budget gate exists before the builder is built, not after it.** SITE-078 enforces the full performance budgets in CI at P1 — after every builder issue has landed. A ceiling first checked at the end is a criterion satisfiable by the absence of the thing it measures (§0.3), and a dependency that breaks the budget would be discovered at SITE-076 rather than in the PR that added it. **The bundle-size check is therefore in the CI sweep from the first product commit, at 120 KB, failing the build.** It measures the exported chunks each document actually references — every route, not only `/`, because a check that watches one page can be walked around by putting the import on another — and excludes the `noModule` polyfill chunk, which no browser supporting ES modules fetches. SITE-078 still owns the remaining budgets; this is the bundle ceiling arriving early, not SITE-078 moving.
+**Ruled, and in effect: the budget gate exists before the builder is built, not after it.** SITE-078 enforces the full performance budgets in CI at P1 — after every builder issue has landed. A ceiling first checked at the end is a criterion satisfiable by the absence of the thing it measures (§0.3), and a dependency that breaks the budget would be discovered at SITE-076 rather than in the PR that added it. **The bundle-size check is therefore in the CI sweep from the first product commit, at 120 kB, failing the build.** It measures the exported chunks each document actually references — every route, not only `/`, because a check that watches one page can be walked around by putting the import on another — and excludes the `noModule` polyfill chunk, which no browser supporting ES modules fetches. SITE-078 still owns the remaining budgets; this is the bundle ceiling arriving early, not SITE-078 moving.
 
 ---
 
@@ -593,7 +636,23 @@ Ten tells. **Each is a yes/no. Any single yes rejects the work** — the reviewe
 
 **The reviewer is Kian (ruled 2026-09-19).** He is not the implementer, and he does not watch the build — he sees reports, not the work. That satisfies both clauses as written. **If a gate ever requires someone who has not been in the conversation at all, that is a real staffing problem and it is hit at SITE-085 rather than solved in advance.** It is named here so that when it is hit, it is recognised as the known limit rather than rediscovered as a surprise.
 
-**Applies equally at SITE-087 and SITE-088.** The same ten questions, the same rule, the same staffing constraint.
+#### The band grammar questions — added 2026-09-19 (Kian)
+
+**Five more, from §6.3b. Same rule: each a yes/no, any single yes rejects.** They are not a second gate and not weighed against the ten — the checklist is fifteen questions with one disqualifying answer each.
+
+| | Question |
+|---|---|
+| 11 | Does any band appear where there is no recurring window behind it? |
+| 12 | Does any band read as climbing, tilting, tapering, or having an end? |
+| 13 | Does lavender appear as fill anywhere — a stripe, a block, a painted region? |
+| 14 | Does any dark mark read as a gap, an absence, a miss, or a disabled control? |
+| 15 | Does any element suggest the dark marks should be filled? |
+
+**The review set MUST include at least one frame where most marks are dark, and the gate's output MUST state which frame carried the sparse case.**
+
+That requirement is the gate's own §12.4. A set of frames showing full or near-full weeks **cannot fail question 14 or 15**, because the condition they measure never occurs — the reviewer answers no to both, honestly, and the gate reports a pass it never tested. **Naming the sparse frame in the output is what makes an untested pass visible at the time**, rather than a year later when a dark mark ships reading as a miss.
+
+**Applies equally at SITE-087 and SITE-088.** The same fifteen questions, the same rule, the same staffing constraint.
 
 **What this gate cannot catch.** It catches *tells*, not dullness. Work can pass all ten and still be inert — correctly composed, correctly restrained, and not worth looking at. §12.4a is a floor that removes the specific ways this work fails by default; clearing it is not evidence that the work is good.
 

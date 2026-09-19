@@ -455,9 +455,9 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 
 **SITE-EVAL-051 · Load budgets** · `PERF` `AUTO`
 *Steps* Lighthouse mobile in CI, throttled 4G.
-*Pass* LCP ≤1.8s · CLS ≤0.05 · INP ≤200ms · **core ≤120KB gzip · scene ≤140KB gzip and excluded from first load** · Lighthouse mobile perf ≥90.
+*Pass* LCP ≤1.8s · CLS ≤0.05 · INP ≤200ms · **core ≤120 kB gzip · scene ≤140 kB gzip and excluded from first load** (kB decimal, ruled 2026-09-19) · Lighthouse mobile perf ≥90.
 *Fail* Any budget exceeded — build fails.
-*Stub check* Asserts the **built artifacts exist and are non-empty** before comparing them to the budgets. An empty bundle is under every ceiling — this is the §0.3 shape the 120 KB check was written against, and the same trap applies to every budget here.
+*Stub check* Asserts the **built artifacts exist and are non-empty** before comparing them to the budgets. An empty bundle is under every ceiling — this is the §0.3 shape the 120 kB check was written against, and the same trap applies to every budget here.
 *PRD* §16 · *Issues* SITE-076, SITE-078
 
 **SITE-EVAL-052 · Headline is LCP** · `PERF` `AUTO`

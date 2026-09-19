@@ -67,7 +67,7 @@ Governing principle, encoded in every priority and dependency below:
 
 **Purpose** The semantic plan model, the layout abstraction, `FlatLayout`, and the object rendering that makes structure legible.
 **Dependencies** SP-01
-**Exit** A hand-fed `Plan` renders as an ascending route with dated occurrence marks, a protection band, and a timer segment — coherent and compelling with zero 3D and zero LLM. Reviewable as a standalone demo.
+**Exit** A hand-fed `Plan` renders under **PRD v7.3 §6.3b's band grammar** — a recurrence as a horizontal band with its occupied days as marks inside it, protection as a second denser band below — coherent and compelling with zero 3D and zero LLM. Reviewable as a standalone demo. ~~*an ascending route with dated occurrence marks, a protection band, and a timer segment*~~ — **superseded 2026-09-19 by §6.3b**, which supersedes any description of a route, path, summit or ascent anywhere in this repository.
 **PRD** §6, §8.1, §8.2
 **Non-goals** No projection. No Peak. No generation. `FlatLayout` is the reference implementation, not a fallback.
 
@@ -216,7 +216,7 @@ and runs alongside SP-02…SP-10, not after SP-16.
 
 **Purpose** Tier detection, lazy scene loading, and budget enforcement.
 **Dependencies** SP-12
-**Exit** Core bundle ≤120KB gzip; scene lazy and uncounted; all four tiers force-testable by flag; Lighthouse mobile ≥90 with the Peak live.
+**Exit** Core bundle ≤120 kB gzip (decimal, ruled 2026-09-19); scene lazy and uncounted; all four tiers force-testable by flag; Lighthouse mobile ≥90 with the Peak live.
 **PRD** §15, §16
 **Non-goals** Live mid-session demotion is P2.
 
@@ -489,10 +489,10 @@ Project SP-04 · P0 · Deps SITE-020
 
 **SITE-022 · FlatLayout adapter**
 Project SP-04 · P0 · Deps SITE-021
-*Scope* Deterministic 2D composition — ascending route with dated marks, protection band, timer segment.
+*Scope* Deterministic 2D composition under **PRD v7.3 §6.3b's closed visual vocabulary**: a horizontal band per recurring window, lit marks for scheduled days and dark marks for unscheduled ones inside it, and a second denser band below for protection. Charcoal and translucent, geometrically level, bleeding off both frame edges; lavender only as a thin lit line on the upper boundary and on active marks, **never as fill**; dark marks **never crossed out, never rust, never styled as disabled**. **Nothing else ever gets a band.** ~~*ascending route with dated marks, protection band, timer segment*~~ — **superseded 2026-09-19 by §6.3b.**
 *Accept* **Renders a coherent, compelling plan with zero 3D and zero LLM.** Reviewable as a standalone product demo.
 *Tests* Unit: anchor determinism for a fixed plan.
-*Verify* **Screenshot at 1440px and 375px.** The design review gate is SITE-085, whose criterion was **amended 2026-09-19 by PRD v7.3 §12.4a**: not *"is this compelling on its own?"* — every answer to that is defensible — but **"does any part of this look like it came out of a generator?"**, against ten yes/no tells where any single yes rejects the work. If it fails, the whole P0 is at risk.
+*Verify* **Screenshot at 1440px and 375px.** The design review gate is SITE-085, whose criterion was **amended 2026-09-19 by PRD v7.3 §12.4a**: not *"is this compelling on its own?"* — every answer to that is defensible — but **"does any part of this look like it came out of a generator?"**, against **fifteen** yes/no questions — the ten generator tells plus **§6.3b's five band-grammar questions, added 2026-09-19** — where any single yes rejects the work. **The review set MUST include at least one frame where most marks are dark, and the output MUST state which frame carried it.** If it fails, the whole P0 is at risk.
 *PRD* §6, §2 DS-6
 *Non-goals* Not a degraded mode. This is the reference implementation.
 
@@ -516,7 +516,7 @@ Project SP-04 · P0 · Deps SITE-006
 
 **SITE-025 · Route and occurrence mark rendering**
 Project SP-04 · P0 · Deps SITE-022, SITE-023, SITE-024
-*Scope* Route stroke-reveal 450ms; occurrence marks land with 45ms stagger, settling spring, ~600ms total. **Interruptible.** Each mark labeled with its real date at 11px.
+*Scope* Band reveal 450ms; occurrence marks land inside it with 45ms stagger, settling spring, ~600ms total. **Interruptible.** Each mark labeled with its real date at 11px. ~~*Route stroke-reveal*~~ — **superseded 2026-09-19 by PRD v7.3 §6.3b**; the band is geometrically level and bleeds off both frame edges, so a reveal that reads as a stroke travelling along a path would fail §6.3b's gate question *"does any band read as climbing, tilting, tapering, or having an end?"* **What the reveal is instead is undefined and is Kian's to rule** (§4).
 *Accept* **Tune controls are interactive before the fan-out completes.** Interrupting mid-animation leaves no orphaned state.
 *Tests* Automated: control enablement fires on data availability, not animation completion.
 *Verify* **Screenshot and clip at both widths.** Motion timing review — does the fan-out read as ten real dated objects existing?
@@ -525,11 +525,11 @@ Project SP-04 · P0 · Deps SITE-022, SITE-023, SITE-024
 
 **SITE-026 · Timer, gate, and tracker object rendering**
 Project SP-04 · P0 · Deps SITE-025
-*Scope* Timer as a thickened route segment with real duration; gate as a protection band with hard edges; tracker as an off-route node. Each carries type and authority tier as 11px metadata.
+*Scope* Gate as §6.3b's second, denser band below, with hard edges. Each object carries type and authority tier as 11px metadata. ~~*Timer as a thickened route segment with real duration; tracker as an off-route node*~~ — **superseded 2026-09-19 by §6.3b**, which supersedes any route description and does not assign a band to a timer or a tracker: **nothing but a recurring window and protection ever gets one.** How a timer and a tracker render under the grammar is **undefined and is Kian's to rule** — a session may not decide it (§4).
 *Accept* Authority tiers are contract-derived, not passed in. Gate always renders `explicit`.
 *Tests* Unit: tier derivation is a pure function of object type.
 *Verify* **Screenshot at both widths.**
-*PRD* §4, §5.2 (v4 lineage), §14
+*PRD* §4, §5.2 (v4 lineage), §6.3b, §14
 *Non-goals* No activation behavior.
 
 **SITE-104 · Problem-line object metadata**
@@ -957,7 +957,7 @@ Project SP-12 · P1 · Deps SITE-065
 
 **SITE-067 · Named anchor set**
 Project SP-13 · P1 · Deps SITE-062
-*Scope* Author named vertices: `summit`, `route[0..n]`, `band_l/r`, `timer_start/end`.
+*Scope* Author named vertices. ~~*`summit`, `route[0..n]`, `band_l/r`, `timer_start/end`*~~ — **superseded 2026-09-19 by PRD v7.3 §6.3b**, which supersedes any description of a route, path, summit or ascent. **The vertex set is undefined under the grammar and is Kian's to rule**; a P1 issue, so it blocks nothing at P0.
 *Accept* Anchors are stable across mesh edits or the build fails.
 *Tests* Automated: anchor presence assertion.
 *Verify* —
@@ -1029,7 +1029,7 @@ Project SP-17 · **P0** · Deps SITE-005
 *Tests* Automated: every declared icon path resolves; `theme-color` matches the token.
 *Verify* Installed to an iOS home screen and checked in a mobile browser with chrome visible.
 *PRD* v7.3 §13, §18.2
-*Non-goals* **Not metadata, not the OG card, not the legal routes** — SITE-100 and SITE-099 own those. No app-store assets, no blog, no marketing imagery. Its old non-goal *"no `/pricing`"* is **void**: `/pricing` exists and is P0 (v7.3 §7, SITE-094). Icons are static assets, not JavaScript, so this costs nothing against the 120 KB ceiling (§11).
+*Non-goals* **Not metadata, not the OG card, not the legal routes** — SITE-100 and SITE-099 own those. No app-store assets, no blog, no marketing imagery. Its old non-goal *"no `/pricing`"* is **void**: `/pricing` exists and is P0 (v7.3 §7, SITE-094). Icons are static assets, not JavaScript, so this costs nothing against the 120 kB ceiling (§11).
 
 ---
 
@@ -1047,7 +1047,7 @@ Project SP-15 · P1 · Deps SITE-066, SITE-006
 **SITE-076 · Scene lazy load and budget enforcement**
 Project SP-15 · P1 · Deps SITE-075
 *Scope* Scene bundle loads on `requestIdleCallback` after LCP, split from core.
-*Accept* **Core ≤120KB gzip, scene ≤140KB gzip and excluded from first load. Enforced in CI.**
+*Accept* **Core ≤120 kB gzip, scene ≤140 kB gzip and excluded from first load. Enforced in CI.** kB is decimal — 120,000 bytes (ruled 2026-09-19); the earlier binary reading was an accident of the tool.
 *Tests* Automated: bundle-size CI gate on both budgets separately.
 *Verify* Lighthouse trace confirming the headline is LCP with the Peak live.
 *PRD* §16
@@ -1069,7 +1069,7 @@ Project SP-15 · P1 · Deps SITE-076
 *Tests* Automated: full budget suite.
 *Verify* Reported number recorded per release.
 *PRD* §16, §18.2
-*Non-goals* The core bundle ceiling. Ruled pulled forward (PRD §11) and already in the CI sweep at 120 KB from the first product commit; this issue adds the remaining budgets around it, and must not re-implement or relax it.
+*Non-goals* The core bundle ceiling. Ruled pulled forward (PRD §11) and already in the CI sweep at 120 kB — decimal, 120,000 bytes — from the first product commit; this issue adds the remaining budgets around it, and must not re-implement or relax it.
 
 ---
 

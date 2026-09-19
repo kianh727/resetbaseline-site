@@ -1,9 +1,20 @@
 /*
- * Core bundle budget — 120 KB gzip (PRD v7.3 §11, CLAUDE.md §12).
+ * Core bundle budget — 120 kB gzip (PRD v7.3 §11, CLAUDE.md §12).
+ *
+ * **Decimal kB throughout, ruled 2026-09-19 (Kian).** This check previously
+ * divided by 1024 and labelled the result `KB`, while Next's build output
+ * divides by 1000. The same five chunks read 102.5 here and 105 there — one
+ * artifact, two divisors, and no way to compare the gate against the framework
+ * floor §11 records, which is Next's number. A dependency ban whose ceiling and
+ * whose floor are in different units is not a ban anybody can reason about.
+ *
+ * The ruling **tightens** the gate by 2,880 bytes rather than loosening it:
+ * 120 * 1024 was 122,880, and the extra 2,880 was an accident of the tool, not
+ * a grant.
  *
  * The budget is enforced as a dependency ban, not as a coding-discipline
- * target: the framework floor is ~103 KB and a hand-written interactive
- * component costs ~0.4 KB, so the only thing that can breach 120 KB is a
+ * target: the framework floor is ~103 kB and a hand-written interactive
+ * component costs ~0.4 kB, so the only thing that can breach 120 kB is a
  * runtime dependency. This check is what says so at the commit that adds
  * one rather than at SITE-078.
  *
@@ -18,7 +29,7 @@
  *
  * `noModule` scripts are not counted. Next emits its legacy polyfill chunk
  * that way and no browser supporting ES modules ever fetches it, so counting
- * it would be measuring bytes nobody downloads — the 103 KB floor §11 records
+ * it would be measuring bytes nobody downloads — the 103 kB floor §11 records
  * is the module set. Excluded files are printed rather than dropped silently.
  *
  * Run after `npm run build`. Exits 1 over budget, with the breakdown.
@@ -28,8 +39,11 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { gzipSync, constants } from 'node:zlib'
 
-/** PRD v7.3 §11. Ruled 120 over the earlier 145; the artifacts agree. */
-const BUDGET_BYTES = 120 * 1024
+/**
+ * PRD v7.3 §11. Ruled 120 over the earlier 145; the artifacts agree. Decimal,
+ * so it is the same unit as the 103 kB framework floor and as Next's report.
+ */
+const BUDGET_BYTES = 120_000
 
 const OUT = 'out'
 
@@ -92,7 +106,7 @@ function references(html) {
 }
 
 const byGzip = (a, b) => b.gzip - a.gzip
-const kb = (n) => `${(n / 1024).toFixed(1)} KB`
+const kb = (n) => `${(n / 1000).toFixed(1)} kB`
 
 const routes = docs.map((doc) => {
   const { refs, legacy } = references(readFileSync(doc, 'utf8'))
@@ -153,8 +167,8 @@ if (over.length > 0) {
     console.error(`bundle: ${r.route} is over budget by ${kb(r.total - BUDGET_BYTES)}.`)
   }
   console.error(
-    `\nThe 120 KB ceiling is a dependency ban (PRD v7.3 §11). The framework ` +
-      `floor is ~103 KB and a hand-written component costs ~0.4 KB, so what ` +
+    `\nThe 120 kB ceiling is a dependency ban (PRD v7.3 §11). The framework ` +
+      `floor is ~103 kB and a hand-written component costs ~0.4 kB, so what ` +
       `breached this is almost certainly a runtime dependency. Binding ` +
       `consequences already ruled: no animation library, no client-side ` +
       `schema validator, no date library. Remove it — do not raise the number.`,

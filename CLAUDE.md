@@ -183,8 +183,14 @@ made, not a discussion.**
 
 ## 5. The determinism boundary
 
-This is the product, and it is never softened for convenience. **PRD §4 is the
-authoritative table; where anything else appears to contradict it, the table wins.**
+This is the product, and it is never softened for convenience. **PRD v7.3 §6.5 is the
+authoritative statement of the boundary, and it carries it inline.**
+
+**Corrected 2026-09-19 (Kian).** This section previously cited *"PRD §4's table"*. **v7.3 §4 is
+"What it won't do" and contains no table** — the table was v5 §4, and §1 declares v5 superseded
+entirely. A citation pointing at a superseded document is worse than none: the reader follows
+it, finds nothing, and cannot tell whether the boundary is unjustified or the definition is
+missing. §6.5 now states the boundary with no cross-reference, and this file defers to it.
 
 **Ruled 2026-09-19 (Kian): the output surface is three fields, not two** (PRD v7.3
 §6.4, §6.5). **The LLM's entire output surface is one commitment title (≤48 chars),
@@ -221,9 +227,15 @@ Consequences that follow, each with its own eval:
 - **The clarification question is generated and validated** (SITE-030, SITE-103,
   SITE-EVAL-079). Classification still decides *whether* the beat runs; the model only
   writes the sentence once that decision is already made.
-- **The LLM selects a recurrence rule from the closed set; code computes every
-  date.** Identical dates and counts across semantically identical phrasings
-  (SITE-023, EVAL-030).
+- **Recurrence-rule selection is deterministic, from the parse. The model never sees it**
+  (PRD v7.3 §6.5, amended 2026-09-19). This file previously said the LLM selected the rule
+  while code computed the dates. **That would be a fourth generated field**, and the
+  determinism claim the whole site rests on would be false while reading true — the surface
+  says three and would behave as four. The old wording survived because §6.5's may-never-touch
+  list named *recurrence expansion*, which is the **computation** and not the **choice**, so
+  the gap read as covered. Identical dates and counts across semantically identical phrasings
+  (SITE-023, EVAL-030). **The closed set of rules is enumerated in no artifact** — an open PRD
+  defect, Kian's, biting at SITE-023. **No session may enumerate it.**
 - **Authority tiers are contract-derived** — a pure function of object type. Gate is
   always `explicit`. No model input reaches tier assignment (EVAL-031).
 - **Tuning is fully local.** Zero network requests, asserted. This is the single most
@@ -231,6 +243,18 @@ Consequences that follow, each with its own eval:
 - **Generation is never blocking.** Hard 4000ms timeout with abort; every failure
   mode resolves to `StaticProvider` silently, with no user-visible error and no dead
   state (SITE-032, SITE-033).
+
+- **The band grammar is a closed visual vocabulary** (PRD v7.3 §6.3b, ruled 2026-09-19,
+  a MUST). A horizontal band always means a recurring time window; marks inside it are the days
+  it occupies; a second denser band below is protection; **nothing else ever gets a band.**
+  Charcoal, translucent, geometrically level, bleeding off both frame edges. **Lavender only as
+  a thin lit line on the upper boundary and on active marks — never as fill.** Lit marks are
+  scheduled days, **dark marks are unscheduled days — never crossed out, never rust, never
+  styled as disabled.** The last rule is §4 rendered in visual grammar: a dark mark styled as a
+  gap regresses *"no completeness meters"* **in pixels while the copy still reads correctly**,
+  which no copy check on this site can see. **It supersedes any description of a route, path,
+  summit or ascent anywhere in this repository**, and any prompt-set or visualisation document
+  is mood reference only — not authoritative on structure, copy or behaviour.
 
 **Honesty is a hard constraint, not a tone.** The site never implies a capability a
 browser cannot activate (DS-8). It never fake-activates. The wall is reachable
@@ -486,9 +510,19 @@ criterion — a precondition assumed done before the issue starts, and not verif
 from a session. Build command `npm run build`, output directory `out`, Node 22. **No
 deploy was fabricated and no secret was hardcoded.**
 
-**The bundle budget is 120 KB gzip, and it is a dependency ban rather than a
-coding-discipline target.** v7.3 §11 said 145 KB while SITE-76 and SP-15's exit said 120;
+**The bundle budget is 120 kB gzip, and it is a dependency ban rather than a
+coding-discipline target.** v7.3 §11 said 145 kB while SITE-76 and SP-15's exit said 120;
 ruled 120, and §11 is amended so the artifacts agree rather than one deferring to the other.
+
+**The unit is decimal kB, ruled 2026-09-19 (Kian), and the gate is 120,000 bytes.**
+`scripts/check-bundle.mjs` divided by 1024 and labelled the result `KB`, while Next's build
+output divides by 1000 — one artifact, two divisors, so the same five chunks read **102.5**
+here and **105** there. Neither number was wrong and they were never commensurable, which
+meant the gate could not be compared against the 103 kB framework floor §11 records, and a
+dependency ban whose ceiling and floor are in different units is not a ban anybody can reason
+about. **The ruling tightens by 2,880 bytes rather than loosening**: `120 * 1024` was 122,880,
+and the extra was a property of the tool, not a grant. Proven negatively at the new threshold —
+the budget set to 104,000 exits 1 naming the route and the 1.0 kB overage.
 
 Measured on this scaffold, gzip, marginal over the framework floor: **the floor is 103 KB**
 (React 19 + Next 15 App Router, before any product code, not reducible without leaving
@@ -501,7 +535,7 @@ settling spring is hand-rolled on WAAPI/CSS), no client-side schema validator (v
 server-side on `/api/plan`), no date library (SITE-023 already specifies hand-rolled DST-safe
 math with its own fixture suite).
 
-**Ruled and in effect: the bundle check is in the sweep now, at 120 KB, failing the build.**
+**Ruled and in effect: the bundle check is in the sweep now, at 120 kB decimal, failing the build.**
 SITE-078 would have enforced it at P1, after every builder issue had landed — a ceiling first
 checked at the end is a criterion satisfiable by the absence of the thing it measures (§0.3),
 and a dependency that breaks the budget would surface at SITE-076 rather than in the PR that
@@ -509,8 +543,8 @@ added it. `scripts/check-bundle.mjs` runs after the build and measures **every e
 route**, not only `/`: a check that watches one page can be walked around by putting the
 import on another. It gzips the chunks each document actually references rather than reading
 Next's summary line, and excludes the `noModule` polyfill chunk, which no browser supporting
-ES modules fetches — counting it would measure 38.6 KB nobody downloads. **Measured at
-100.2 KB, 19.8 KB remaining.** SITE-078 still owns the remaining §16 budgets; its non-goals
+ES modules fetches — counting it would measure 38.6 KB nobody downloads. **Now measured at
+105.0 kB, 15.0 kB remaining** — the same bytes the earlier entries in this file call 100.2 and 102.5. SITE-078 still owns the remaining §16 budgets; its non-goals
 now say so.
 
 **`/tokens` and `/type` are development-only routes.** `page.dev.tsx`, with `dev.tsx` in
@@ -1084,21 +1118,54 @@ SITE-004.**
 
 1. **`SITE-21`'s scope is `anchorFor(node)`, and SITE-025 renders a mark per occurrence.**
    Occurrences are not nodes. Nothing in §6 or the decomposition says how one is anchored.
-   Built exactly as scoped; the gap is SITE-022/025's to resolve and is §4's *"anything the
-   issue does not specify is undefined behavior"* rather than a session's call.
-2. **PRD v7.3 §6.5 cites *"§4's table"* as governing the determinism boundary, and v7.3 §4 has
-   no table** — it is *"§3 — What it won't do"*. The table lives in the superseded v5 §4, and §1
-   says nothing from a superseded PRD is a requirement. **This file's §5 points at the same
-   hole.** The *rule* survives in §6.5's own list, so nothing is blocked; the *citation*
-   resolves to nothing, which is the DS-15 shape Kian already ruled on — a reader follows it,
-   finds nothing, and cannot tell whether the boundary is unjustified or the definition is
-   missing.
-3. **Recurrence-rule selection is unassigned in v7.3.** §6.5 ruled the model's surface is three
-   fields and recurrence is not one of them; §6.5's own may-never-touch list says *recurrence
-   expansion*, which is the computation rather than the choice. This file's §5 still says
-   *"The LLM selects a recurrence rule from the closed set"*. The closed set itself is
-   enumerated in no artifact. It bites at **SITE-023**, not here — `SITE-20` holds expanded
-   occurrences and never a rule — so no enum was invented.
+   Built exactly as scoped. **Ruled 2026-09-19 (Kian): correct call — do not extend the seam
+   yet.** It is a SITE-25 question and is ruled with the rendering grammar in hand.
+2. **RULED 2026-09-19 (Kian): §6.5's citation is fixed, the content is not moved.** §6.5 cited
+   *"§4's table"* and v7.3 §4 has no table — it is *"What it won't do"*; the table was v5 §4,
+   which §1 declares superseded. **§6.5 now carries its boundary statement inline with no
+   cross-reference**, because the rule already survived in its own list. This file's §5 is
+   corrected in the same pass and defers to §6.5. A citation to a superseded document is worse
+   than none: the reader follows it, finds nothing, and cannot tell whether the boundary is
+   unjustified or the definition is missing.
+3. **RULED 2026-09-19 (Kian): recurrence-rule selection is deterministic, from the parse.**
+   Corrected, not reconciled — **the LLM's output surface is three fields, full stop.** If the
+   model also chose the rule there would be a fourth generated field, and **the determinism
+   claim the whole site rests on would be false while reading true.** §6.5 now says so
+   explicitly rather than leaving it to be inferred from the may-never-touch list, since that
+   list named *recurrence expansion* — the computation, not the choice — which is exactly the
+   gap. **The closed set is enumerated in no artifact; that is `SITE-113`, a PRD defect, Kian's,
+   blocking `SITE-23`.** No session enumerates it.
+
+**The band grammar arrived, and it is PRD v7.3 §6.3b** — amended 2026-09-19 (Kian), a MUST,
+with the same status as §6.3's closed value lists. It is the visual vocabulary §6 had been
+missing, and **it supersedes any description of a route, path, summit or ascent anywhere in
+this repository.** Any prompt-set or visualisation document is **mood reference only** and is
+not authoritative on structure, copy or behaviour.
+
+The grammar is in §5 of this file. Three things about it that matter more than the vocabulary:
+
+- **The dark-mark rule is §4 rendered in visual grammar, which is why it is a MUST.** §4
+  promises no completeness meters and *cannot regress and cannot be wrong*. A dark mark styled
+  as a gap regresses it **in pixels while the copy still reads correctly** — the section says
+  the right thing and the most dominant element on the page contradicts it. **No copy check on
+  this site can see that**, which is what makes it a gate rather than a preference.
+- **The gate is fifteen questions now, not ten** (§12.4a, SITE-085, and equally at SITE-087 and
+  SITE-088). **The review set MUST include at least one frame where most marks are dark, and
+  the output MUST state which frame carried the sparse case.** That is §12.4 applied to a
+  design gate: a set of full or near-full weeks cannot fail the dark-mark questions, because
+  the condition they measure never occurs — the reviewer answers no honestly and the gate
+  reports a pass it never tested.
+- **Enforcement is construction, not convention.** A band must be derivable **only** from a
+  recurrence and is **not a prop a component may pass**. The shape of that is being agreed
+  before it is built, per the instruction.
+
+**What §6.3b does not say, and what therefore stopped rather than being decided.** The grammar
+assigns a band to a recurring window and to protection, and **nothing else ever gets a band**.
+It does not say what a **timer** or a **tracker** is instead, and it does not say what the
+450ms reveal is now that a route stroke is superseded. Both are recorded as undefined on
+`SITE-25` and `SITE-26` and are Kian's to rule — §4's *"anything the issue does not specify is
+undefined behavior. STOP"*, not a session's call. Struck through in the decomposition and in
+Linear rather than deleted, so nobody reads the old scope and builds it.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
@@ -1263,11 +1330,36 @@ milestone's phase is the project it sits in.
 The SP decomposition is fully preserved; milestones are ordered and show
 progress, which projects do not.
 
-**109 issues total: P0 = 86, P1 = 17, P2 = 6.** The original 84, plus four design
+**113 issues total: P0 = 90, P1 = 17, P2 = 6.** The original 84, plus four design
 review gates (SITE-085…088) defined in addendum §3, plus PRE-1 Part B's twenty
-(SITE-089…108), plus **SITE-109** — the copy pass, created 2026-09-19 by PRD v7.3
-§15.4's ruling. Creation order runs 001…084, then 085…088, then 089…108, then 109,
-in strict sequence throughout; the mapping stays positional and append-only.
+(SITE-089…108), plus **SITE-109…113**, all created 2026-09-19. Creation order runs
+001…084, then 085…088, then 089…108, then 109…113, in strict sequence throughout;
+the mapping stays positional and append-only.
+
+**The five added 2026-09-19, and why they are five issues rather than one.** The copy
+gap surfaced four separate times — the hero H1, the chip strings, the five refusals,
+§6.4's fallback question set — and was flagged one item at a time each time, which is
+how it stayed open. It is now owned, split by **gate** rather than by subject, because
+a refusal and a chip string do not pass the same review:
+
+- **SITE-109** · Copy pass — every rendered sentence. P0, SP-17, deps SITE-101,
+  **blocks SITE-061**. PRD v7.3 §15.4. Owner Kian.
+- **SITE-110** · Builder copy — the conditional copy the builder fires. **Blocks
+  SITE-103.** Owner Kian.
+- **SITE-111** · Builder refusals — five, one per bounded domain. **Blocks SITE-17 and
+  SITE-18.** Owner Kian. Separate from SITE-110 because these are the site's most
+  sensitive sentences and §5 puts refusal copy outside anything a session generates.
+- **SITE-112** · PRD defect — §6.4 falls back to a source that was never written. The
+  authored question set exists in no artifact, so the beat fails silently into the dead
+  state §6.4 forbids by name. Owner Kian.
+- **SITE-113** · PRD defect — §6.4/§6.5 specify a deterministic recurrence-rule choice
+  **over a set no artifact enumerates.** SP-04, **blocks SITE-23.** Owner Kian. Sibling
+  to SITE-112, same shape: a closed set named precisely and never written down.
+
+**No session drafts any of that copy or that set**, not as a placeholder and not as
+something for Kian to edit — a draft written to be corrected reads later as a draft that
+was approved. Enumerating the recurrence set would additionally be §9's *"inventing an
+enum not in the frozen contracts"* wearing a different hat.
 
 **79 evals: SITE-EVAL-001…079.** Part B added section Q — SITE-EVAL-070…078;
 SITE-EVAL-079 was added 2026-09-19 with the §6.4 generated-question ruling.
