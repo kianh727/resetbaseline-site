@@ -315,11 +315,37 @@ Seven deterministic classes, pre-generation, so garbage never reaches `/api/plan
 
 **The clarification beat** — `vague` input gets one question, three tap answers plus free text, then builds. Never more than one per session; never blocks past 8s. This is the site's only demonstration of *it asks once*.
 
-All response copy authored. All classification deterministic.
+**Ruled 2026-09-19 (Kian): the question is generated, not authored.** It is a third field on the existing `/api/plan` call — no second round trip, no separate model call.
+
+The earlier line read *"all response copy authored."* That cannot survive contact with what this beat is for. An authored question is a keyword-selected question: the input is matched against a small set of stock questions and the closest one is shown. A visitor who writes something the set did not anticipate gets a question that is visibly about something else, which demonstrates the opposite of *it asks once* — it demonstrates a form. The beat exists to show the system reading **this** goal, and a bank of prewritten questions cannot do that no matter how large the bank is.
+
+**Five validation constraints. All five are checked; any failure discards the generated field.**
+
+1. The question is under 90 characters.
+2. Exactly three options, each under 24 characters.
+3. Every option is answerable by tapping — no option requires the visitor to type.
+4. No preamble. The field is the question, not a sentence leading into one.
+5. It ends in a question mark.
+
+**Fallback is silent and authored.** On any validation failure, on timeout, or on the spend cap, the beat renders from the authored question set with no user-visible error and no dead state. Free text remains available regardless of which path produced the question.
+
+**What does not move.** Classification stays deterministic, client and server (§6.5). All other copy on the site stays authored — this widens the model's surface by exactly one field, for exactly one input class, and nothing else.
 
 ### 6.5 Determinism
 
-The LLM's entire output surface is **one commitment title (≤48 chars) and one execution window from a closed set.**
+**Ruled 2026-09-19 (Kian). The surface is three fields, not two** — widened by §6.4's clarification-beat ruling and by nothing else.
+
+The LLM's entire output surface is:
+
+1. **One commitment title**, ≤48 characters.
+2. **One execution window**, from a closed set.
+3. **For `vague` input only — one clarification question and its three options**, under §6.4's five constraints.
+
+**Each of the three validates and falls back independently.** A title that fails its constraint does not discard a valid window; a clarification question that fails validation does not discard a valid title. There is no all-or-nothing response.
+
+**What the model still may never touch**, unchanged and non-exhaustive only in the sense that §4's table governs: parsed deadlines · **domain and input classification** · the refusal decision · refusal copy · recurrence expansion · occurrence dates or counts · tuning · contention vetoes · route layout · authority tiers · product capabilities · **every other line of copy on the site.**
+
+The third field is a widening of one beat's copy, not a softening of the boundary. Classification decides *whether* the clarification beat runs; the model only writes the sentence once that decision is already made.
 
 ### 6.6 Contracts manifest and drift detection
 
@@ -492,6 +518,33 @@ Thresholds: 5/6 wall · 4/6 tune · 5/6 on each live question.
 
 v5 §18.2 in full, plus: every user-visible label traces to §6.3 · the drift check fails on divergence (cited above as DS-15, which §12.1 records as undefined) · input classification is deterministic and pre-generation · pricing renders both states by config · no section references anything on §10's lists · no Apple-supplied UI appears as Baseline's.
 
+### 12.4a The generator tell — SITE-085's actual criterion
+
+**Ruled 2026-09-19 (Kian).** SITE-085's criterion was *"is this compelling?"* That is not a question a reviewer can fail the work on, because every answer to it is defensible. It is replaced by one that has a wrong answer:
+
+> **Does any part of this look like it came out of a generator?**
+
+Ten tells. **Each is a yes/no. Any single yes rejects the work** — the reviewer does not weigh them, count them, or trade one against the rest.
+
+| | Tell |
+|---|---|
+| 1 | Identical rounded cards in a row |
+| 2 | An italic or coloured accent on one word of a headline |
+| 3 | Tracked-out ALL-CAPS eyebrows |
+| 4 | `01 / 02 / 03` numbering |
+| 5 | Arrows appended to buttons |
+| 6 | Fade-and-slide-up on every section |
+| 7 | Hover lift |
+| 8 | Centered body type |
+| 9 | Decorative monospace |
+| 10 | Evenly-weighted type with no metadata layer |
+
+**The reviewer must not be the implementer, and must not have watched the build.** Someone who watched a decision get made cannot see the result the way a first-time visitor does; they see the reasoning instead of the page. This is a staffing constraint on the gate, not a suggestion.
+
+**Applies equally at SITE-087 and SITE-088.** The same ten questions, the same rule, the same staffing constraint.
+
+**What this gate cannot catch.** It catches *tells*, not dullness. Work can pass all ten and still be inert — correctly composed, correctly restrained, and not worth looking at. §12.4a is a floor that removes the specific ways this work fails by default; clearing it is not evidence that the work is good.
+
 ### 12.4 No criterion satisfiable by absence — standing
 
 Every automated eval must **fail on an empty implementation.** Before an eval is accepted, it is run against a stub that does nothing. If it passes, it is measuring the container and must be rewritten.
@@ -577,6 +630,18 @@ Implemented by **SITE-107**.
 ### 15.4 Copy pass — Kian
 
 §2's three blocks, §3's four refusals, twelve FAQ answers, §7, §9, and `docs/site-copy/roadmap-source.md`. Specified structure with example text; not final prose.
+
+**Ruled 2026-09-19 (Kian): this is the largest unmitigated risk in the project, and no gate catches it.**
+
+Every gate that exists checks something adjacent to the sentences and not the sentences:
+
+- **Design review** (§12.4a) checks composition and format tells.
+- **The six-user study** (SITE-060, SITE-061) checks comprehension — whether a visitor understood, not whether the writing was any good.
+- **§12.4** checks that evals fail against a stub.
+
+None of them asks whether the prose is worth reading. A site can clear all three with copy that is accurate, comprehensible, correctly formatted and completely flat, and nothing in the process would say so.
+
+It is also **the only P0 work with no owning issue and no schedule** — the one item in this document that was specified as a person's name rather than as work. **It carries a date.**
 
 ### 15.5 Findings for the app, not the site
 

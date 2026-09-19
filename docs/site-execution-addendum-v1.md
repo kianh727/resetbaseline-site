@@ -73,7 +73,7 @@ The decomposition verifies 84 units individually and never verifies the composit
 **SITE-085 · Flat demo design review**
 Project P0 · Milestone SP-04 · Blocks SITE-027 · Depends SITE-026
 *Scope* Full review of the flat plan renderer as a standalone product demo, before any provider work.
-*Accept* Reviewer answers yes to: **is this compelling with no LLM and no 3D?** Composition, hierarchy, and density reviewed at 1440px and 375px. Type scale verified against §14's technical-drawing intent.
+*Accept* **Amended 2026-09-19 by PRD v7.3 §12.4a.** The criterion is no longer *"is this compelling?"* — every answer to that is defensible, so it cannot fail work. It is now: **does any part of this look like it came out of a generator?** The ten tells in §12.4a are each a yes/no; **any single yes rejects the work**, without weighing or counting. **The reviewer must not be the implementer and must not have watched the build.** Composition, hierarchy, and density reviewed at 1440px and 375px. Type scale verified against §14's technical-drawing intent. §12.4a catches tells, not dullness — clearing it is not evidence the work is good.
 *Failure* Opens revision issues in SP-04 and blocks SP-05 until resolved. If the flat version isn't convincing, nothing downstream rescues it.
 *PRD* §6, §14, §2 DS-6 · *Label* `design-review`
 
@@ -87,18 +87,20 @@ Project P0 · Milestone SP-09 · Blocks SITE-053 · Depends SITE-052
 **SITE-087 · Pre-gate composition review**
 Project P0 · Milestone SP-11 · Blocks SITE-061 · Depends SITE-060
 *Scope* Full-page review immediately before the user study, so participants see the intended article.
-*Accept* No unresolved visual defects. §19 ban list clean. Both widths screenshotted and signed off.
+*Accept* No unresolved visual defects. §19 ban list clean. Both widths screenshotted and signed off. **PRD v7.3 §12.4a applies here in full** — the same ten tells, the same any-single-yes rejection, and the same constraint that the reviewer is neither the implementer nor someone who watched the build.
 *Failure* Blocks the user study. Running six participants against a half-finished build wastes the recruitment.
 *PRD* §19, §2 · *Label* `design-review`
 
 **SITE-088 · Peak integration review**
 Project P1 · Milestone SP-14 · Blocks SITE-074 · Depends SITE-073
 *Scope* Whole-site review with the Peak live.
-*Accept* Reviewer answers yes to: **does this read as one designed thing, or as a builder sitting on top of a 3D scene?** Plan legibility over every facet at every light angle. Peak does not compete with the input for first attention.
+*Accept* Reviewer answers yes to: **does this read as one designed thing, or as a builder sitting on top of a 3D scene?** **PRD v7.3 §12.4a applies here in full** — the same ten tells, the same any-single-yes rejection, and the same constraint that the reviewer is neither the implementer nor someone who watched the build. Plan legibility over every facet at every light angle. Peak does not compete with the input for first attention.
 *Failure* K-1 or K-3 fires — simplify the Peak or adjust geometry; plan readability wins.
 *PRD* §7, §17 K-1/K-3, SITE-EVAL-061, SITE-EVAL-062 · *Label* `design-review`
 
-**Total issues: 108.** P0 = 84 · P1 = 18 · P2 = 6. The original 84, plus the four design review gates (SITE-085…088), plus PRE-1 Part B's twenty (SITE-089…108).
+**Total issues: 109.** P0 = 86 · P1 = 17 · P2 = 6. The original 84, plus the four design review gates (SITE-085…088), plus PRE-1 Part B's twenty (SITE-089…108), plus **SITE-109** — the copy pass, created 2026-09-19 by PRD v7.3 §15.4's ruling, which had been the only P0 work in the document specified as a person's name rather than as work.
+
+**SITE-074 also moved P1 → P0** (SP-14 → SP-17) when it was re-scoped to the favicon set, which is why P0 is 86 rather than 85 and P1 is 17 rather than 18. Creation order is unchanged and still append-only: SITE-109 is the hundred-and-ninth issue created.
 
 ---
 

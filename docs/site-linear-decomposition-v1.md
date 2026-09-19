@@ -442,16 +442,16 @@ Project SP-03 · P0 · Deps SITE-001
 *Tests* Unit: fixture suite across all seven classes, client/server parity, and a negative test asserting zero fetches for `empty` and `unreadable`.
 *Verify* —
 *PRD* v7.3 §6.4, §4
-*Non-goals* Not the domain classifier — SITE-014 is orthogonal and both run. No LLM involvement. No copy generated at runtime.
+*Non-goals* Not the domain classifier — SITE-014 is orthogonal and both run. No LLM involvement in classification. **Amended 2026-09-19 by PRD v7.3 §6.4:** this issue's response copy is authored, per class, as stated — but the `vague` class's *clarification question* is no longer part of it. That field is generated on `/api/plan` and belongs to SITE-030 and SITE-103. The classifier itself still generates no copy and still calls no model; what changed is which artefact the vague-path question comes from, not how the class is decided.
 
 **SITE-103 · The clarification beat**
 Project SP-03 · P0 · Deps SITE-102, SITE-015
-*Scope* `vague` input gets **one** question, three authored tap answers plus free text, then builds. The site's only demonstration of *it asks once*.
-*Accept* **Never more than one clarification per session**, enforced in the state machine rather than the UI. Never blocks past 8s — on timeout the build proceeds on the original input.
-*Tests* Automated: a second `vague` submission in one session raises no second question; the 8s bound asserted with the answer withheld.
+*Scope* **Amended 2026-09-19 by PRD v7.3 §6.4: the question and its three options are generated, not authored.** They arrive as a third field on the existing `/api/plan` call — no second round trip. `vague` input gets **one** question, three tap answers plus free text, then builds. An authored question is a keyword-selected question, which demonstrates a form rather than *it asks once*; this beat is the site's only demonstration of the latter, so the question has to be about the goal actually typed.
+*Accept* **Never more than one clarification per session**, enforced in the state machine rather than the UI. Never blocks past 8s — on timeout the build proceeds on the original input. **The generated field satisfies all five §6.4 constraints** — under 90 chars; exactly three options, each under 24; every option tappable without typing; no preamble; ends in a question mark. **On any validation failure, timeout, or spend cap it falls back silently to the authored question set**, with no user-visible error and no dead state. Free text is available on either path.
+*Tests* Automated: a second `vague` submission in one session raises no second question; the 8s bound asserted with the answer withheld; the five constraints asserted per §6.4; a negative test proving each failure mode lands on the authored set silently (SITE-EVAL-079).
 *Verify* **Clip at 1440px and 375px.** Must read as one question asked well, not as a form.
 *PRD* v7.3 §6.4
-*Non-goals* No multi-turn dialogue. No free-text-only fallback. The question and all three answers are authored constants.
+*Non-goals* No multi-turn dialogue. No free-text-only fallback. **Amended 2026-09-19 by PRD v7.3 §6.4** — the question and its three answers were authored constants and are now generated; the authored set survives only as the silent fallback. This remains a non-goal in the sense that matters: **no multi-turn dialogue, and no second model call.** The question is one field on the one request already being made.
 
 ---
 
@@ -480,7 +480,7 @@ Project SP-04 · P0 · Deps SITE-021
 *Scope* Deterministic 2D composition — ascending route with dated marks, protection band, timer segment.
 *Accept* **Renders a coherent, compelling plan with zero 3D and zero LLM.** Reviewable as a standalone product demo.
 *Tests* Unit: anchor determinism for a fixed plan.
-*Verify* **Screenshot at 1440px and 375px.** Design review gate: is this compelling on its own? If not, the whole P0 is at risk.
+*Verify* **Screenshot at 1440px and 375px.** The design review gate is SITE-085, whose criterion was **amended 2026-09-19 by PRD v7.3 §12.4a**: not *"is this compelling on its own?"* — every answer to that is defensible — but **"does any part of this look like it came out of a generator?"**, against ten yes/no tells where any single yes rejects the work. If it fails, the whole P0 is at risk.
 *PRD* §6, §2 DS-6
 *Non-goals* Not a degraded mode. This is the reference implementation.
 
@@ -563,11 +563,11 @@ Project SP-05 · P0 · Deps SITE-028
 **SITE-030 · `/api/plan` route and prompt**
 Project SP-05 · P0 · Deps SITE-028
 *Scope* Edge route calling Claude. Constrained system prompt, few-shot on the five scenarios, action vocabulary restricted to the 45 types in `contracts-manifest.json`, JSON only, `max_tokens: 1000`, 300-char input cap.
-*Accept* **Total generated surface is one commitment title (≤48 chars) and one window selection from a closed set.** Nothing else.
-*Tests* Automated: prompt-output contract test over 30 varied inputs; assertion that no other field originates from the model.
+*Accept* **Amended 2026-09-19 by PRD v7.3 §6.5. The generated surface is three fields, not two:** one commitment title (≤48 chars), one window selection from a closed set, and — **for `vague` input only** — one clarification question with its three options, under §6.4's five constraints. Nothing else. **Each of the three validates and falls back independently**: a failed title does not discard a valid window, and a failed question does not discard a valid title.
+*Tests* Automated: prompt-output contract test over 30 varied inputs; assertion that no fourth field originates from the model; independent-fallback test asserting that one invalid field does not discard the other two.
 *Verify* —
-*PRD* §4, §12
-*Non-goals* The model never returns dates, counts, tiers, refusals, or copy.
+*PRD* v7.3 §6.4, §6.5, §4, §12
+*Non-goals* The model never returns dates, counts, tiers, refusals, or any copy other than the title and — for `vague` input — the clarification question. The clarification question is not a fourth beat: classification still decides **whether** it runs, and the model only writes the sentence once that decision is made.
 
 **SITE-031 · Schema validation layer**
 Project SP-05 · P0 · Deps SITE-030
@@ -882,7 +882,7 @@ Project SP-11 · P0 · Deps SITE-090, SITE-093, SITE-095
 *Non-goals* Does not verify the capabilities itself — it records verdicts produced elsewhere. Does not cover §4 or §5, which are P1 and gated (§15.1).
 
 **SITE-061 · First-time user study**
-Project SP-11 · P0 · Deps SITE-060, SITE-108
+Project SP-11 · P0 · Deps SITE-060, SITE-108, **SITE-109** (copy pass — added 2026-09-19 per §15.4; a study run on example text measures the structure and nothing else)
 *Scope* Execute §2.1 with six users (two mobile, four desktop), score against the §18.3 rubric. **Q4 — *"Is this finished?"* — is asked and scored** (v7.3 §12.2); Q3 stays held with §4.
 *Accept* **5/6 reach the wall unprompted · 4/6 tune without being told · 5/6 on each live comprehension question.** A participant who thinks the product is complete is a Q4 failure and means §2 failed.
 *Tests* n/a
@@ -992,14 +992,14 @@ Project SP-14 · P1 · Deps SITE-070
 *PRD* §7.5, §8.3
 *Non-goals* Seven-station choreography is P2.
 
-**SITE-072 · Sections 2, 4, 5, 6**
+**SITE-072 · §6 Method — four principles, collapsed**
 Project SP-14 · P1 · Deps SITE-071
-*Scope* "What you didn't see", "What it won't do", "Method" with progressive disclosure, "Join". Copy per §13, audited against §19 bans.
-*Accept* **Zero banned words. Zero ALL-CAPS eyebrows. No identical rounded cards in a row.**
+*Scope* **Re-scoped against PRD v7.3; the entry below was stale until 2026-09-19.** This issue was authored against the pre-v7.3 section map and covered four sections. Three moved: §2 "Where Baseline is right now" and §3 "What it won't do" are P0 in SP-17 (SITE-089…093), and §10 Join is P0 in SP-17 (SITE-097). "What you didn't see" / "What's underneath" was **cut entirely** in v7.3 §4.1 — its surviving rows went into §2 Block 1, §2 Block 2 and §3. §5 Day 1 → Day 30 has its own issue, SITE-073. **What remains is §6 Method**, which v7.3 §2 keeps at P1: four principles, collapsed by default, expanding on interaction. Copy per §13, audited against §19 bans.
+*Accept* **Zero banned words. Zero tracked-out ALL-CAPS eyebrows. No identical rounded cards in a row.** The collapsed state is the default and is readable on its own; expansion adds detail rather than supplying the meaning.
 *Tests* Automated: copy audit against the §19 word list.
-*Verify* **Screenshot each at both widths.**
-*PRD* §13, §19
-*Non-goals* No ADHD-specific positioning. Wide funnel preserved.
+*Verify* **Screenshot collapsed and expanded, at 1440px and 375px.**
+*PRD* v7.3 §2 (§6 row), §13, §19
+*Non-goals* No ADHD-specific positioning; the wide funnel is preserved. **No fade-and-slide-up on the section.** Not §2, §3 or §10 — those are P0 and owned elsewhere. **Does not describe capabilities** — §6 is method, and any claim about what the app does belongs to §2 and carries a DS-18 verdict. **K-5 applies with force**: if the four principles can't be understood without explanatory copy, redesign the disclosure rather than adding the copy.
 
 **SITE-073 · Day 1 → Day 30**
 Project SP-14 · P1 · Deps SITE-072
@@ -1010,14 +1010,14 @@ Project SP-14 · P1 · Deps SITE-072
 *PRD* §13, §8.3
 *Non-goals* —
 
-**SITE-074 · Metadata, OG card, legal pages**
-Project SP-14 · P1 · Deps SITE-072
-*Scope* Rewritten title/description matching current positioning, generated 1200×630 OG card, favicon set, `theme-color`, `/privacy`, `/terms`.
-*Accept* **`og:image` no longer points at a `lovable.app` URL.** No copy references pre-pivot environment/blocker positioning.
-*Tests* Automated: metadata assertions; URL-domain check.
-*Verify* Preview cards in a social debugger.
-*PRD* §13, §18.2
-*Non-goals* No blog, no `/pricing`.
+**SITE-074 · Favicon set and `theme-color`**
+Project SP-17 · **P0** · Deps SITE-005
+*Scope* **Re-scoped and re-prioritised; the entry below was stale until 2026-09-19.** Ruled P0, and **the SITE-088 gate is dropped** — a favicon is visible on first load, which is before any P1 work exists, and the Peak integration review gated this issue when it was metadata-and-legal, a scope that no longer lives here. Moved from SP-14 (P1) to SP-17 (P0) and re-pointed at SITE-005. Metadata and the OG card went to **SITE-100**; `/privacy` and `/terms` to **SITE-099**. What remains: the favicon set across the sizes a modern browser and an iOS home-screen install actually request, plus `theme-color`.
+*Accept* Icons resolve at every declared size with no 404. `theme-color` matches the site's near-black background so browser chrome does not flash a mismatched colour on load.
+*Tests* Automated: every declared icon path resolves; `theme-color` matches the token.
+*Verify* Installed to an iOS home screen and checked in a mobile browser with chrome visible.
+*PRD* v7.3 §13, §18.2
+*Non-goals* **Not metadata, not the OG card, not the legal routes** — SITE-100 and SITE-099 own those. No app-store assets, no blog, no marketing imagery. Its old non-goal *"no `/pricing`"* is **void**: `/pricing` exists and is P0 (v7.3 §7, SITE-094). Icons are static assets, not JavaScript, so this costs nothing against the 120 KB ceiling (§11).
 
 ---
 
@@ -1198,6 +1198,15 @@ Project SP-17 · P0 · Deps —
 *PRD* v7.3 §3.2, §5, §15.1, §15.4
 *Non-goals* Not a content-management system. Not rendered. Its job is to stop held content being rediscovered and shipped by someone who doesn't know why it was held.
 
+**SITE-109 · Copy pass — every rendered sentence**
+Project SP-17 · **P0** · Deps SITE-101 · **Blocks SITE-061** · Owner **Kian** · No date set
+*Scope* **Created 2026-09-19 by PRD v7.3 §15.4's ruling.** Final prose for §2's three blocks, §3's four refusals, the twelve FAQ answers, §7, §9, and `docs/site-copy/roadmap-source.md`. What exists today is *specified structure with example text* — the shape of each sentence and roughly what it says, not the sentence. This issue writes the sentences.
+*Accept* Every rendered string on the site is final prose, signed off by its author. No example text survives into a built page. §19's copy bans clean. §6.3a's gate-copy MUST holds in every variant written — **no depicted Baseline UI names an app**, because Screen Time returns opaque tokens.
+*Tests* CI: the §19 ban list and the app-name list (SITE-107) run against final copy, not against example text.
+*Verify* **The study does not run before this lands.** A six-user study on example text measures the structure and nothing else — the participants would be reading placeholder sentences and scoring comprehension of the skeleton.
+*PRD* v7.3 §15.4, §2, §3, §6.3a, §8, §19
+*Non-goals* Not a redesign. Not a scope change to any section — the sections and their blocks are fixed by their own issues; this writes what they say. **No gate catches the result**: §12.4a checks format tells, the study checks comprehension, §12.4 checks evals against stubs, and none of them asks whether the prose is worth reading. That is why this issue exists and why §15.4 calls it the largest unmitigated risk in the project.
+
 ---
 
 ## SUMMARY
@@ -1219,10 +1228,10 @@ Project SP-17 · P0 · Deps —
 | SP-11 | P0 Validation Gate | P0 | 2 | SP-09, SP-10 |
 | SP-12 | Peak Geometry + Lighting | P1 | 5 | **SP-11 passing** |
 | SP-13 | Plan → Peak Projection | P1 | 3 | SP-12 |
-| SP-14 | Camera, Scroll + Sections | P1 | 5 | SP-13 |
+| SP-14 | Camera, Scroll + Sections | P1 | 4 | SP-13 |
 | SP-15 | P1 Performance + Degradation | P1 | 4 | SP-12 |
 | SP-16 | Signature Polish | P2 | 6 | SP-14, SP-15 |
-| SP-17 | Website Sections | **P0** | 13 | SP-01, SP-08 (§10 Join) |
+| SP-17 | Website Sections | **P0** | 15 | SP-01, SP-08 (§10 Join) |
 
 ### Issue count
 

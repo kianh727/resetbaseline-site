@@ -191,10 +191,11 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 ## F. GeneratedProvider
 
 **SITE-EVAL-021 · Valid response path** · `AUTO`
-*Steps* 30 varied inputs through `/api/plan`.
-*Pass* All validate; commitment title ≤48 chars; window from the closed set; action types restricted to the 45 in `contracts-manifest.json`; **no other field originates from the model**.
-*Fail* Any model-authored date, count, tier, refusal, or copy string.
-*PRD* §4, §12 · *Issues* SITE-030, SITE-031
+*Steps* 30 varied inputs through `/api/plan`, of which **at least 8 classify as `vague`** so the third field is exercised rather than merely permitted.
+*Pass* **Amended 2026-09-19 by PRD v7.3 §6.5 — the model's surface is three fields, not two.** Every response validates; commitment title ≤48 chars; window from the closed set; action types restricted to the 45 in `contracts-manifest.json`; for `vague` inputs a clarification question meeting all five §6.4 constraints; **no fourth field originates from the model**. The non-`vague` inputs return **no** clarification field at all.
+*Fail* Any model-authored date, count, tier, refusal, or copy string other than the title and the `vague`-path clarification question · a clarification field returned for a non-`vague` class · a fourth field of any kind.
+*Stub check* **Was a known §12.4 exposure and is rewritten here.** *"All validate"* passed on zero requests: an empty implementation issues no calls, so nothing fails to validate. It now asserts **counts before properties** — 30 responses received, ≥8 carrying a clarification field — so a stub that returns nothing fails on the count rather than passing on the vacuum.
+*PRD* v7.3 §6.4, §6.5, §4, §12 · *Issues* SITE-030, SITE-031, SITE-103
 
 **SITE-EVAL-022 · Malformed response** · `AUTO`
 *Steps* Inject 20 malformed fixtures — truncated JSON, extra fields, wrong enums, missing required, wrong types.
@@ -580,6 +581,14 @@ Added by PRE-1 Part B against PRD v7.3. **Every eval here must fail against a st
 *Fail* Any eval accepted with no stub result · any eval that passes against the stub and is kept as written.
 *Stub check* This eval is the stub check. Its own failure mode is passing when the suite is empty, so it asserts a non-zero eval count.
 *PRD* v7.3 §12.4, §0.3 · *Issues* SITE-106
+
+**SITE-EVAL-079 · The generated clarification question** · `AUTO`
+*Risk* §6.4's ruling moved the clarification beat from authored copy to model output. Model output inherits every constraint model output carries, and a generated field with no eval is exactly what §0 exists to stop. The specific danger is not a bad question — it is a question that fails one of the five constraints and renders anyway, or a fallback that fires visibly and leaves the beat looking broken.
+*Steps* Drive the beat with **at least 25 `vague` fixtures** spanning short, long, multi-clause and unanticipated phrasings. Then force each failure mode separately: each of the five constraints violated in turn, a timeout, and the spend cap.
+*Pass* Every rendered question satisfies all five §6.4 constraints — **under 90 characters · exactly three options, each under 24 · every option answerable by tapping, none requiring typed input · no preamble · ends in a question mark**. Each of the seven forced failures lands on the **authored** question set, **silently**: no user-visible error, no dead state, no spinner, and free text still available. Classification is unchanged across every fixture — the model never moved an input into or out of `vague`. Never more than one question per session on any path.
+*Fail* A question rendered while violating any constraint · a validation failure that reaches the user as an error or an empty beat · a fallback that discards a valid title or window alongside the question (§6.5: the three fields fall back independently) · any second clarification in one session · any copy other than the question and its options originating from the model.
+*Stub check* An implementation that renders **no** clarification beat at all would pass a bare "every rendered question is valid" assertion vacuously. So this eval asserts **counts first**: ≥25 questions rendered across the fixture set, and exactly 7 fallbacks observed across the 7 forced failures. A stub that does nothing fails on both counts before any property is examined.
+*PRD* v7.3 §6.4, §6.5, §12.4 · *Issues* SITE-030, SITE-031, SITE-102, SITE-103
 
 ---
 

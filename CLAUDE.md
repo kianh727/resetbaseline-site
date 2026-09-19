@@ -155,13 +155,28 @@ made, not a discussion.**
 This is the product, and it is never softened for convenience. **PRD §4 is the
 authoritative table; where anything else appears to contradict it, the table wins.**
 
-**The LLM's entire output surface is one commitment title (≤48 chars) and one
-window selection from a closed set.** That is all.
+**Ruled 2026-09-19 (Kian): the output surface is three fields, not two** (PRD v7.3
+§6.4, §6.5). **The LLM's entire output surface is one commitment title (≤48 chars),
+one window selection from a closed set, and — for `vague` input only — one
+clarification question with its three options.** That is all.
 
-**The model may never gain authority over:** parsed deadlines · domain
-classification · the refusal decision · refusal copy · recurrence expansion ·
-occurrence dates or counts · tuning · contention vetoes · route layout · authority
-tiers · product capabilities · any other copy on the site.
+The third field is the clarification beat. An authored question is a keyword-selected
+question, and a visitor whose phrasing the set did not anticipate gets a question
+visibly about something else — which demonstrates a form, not *it asks once*. It is a
+third field on the existing `/api/plan` call, never a second round trip, and it carries
+**five validation constraints**: under 90 chars · exactly three options, each under 24 ·
+every option tappable without typing · no preamble · ends in a question mark. **Any
+failure, timeout, or spend cap falls back silently to the authored question set** — no
+user-visible error, no dead state. **Each of the three fields validates and falls back
+independently**; one invalid field never discards the other two. Enforced by
+SITE-EVAL-079, which asserts counts before properties so it cannot pass on a beat that
+never rendered.
+
+**The model may never gain authority over:** parsed deadlines · domain classification ·
+**input classification, which decides whether the clarification beat runs at all** · the
+refusal decision · refusal copy · recurrence expansion · occurrence dates or counts ·
+tuning · contention vetoes · route layout · authority tiers · product capabilities ·
+**every other line of copy on the site.**
 
 Consequences that follow, each with its own eval:
 
@@ -170,7 +185,11 @@ Consequences that follow, each with its own eval:
 - **Domain classification is deterministic**, mirrored client and server. The model
   may **escalate** to bounded; it can never de-escalate (SITE-014, EVAL-025).
 - **Refusal copy is authored, per domain. Five variants. No code path generates
-  refusal text** (SITE-017).
+  refusal text** (SITE-017). The §6.4 widening is the clarification question and
+  nothing else — it does not reach refusals, and a refusal is never generated.
+- **The clarification question is generated and validated** (SITE-030, SITE-103,
+  SITE-EVAL-079). Classification still decides *whether* the beat runs; the model only
+  writes the sentence once that decision is already made.
 - **The LLM selects a recurrence rule from the closed set; code computes every
   date.** Identical dates and counts across semantically identical phrasings
   (SITE-023, EVAL-030).
@@ -470,6 +489,45 @@ stacking below `lg`. The harness reports which families the browser actually loa
 two identical columns otherwise read as "these faces are alike" when the truth is "neither
 file is present".
 
+**Four amendments to v7.3, ruled 2026-09-19 (Kian), and swept in the same pass.**
+
+1. **§6.4 — the clarification question is generated, not authored.** A third field on the
+   existing `/api/plan` call, with five validation constraints and a silent fallback to the
+   authored set. An authored question is a keyword-selected question, which demonstrates a
+   form rather than *it asks once*.
+2. **§6.5 — the model's surface widened from two fields to three**, and each validates and
+   falls back independently.
+3. **§12.4a — new subsection.** SITE-085's criterion changed from *"is this compelling?"*,
+   which has no wrong answer, to *"does any part of this look like it came out of a
+   generator?"* — ten yes/no tells, any single yes rejects, reviewer neither the implementer
+   nor someone who watched the build. Applies at SITE-087 and SITE-088 too.
+4. **§15.4 — the copy pass is the largest unmitigated risk and no gate catches it.** Design
+   review checks composition, the study checks comprehension, §12.4 checks evals against
+   stubs; none asks whether the prose is worth reading.
+
+**Swept, and which tiers were checked.** Addendum: SITE-085, SITE-087, SITE-088 accept lines.
+Decomposition: SITE-030, SITE-102, SITE-103, SITE-061, and — caught by grep rather than by the
+ruling — SITE-022's *Verify*, which restated the withdrawn "is this compelling" criterion.
+Evals: SITE-EVAL-021 rewritten (it was a named §12.4 exposure and now asserts counts before
+properties), **SITE-EVAL-079 added** for the generated question. This file: §5's determinism
+boundary and §13's counts. Linear: the same seven issues amended in place, with the superseded
+lines struck through rather than deleted so nobody reads the old scope and stops.
+
+**`SITE-109 · Copy pass — every rendered sentence` created** — P0, SP-17, deps SITE-101,
+**blocks SITE-061**, assigned to Kian, no date. A study run on example text measures the
+structure and nothing else.
+
+**A propagation failure of my own, found in this pass and fixed.** `SITE-72` and `SITE-74`
+were re-scoped in Linear and recorded in this file, but **the decomposition was never swept** —
+it still carried "Sections 2, 4, 5, 6" and "Metadata, OG card, legal pages" at SP-14/P1. That
+is the §1 worked example repeating: the ruling landed in two places and the third kept saying
+the old thing. Both entries now match Linear, and SITE-074's P1 → P0 move is why the counts
+read P0 = 86, P1 = 17.
+
+**The longest chain is unchanged at 29.** SITE-109's only edge into the graph is
+SITE-101 → SITE-109 → SITE-061, and SITE-101 has no dependencies — a three-node path into a
+node already reached by a 29-long one.
+
 **Next in sequence is `SITE-4`** (contracts manifest, generated types, drift guard).
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
@@ -635,12 +693,14 @@ milestone's phase is the project it sits in.
 The SP decomposition is fully preserved; milestones are ordered and show
 progress, which projects do not.
 
-**108 issues total: P0 = 84, P1 = 18, P2 = 6.** The original 84, plus four design
+**109 issues total: P0 = 86, P1 = 17, P2 = 6.** The original 84, plus four design
 review gates (SITE-085…088) defined in addendum §3, plus PRE-1 Part B's twenty
-(SITE-089…108). **Counts are final** — Part B is applied. Creation order runs
-001…084, then 085…088, then 089…108, in strict sequence throughout.
+(SITE-089…108), plus **SITE-109** — the copy pass, created 2026-09-19 by PRD v7.3
+§15.4's ruling. Creation order runs 001…084, then 085…088, then 089…108, then 109,
+in strict sequence throughout; the mapping stays positional and append-only.
 
-**78 evals: SITE-EVAL-001…078.** Part B added section Q — SITE-EVAL-070…078.
+**79 evals: SITE-EVAL-001…079.** Part B added section Q — SITE-EVAL-070…078;
+SITE-EVAL-079 was added 2026-09-19 with the §6.4 generated-question ruling.
 
 Creation order is load-bearing. See addendum §2 before any Linear write:
 the team key is `SITE` and the team must be empty before the first issue,
