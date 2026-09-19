@@ -962,6 +962,36 @@ bundle is unchanged at 101.0 KB.
   would ask a clarifying question about a medical situation it has already decided not to
   advise on. §6.4 lists the classes; it does not order the tests.
 
+**`SITE-15` and `SITE-19` are done; `SITE-16`'s mechanics are in place and its timing assertion
+waits on a provider.**
+
+- **The frame is complete and empty at t=0, and that is structural.** All five §3.4 rows are in
+  the DOM from first paint showing `—`; none is conditionally rendered, none is skeletonised,
+  and the frame's shape does not depend on what has arrived. A frame assembled from available
+  data would grow as data landed, which is the spinner problem with better manners.
+- **`scripts/check-builder.mjs` asserts it in a browser with every post-document request
+  aborted**, so a frame that depended on any fetch could not appear. It also counts requests
+  while typing: **"finish my thesis by May" surfaces `May 31` with zero network requests**,
+  which is SITE-019's *"verified in devtools"* automated.
+- **Proven negatively, twice, bare.** Rendering one row conditionally fails naming the missing
+  row; adding `animate-pulse` to an unfilled value fails with the element count — exit `1` in
+  both cases.
+- **The check writes §3.4's row list out rather than importing it** from
+  `lib/builder/rows.ts`. Importing would make the assertion a pure function of its own
+  reference (§0.3b) — comparing the rendered rows to the same constant the renderer used, and
+  agreeing by construction. Written separately from the PRD's table, it is a second source.
+- **The parse runs during render, synchronously — no effect, no debounce, no timer.** A debounce
+  would make the deadline arrive *after* the keystroke that earned it, which is the one thing
+  §3.3's detail exists to avoid. It costs a regex pass over at most 300 characters.
+- **The parser reports the phrase it matched**, so §3.4's qualifier can say `from "by May"`
+  without a second regex re-deriving it. The first version had that second regex; it disagreed
+  with the parser on a sentence with no trailing punctuation and rendered nothing. Two matchers
+  describing one match can disagree — now the phrase is a by-product of the parse.
+- **`SITE-8`'s input is now controlled by the builder.** Two things read the text: the input
+  renders it, the block parses it. Its pure rules and their tests are untouched.
+
+**Bundle 102.5 KB of 120.** The builder is the first substantial client component.
+
 **`SITE-17` is blocked, and the premise that it was not is worth recording.** The ruling said the
 five refusals are "§3 verbatim and already authored in v7.3". They are two different artifacts.
 **v7.3 §4 (the site's §3) carries four lines** — no streaks · no completeness meters · silence is

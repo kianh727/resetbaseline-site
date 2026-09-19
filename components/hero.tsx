@@ -11,11 +11,13 @@
  *
  * The chips (SITE-010) sit beneath the input and are not built yet, which is
  * why this issue's *"no scroll to see headline, input and chips"* criterion is
- * only half-verifiable today. The fold reserves room for them rather than
- * being laid out as though they will never exist.
+ * only half-verifiable today.
+ *
+ * SITE-015's transformation block now renders below the input, complete and
+ * empty, from first paint — so the fold is headline, input, block.
  */
 
-import AskInput from '@/components/ask-input'
+import Builder from '@/components/builder'
 import { HEADLINE } from '@/lib/copy/hero'
 
 export default function Hero() {
@@ -27,7 +29,7 @@ export default function Hero() {
         */}
       <h1 className="max-w-[18ch] text-balance text-display text-bone">{HEADLINE}</h1>
 
-      <AskInput />
+      <Builder />
     </section>
   )
 }

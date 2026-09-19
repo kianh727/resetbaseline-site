@@ -80,7 +80,16 @@ function nextOccurrenceOfMonth(now: Date, month: number): Date {
  * understanding. The fixture suite caught exactly this.
  */
 const INVALID = Symbol('invalid-date')
-type RuleResult = Date | null | typeof INVALID
+
+/**
+ * A match carries the **phrase that produced it**, so §3.4's qualifier column
+ * can say `from "by May"` without a second regex re-deriving it. Two matchers
+ * describing one match can disagree; this one cannot, because the phrase is a
+ * by-product of the parse rather than a re-reading of the text.
+ */
+export type DeadlineMatch = { date: Date; phrase: string }
+
+type RuleResult = DeadlineMatch | null | typeof INVALID
 type Rule = (text: string, now: Date) => RuleResult
 
 /*
@@ -91,7 +100,7 @@ const monthPhrase: Rule = (text, now) => {
   const m = /\b(?:by|before|until|due)\s+(?:the\s+end\s+of\s+)?([a-z]+)\b/i.exec(text)
   if (!m?.[1]) return null
   const idx = monthIndex(m[1])
-  return idx === null ? null : nextOccurrenceOfMonth(now, idx)
+  return idx === null ? null : { date: nextOccurrenceOfMonth(now, idx), phrase: m[0] }
 }
 
 /** `in N days|weeks|months`. */
@@ -101,8 +110,9 @@ const relativePhrase: Rule = (text, now) => {
   const n = Number(m[1])
   if (n === 0) return null
   const unit = m[2].toLowerCase()
-  if (unit === 'day') return at(now.getFullYear(), now.getMonth(), now.getDate() + n)
-  if (unit === 'week') return at(now.getFullYear(), now.getMonth(), now.getDate() + n * 7)
+  const phrase = m[0]
+  if (unit === 'day') return { date: at(now.getFullYear(), now.getMonth(), now.getDate() + n), phrase }
+  if (unit === 'week') return { date: at(now.getFullYear(), now.getMonth(), now.getDate() + n * 7), phrase }
   /*
    * Month arithmetic clamps rather than overflowing: "in 1 month" from 31 Jan
    * is 28 Feb, not 3 March. Overflowing would put the deadline in a month the
@@ -111,7 +121,7 @@ const relativePhrase: Rule = (text, now) => {
   const targetMonth = now.getMonth() + n
   const year = now.getFullYear() + Math.floor(targetMonth / 12)
   const month = ((targetMonth % 12) + 12) % 12
-  return at(year, month, Math.min(now.getDate(), daysInMonth(year, month)))
+  return { date: at(year, month, Math.min(now.getDate(), daysInMonth(year, month))), phrase }
 }
 
 /** `by the end of the month|quarter|year`. */
@@ -119,12 +129,13 @@ const endOfPeriod: Rule = (text, now) => {
   const m = /\b(?:by\s+)?(?:the\s+)?end\s+of\s+(?:the\s+|this\s+)?(month|quarter|year)\b/i.exec(text)
   if (!m?.[1]) return null
   const period = m[1].toLowerCase()
+  const phrase = m[0]
   if (period === 'month') {
-    return at(now.getFullYear(), now.getMonth(), daysInMonth(now.getFullYear(), now.getMonth()))
+    return { date: at(now.getFullYear(), now.getMonth(), daysInMonth(now.getFullYear(), now.getMonth())), phrase }
   }
-  if (period === 'year') return at(now.getFullYear(), 11, 31)
-  const lastMonthOfQuarter = Math.floor(now.getMonth() / 3) * 3 + 2
-  return at(now.getFullYear(), lastMonthOfQuarter, daysInMonth(now.getFullYear(), lastMonthOfQuarter))
+  if (period === 'year') return { date: at(now.getFullYear(), 11, 31), phrase }
+  const q = Math.floor(now.getMonth() / 3) * 3 + 2
+  return { date: at(now.getFullYear(), q, daysInMonth(now.getFullYear(), q)), phrase }
 }
 
 /**
@@ -143,15 +154,15 @@ const explicitDate: Rule = (text, now) => {
     const day = Number(iso[3])
     if (month < 0 || month > 11) return INVALID
     if (day < 1 || day > daysInMonth(year, month)) return INVALID
-    return at(year, month, day)
+    return { date: at(year, month, day), phrase: iso[0] }
   }
 
   const monthFirst = /\b([a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?\b/i.exec(text)
   const dayFirst = /\b(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]+)(?:,?\s+(\d{4}))?\b/i.exec(text)
 
-  for (const [monthWord, dayWord, yearWord] of [
-    [monthFirst?.[1], monthFirst?.[2], monthFirst?.[3]],
-    [dayFirst?.[2], dayFirst?.[1], dayFirst?.[3]],
+  for (const [monthWord, dayWord, yearWord, whole] of [
+    [monthFirst?.[1], monthFirst?.[2], monthFirst?.[3], monthFirst?.[0]],
+    [dayFirst?.[2], dayFirst?.[1], dayFirst?.[3], dayFirst?.[0]],
   ]) {
     if (!monthWord || !dayWord) continue
     const idx = monthIndex(monthWord)
@@ -159,7 +170,7 @@ const explicitDate: Rule = (text, now) => {
     const day = Number(dayWord)
     const year = yearWord ? Number(yearWord) : nextOccurrenceOfMonth(now, idx).getFullYear()
     if (day < 1 || day > daysInMonth(year, idx)) return INVALID
-    return at(year, idx, day)
+    return { date: at(year, idx, day), phrase: whole ?? monthWord }
   }
   return null
 }
@@ -175,7 +186,7 @@ const RULES: readonly Rule[] = [explicitDate, endOfPeriod, relativePhrase, month
  * @returns the parsed deadline, noon-anchored local, or `null` when the text
  *   contains no unambiguous date phrase. Never throws, never guesses.
  */
-export function parseDeadline(text: string, now: Date = new Date()): Date | null {
+export function matchDeadline(text: string, now: Date = new Date()): DeadlineMatch | null {
   if (typeof text !== 'string' || text.trim() === '') return null
   for (const rule of RULES) {
     const result = rule(text, now)
@@ -183,6 +194,11 @@ export function parseDeadline(text: string, now: Date = new Date()): Date | null
     if (result !== null) return result
   }
   return null
+}
+
+/** The date alone, for callers that do not render the qualifier. */
+export function parseDeadline(text: string, now: Date = new Date()): Date | null {
+  return matchDeadline(text, now)?.date ?? null
 }
 
 /** Convenience for assertions and rendering: the calendar day, zero-padded. */

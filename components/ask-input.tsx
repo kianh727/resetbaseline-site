@@ -18,11 +18,22 @@
  * exactly 1, 2 and 300 characters rather than through the DOM.
  */
 
-import { useId, useState } from 'react'
+import { useId } from 'react'
 import { canRun, clamp, MAX_CHARS } from '@/lib/ask-input'
 
-export default function AskInput() {
-  const [value, setValue] = useState('')
+/*
+ * Controlled by the builder rather than holding its own text (SITE-019). The
+ * deadline has to materialise **as the visitor types**, which means the parse
+ * runs on a value the transformation block can also see — so the text lives
+ * one level up and this component reports changes.
+ */
+export default function AskInput({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (next: string) => void
+}) {
   const inputId = useId()
   const enabled = canRun(value)
 
@@ -51,7 +62,7 @@ export default function AskInput() {
           id={inputId}
           type="text"
           value={value}
-          onChange={(e) => setValue(clamp(e.target.value))}
+          onChange={(e) => onChange(clamp(e.target.value))}
           maxLength={MAX_CHARS}
           placeholder="Ask Baseline"
           autoComplete="off"

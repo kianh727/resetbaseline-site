@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · divergences · typecheck · lint · test · build · bundle · overflow
+    name: eval-stubs · divergences · typecheck · lint · test · build · bundle · overflow · builder
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -102,3 +102,10 @@ jobs:
 
       - name: Horizontal overflow at 320/375/390/768/1440/1920
         run: npm run check:overflow
+
+      # SITE-015 / SITE-019. The frame renders complete and empty at t=0 with
+      # the network blocked (DS-10), and the deadline materialises mid-typing
+      # with zero requests (§3.3). Both need a real browser: "no spinner
+      # exists" is a claim about the rendered DOM, not about the source.
+      - name: Builder guarantees — anti-spinner and live parse
+        run: npm run check:builder

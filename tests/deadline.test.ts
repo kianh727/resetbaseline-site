@@ -13,7 +13,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseDeadline, toISODate } from '../lib/parse/deadline.ts'
+import { parseDeadline, matchDeadline, toISODate } from '../lib/parse/deadline.ts'
 
 /** Wednesday 11 March 2026, noon. Mid-month, mid-quarter, mid-year. */
 const NOW = new Date(2026, 2, 11, 12, 0, 0, 0)
@@ -198,4 +198,33 @@ test('the suite covers at least 60 phrases — SITE-013 accept', () => {
   ]
   assert.ok(phrases.length >= 60, `only ${phrases.length} phrases`)
   for (const p of phrases) assert.doesNotThrow(() => parseDeadline(p, NOW))
+})
+
+/*
+ * SITE-019 · The matched phrase, for §3.4's qualifier column.
+ *
+ * Reported by the parser rather than re-derived by the renderer: two matchers
+ * describing one match can disagree, and the qualifier's whole job is to say
+ * why the date is believed.
+ */
+test('the parser reports the phrase that produced the date', () => {
+  const cases: readonly (readonly [string, string])[] = [
+    ['finish my thesis by May', 'by May'],
+    ['finish my thesis by May and stop losing my mornings', 'by May'],
+    ['ship it in 6 weeks', 'in 6 weeks'],
+    ['by the end of the quarter', 'by the end of the quarter'],
+    ['hand it in on 2026-05-15', '2026-05-15'],
+    ['due August', 'due August'],
+  ]
+  for (const [text, phrase] of cases) {
+    const m = matchDeadline(text, NOW)
+    assert.ok(m !== null, `"${text}" should match`)
+    assert.equal(m.phrase.trim(), phrase, `"${text}" reported the wrong phrase`)
+  }
+})
+
+test('no match means no phrase — the qualifier cannot outlive the date', () => {
+  for (const text of ['soon', 'stop losing my mornings', '']) {
+    assert.equal(matchDeadline(text, NOW), null)
+  }
 })
