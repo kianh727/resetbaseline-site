@@ -905,6 +905,22 @@ scope does not cover them — it lists §2, §3, the FAQ, §7, §9 and the roadm
 and the hero headline are copy with no owning issue**, which is the same gap §15.4's ruling
 closed one item over. Flagged, not decided.
 
+**`SITE-103` is blocked twice over, and the second one is the same gap as the refusals.** The
+beat's question is generated on `/api/plan`, which is SP-05 and does not exist — expected, and
+not the interesting half. **§6.4 says every failure "falls back silently to the authored
+question set", and that set is written nowhere.** It is not in v7.3, not in v5, not in the
+decomposition. So the beat has neither of its two sources: no route to generate from, and
+nothing to fall back to. The fallback is the half that matters for honesty — it is what runs
+on timeout and on the spend cap — and a beat with an empty fallback fails silently into a dead
+state, which is the one outcome §6.4 forbids by name.
+
+**SP-03 is therefore complete to its boundary.** `SITE-13`, `SITE-14`, `SITE-15`, `SITE-19` and
+`SITE-102` are done. `SITE-16` needs SP-05's provider seam for its timing assertion, `SITE-17`
+needs four of five refusals, `SITE-18` follows `SITE-17`, and `SITE-103` needs both a route and
+an authored question set. **Three of the four remaining are waiting on authored copy that no
+issue owns** — the same shape as the hero H1 and the chip strings, and the third time it has
+surfaced.
+
 **Where the mountain decision actually bites.** The route-up-the-mountain reading as a progress
 bar with a summit date is not only a visual problem: §10 bans *"progress or completeness
 meters"* outright, and §3's own copy promises *"no streaks, no scores, and no completeness
