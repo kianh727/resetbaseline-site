@@ -150,6 +150,44 @@ test('a day carries lit as a boolean and nothing resembling a status', () => {
  * Geometry — §6.3b's composition rules.
  * ------------------------------------------------------------------ */
 
+test('the protection band is shorter than a window band — SITE-026 density', () => {
+  /*
+   * §6.3b calls protection "a second, denser band below" and does not define
+   * density. Decided in the adapter and flagged provisional: two-thirds height,
+   * higher opacity, a hard rule on both boundaries rather than a lit line on
+   * one. Asserted here so the choice is a stated one rather than a number
+   * somebody can drift.
+   */
+  const { bands } = compose(plan([commitment, gate]))
+  const window = bands.find((g) => g.band.kind === 'window')
+  const protection = bands.find((g) => g.band.kind === 'protection')
+  assert.ok(window && protection)
+  assert.ok(protection.height < window.height, 'protection must be the denser band')
+})
+
+test('bands stack without overlapping, at their own heights', () => {
+  // The protection band has a different height, so a layout that assumed one
+  // height for every band would overlap or leave a gap. Asserted as the
+  // property rather than as coordinates.
+  const { bands, height } = compose(plan([commitment, gate]))
+  for (let i = 1; i < bands.length; i++) {
+    const prev = bands[i - 1]
+    const cur = bands[i]
+    assert.ok(prev && cur)
+    assert.ok(cur.y >= prev.y + prev.height, 'bands must not overlap')
+  }
+  const last = bands[bands.length - 1]
+  assert.ok(last && height > last.y + last.height, 'the composition must contain its last band')
+})
+
+test('a band carries its node\u2019s capability and tier for \u00a76.1a metadata', () => {
+  // Carried, not derived — SITE-004 is blocked and there is no contract source
+  // for a tier. A derivation written now would be a hand-list in a function.
+  const { bands } = compose(plan([commitment]))
+  assert.equal(bands[0]?.band.capability, 'from-the-contract')
+  assert.equal(bands[0]?.band.authority, 'from-the-contract')
+})
+
 test('bands are level, and every mark sits inside the track', () => {
   const { bands } = compose(plan([commitment, gate]))
   for (const g of bands) {

@@ -1615,6 +1615,78 @@ in a shorter window would render a different headline size for no reason a reade
 Restated as **cap height at roughly 7% of viewport width at 1440px**, which `9.72vw` already
 satisfies. It never fought the 0.92 line box — that collision is scale-invariant.
 
+**`SITE-25` is done, `SITE-26`'s gate half is built, and both carry a call of mine.**
+
+- **Occurrence anchoring needed no seam extension.** SITE-21's interface is `anchorFor(node)`
+  and occurrences are not nodes — but the composition already carries each mark's position as a
+  width-independent fraction, so the adapter had it all along. **`PlanLayout` is untouched**,
+  which is what the earlier ruling asked for.
+- **The marks land; the band does not** (§6.3b). 45ms stagger, the settling spring, ~600ms.
+- **Interruptible, and the direction is what makes it safe.** `settle()`'s handle is kept and
+  cancelled on unmount or a new plan. **The marks are rendered at their final position and the
+  animation moves them *from* an offset**, so `cancel()` reverts to the finished state. An
+  implementation animating *to* the final state would leave a cancelled mark at its start
+  position — which is exactly the orphaned state SITE-025's accept forbids. Verified in a
+  browser: 23 animations running with motion allowed, **0 under reduced motion**, and after
+  cancelling in either case every mark is opaque and untransformed.
+- **Each mark carries the day number; the month is named once — my call, recorded.** §8.2 asks
+  for the real date at 11px on every mark. At 375px a twelve-day span gives each mark ~28px,
+  which holds `4` and not `May 4`. Labelling every mark fully would overlap or force type below
+  11px, and **§12.3a forbids anything between the two scales.** The month sits on the band's own
+  metadata line, so the dates stay real rather than ordinal.
+- **The protection band is shorter — that is what "denser" means here. Provisional, my call.**
+  §6.3b calls protection *"a second, denser band below"* and does not define density. Two-thirds
+  height, higher opacity, and **a hard rule on both boundaries** rather than the lit line a
+  window band carries on one. Height was chosen over texture or a darker fill because it
+  survives §12.4a question 13 — *does lavender appear as fill anywhere* — and because a
+  protection band the same size as a window band, only darker, reads as a second schedule rather
+  than a different kind of thing.
+
+**Two halves of these issues are not built, and both are the SITE-004 block showing through.**
+
+1. **SITE-026's accept is *"authority tiers are contract-derived, not passed in"*, and there is
+   nothing to derive from.** The manifest carries no `authority_tier`. The band **carries** the
+   node's capability and tier through to §6.1a's metadata line instead, which is honest about
+   the gap — **a derivation written now would be a hand-list wearing a function's clothes**, and
+   §6.2 forbids exactly that. When SITE-004 lands, the tier stops being carried and becomes the
+   pure function SITE-EVAL-031 asserts.
+2. **SITE-025's first accept clause — *"tune controls are interactive before the fan-out
+   completes"* — cannot be verified: tune is SP-06 and no control exists.** What is built is the
+   structural form of it: **nothing is gated on the animation at all.** The marks are in the DOM
+   at their final position from first paint, so a reader with JavaScript off, reduced motion set,
+   or a cancelled animation sees the finished plan. There is no state to enable because nothing
+   was withheld.
+
+**The environment audit, and it has one real finding rather than the several expected.**
+
+The timezone discovery generalises: **a behaviour that only exists in an environment CI never
+enters is a behaviour CI does not test.** Audited from the tree rather than from memory.
+
+- **`prefers-reduced-motion` — real exposure, now closed.** Four source files branch on it —
+  `app/globals.css`, `components/plan/flat-plan.tsx`, `lib/hooks/use-reduced-motion.ts`,
+  `lib/motion/settle.ts` — and **no automated check ever set it.** Both browser scripts ran at
+  the runner's default, which is motion-allowed, so every reduced-motion branch was verified by
+  hand and by hand leaves no artifact.
+- **Theme — no exposure, and the expected finding is not there.** Zero `prefers-color-scheme`,
+  `dark:` or `data-theme` in `app/`, `components/` or `lib/`. **The site is single-theme by
+  construction**, so there is no theme assertion running in one environment — there is no theme
+  assertion. A matrix would have had nothing to check, which is §0.3 in the check itself.
+- **Locale — no exposure, and it is now guarded.** Zero `toLocale*`, zero `Intl.*`. Dates are
+  formatted from `getDate()` and a written-out month list. That absence is a choice, so a scan
+  keeps it from eroding.
+- **Viewport — already a matrix**, six widths in `check-overflow.mjs`.
+- **Reported, deliberately not matrixed: device pixel ratio and font availability.** Hairlines
+  are 1px and marks 3px, both scripts run at DPR 1, and a retina device renders both
+  differently. Fonts are worse and unfixable by matrix: the site renders in the system stack, so
+  the overflow check measures **the runner's fonts** — and the real faces are not obtainable.
+  It lands with the typeface decision rather than with a check.
+
+**`scripts/check-motion.mjs` is in the sweep, which is fifteen checks**, and **asserts both
+settings** — because checking only the reduced case passes perfectly on a site that never
+animates at all, which is §0.3 with the motion as the missing thing. Proven both ways: removing
+the reduced-motion rule exits 1, and **removing the animation entirely exits 1 naming the
+vacuous case.**
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

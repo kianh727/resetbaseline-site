@@ -18,7 +18,8 @@
     "check:divergences": "node scripts/check-divergences.mjs",
     "check:lavender": "node scripts/check-lavender.mjs",
     "check:predicates": "node scripts/check-predicates.mjs",
-    "check:timezones": "node scripts/check-timezones.mjs"
+    "check:timezones": "node scripts/check-timezones.mjs",
+    "check:motion": "node scripts/check-motion.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder
+    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder · motion
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -118,3 +118,11 @@ jobs:
       # exists" is a claim about the rendered DOM, not about the source.
       - name: Builder guarantees — anti-spinner and live parse
         run: npm run check:builder
+
+      # The environment audit, 2026-09-19. Four source files branch on
+      # prefers-reduced-motion and no check ever set it — the timezone finding
+      # generalised: a behaviour that only exists in an environment CI never
+      # enters is a behaviour CI does not test. Asserts BOTH settings, because
+      # checking only the reduced case passes on a site that never animates.
+      - name: Reduced motion in both settings, and locale independence
+        run: npm run check:motion

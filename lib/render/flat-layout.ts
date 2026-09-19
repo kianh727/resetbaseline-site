@@ -45,6 +45,23 @@ import { bandsFor, type Band } from './bands.ts'
 
 /** Vertical rhythm. A window band, its marks, and the gap to the next. */
 export const BAND_HEIGHT = 44
+
+/**
+ * **The protection band is shorter — that is what "denser" means here.**
+ *
+ * §6.3b calls protection *"a second, denser band below"* and does not define
+ * density. **Decided in this adapter and flagged provisional** (SITE-026): a
+ * band compressed to two-thirds the height, at higher opacity, with a hard edge
+ * on both boundaries rather than a lit line on one.
+ *
+ * The alternative readings were a texture and a darker fill alone. Height was
+ * chosen because it is the one that survives §12.4a question 13 — *does
+ * lavender appear as fill anywhere* — and because a protection band that is the
+ * same size as a window band, only darker, reads as a second schedule rather
+ * than as a different kind of thing.
+ */
+export const PROTECTION_HEIGHT = 28
+
 const BAND_GAP = 16
 const TOP_PAD = 24
 const SIDE_PAD = 24
@@ -81,22 +98,27 @@ export interface FlatComposition {
 export function compose(plan: Plan): FlatComposition {
   const bands = bandsFor(plan)
 
-  const geometry = bands.map((band, i) => ({
-    band,
-    y: TOP_PAD + i * (BAND_HEIGHT + BAND_GAP),
-    height: BAND_HEIGHT,
-    marks: band.days.map((day, d) => ({
-      // Centred in its slot, so the first and last marks sit inside the track
-      // rather than on its edges — a mark at 0 would touch the gutter and read
-      // as the band starting there.
-      xFraction: (d + 0.5) / band.days.length,
-      lit: day.lit,
-      date: day.date,
-    })),
-  }))
+  let y = TOP_PAD
+  const geometry = bands.map((band) => {
+    const height = band.kind === 'protection' ? PROTECTION_HEIGHT : BAND_HEIGHT
+    const top = y
+    y += height + BAND_GAP
+    return {
+      band,
+      y: top,
+      height,
+      marks: band.days.map((day, d) => ({
+        // Centred in its slot, so the first and last marks sit inside the track
+        // rather than on its edges — a mark at 0 would touch the gutter and read
+        // as the band starting there.
+        xFraction: (d + 0.5) / band.days.length,
+        lit: day.lit,
+        date: day.date,
+      })),
+    }
+  })
 
-  const height =
-    bands.length === 0 ? 0 : TOP_PAD * 2 + bands.length * BAND_HEIGHT + (bands.length - 1) * BAND_GAP
+  const height = bands.length === 0 ? 0 : y - BAND_GAP + TOP_PAD
 
   return { height, bands: geometry }
 }

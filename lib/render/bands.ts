@@ -74,6 +74,20 @@ export interface Band {
   readonly window: Window
   readonly label: string
   /**
+   * §6.1a's object metadata, **carried from the node rather than derived.**
+   *
+   * SITE-026's accept asks for contract-derived authority tiers, and SITE-004 is
+   * blocked: the delivered manifest carries no `authority_tier`, so there is
+   * nothing to derive from. Passing the node's own values through is honest
+   * about that — a derivation written now would be a hand-list wearing a
+   * function's clothes, and §6.2 forbids exactly that.
+   *
+   * When SITE-004 lands, the tier stops being carried and becomes a pure
+   * function of `capability`, which is the form SITE-EVAL-031 asserts.
+   */
+  readonly capability: string
+  readonly authority: string
+  /**
    * The days the window occupies, over the plan's span.
    *
    * **Empty for protection.** §6.3b gives marks to the window band — *"marks
@@ -159,6 +173,8 @@ export function bandsFor(plan: Plan): readonly Band[] {
           nodeId: node.id,
           window,
           label: node.label,
+          capability: node.capability,
+          authority: node.authority,
           days: span
             ? daysBetween(span.first, span.last).map((date) => ({
                 date,
@@ -178,6 +194,8 @@ export function bandsFor(plan: Plan): readonly Band[] {
           nodeId: node.id,
           window: protection.window,
           label: `${protection.appCount} apps`,
+          capability: node.capability,
+          authority: node.authority,
           days: [],
         }),
       )
