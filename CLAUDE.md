@@ -304,6 +304,18 @@ analytics/conversion measurement.
    restating the first, it is this shape, and the work is to find a real second source rather
    than to word the assertion better.
 
+**Two parsing rules, PRD §0.3c**, both about the moment the site shows a visitor what it
+understood — the moment its differentiation is demonstrated, and so the moment both failures
+invert it.
+
+- **A parse distinguishes *"did not match"* from *"matched something impossible"*, and an
+  impossible input is never resolved to a nearby valid one.** `by February 30` became 28
+  February by falling through to a looser rule. A parser that silently corrects the user and
+  presents the correction as understanding is the site's claim turned inside out.
+- **Nothing re-derives what a parser already determined.** A second matcher re-reading the text
+  to find what the first one matched can disagree with it, **silently**, because neither is
+  wrong on its own terms. The parser reports its own match.
+
 **Subjective design quality is not pretended to be automatable.** `VIS` and `FTU`
 verdicts are judged by a human and **recorded, not inferred.** A session may prepare
 the evidence for one; it may never mark one passed on its own reasoning.

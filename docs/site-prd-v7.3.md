@@ -44,6 +44,24 @@ Generalised: **a criterion satisfiable by the absence of the thing it measures i
 
 The site's own artifacts are exposed. `SITE-EVAL-021`'s *"all validate"* passes on zero requests. `SITE-EVAL-027`'s *"each demonstrates its assigned behavior"* passes if the assertion is presence-of-render rather than presence-of-behavior. **Standing rule at §12.4.**
 
+#### 0.3c Parsing, and the two rules it owes the visitor
+
+**Recorded 2026-09-19 (Kian), from SITE-013 and SITE-019.** Both are about the same moment: the site parsing what a person typed and showing them what it understood. That moment is the site's differentiation, and both failures invert it.
+
+**A parse distinguishes *"did not match"* from *"matched something impossible"*, and an impossible input is never resolved to a nearby valid one.**
+
+SITE-013's parser rejected `by February 30` at its explicit-date rule and then fell through to its bare-month rule, which matched `by February` and returned **28 February**. The visitor typed a date that does not exist and was shown a date that does, presented as understanding. Nothing signalled a correction.
+
+**A parser that silently corrects the user and presents the correction as understanding is the site's differentiation inverted at the one moment it is demonstrated.** The whole claim of §3.3 is *it read what you actually wrote*. A correction is the system substituting its own guess for the visitor's words while wearing the face of comprehension — worse than returning nothing, because nothing is honest and a plausible wrong date is not.
+
+So an impossible value aborts the parse. It does not fall through to a looser rule, and it does not round to the nearest real date.
+
+**Nothing re-derives what a parser already determined.**
+
+SITE-019 needed §3.4's qualifier — `from "by May"` — to name the phrase the parse had matched. The first implementation used a **second matcher** that re-read the text to work out what the first one had found. The two disagreed on a sentence with no trailing punctuation, and the qualifier silently rendered nothing.
+
+Two matchers describing one match can disagree, and **the disagreement is silent** because neither is wrong on its own terms. **The parser reports its own match**; the phrase is a by-product of the parse rather than a re-reading of the input. This is §0.3b's sibling — there, a check derived its input from its own reference and could not fail; here, two derivations of one fact could differ with nothing to catch it.
+
 #### 0.3b A third shape — the check that derives its input from its own reference
 
 **Recorded 2026-09-19 (Kian).**
