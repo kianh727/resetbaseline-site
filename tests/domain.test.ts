@@ -277,12 +277,62 @@ test('the model cannot escalate or de-escalate unknown', () => {
   }
 })
 
-test('an assessed goal with no bounded signal is still open, not unknown', () => {
-  // Pending Kian's ruling, and asserted so the current behaviour is a stated
-  // choice rather than a recorded output. Every ordinary goal exits here.
-  for (const goal of ['finish my thesis', 'run a marathon', 'learn spanish', 'ship the redesign']) {
-    assert.equal(classifyDomain(goal), 'open', goal)
+test('an assessed goal with no bounded signal is open — a verdict, not a fallback', () => {
+  /*
+   * Ruled 2026-09-19, then corrected the same day. A classifier that ran and
+   * matched no bounded domain **has said something**; one that never ran has
+   * said nothing. The first ruling named the fallback after the verdict and
+   * collapsed them.
+   *
+   * Ten of ten ordinary goals landing here is what a working classifier looks
+   * like, not a gap in one — so this test asserts the count as well as the
+   * value. A version asserting only `!== 'unknown'` would pass on a classifier
+   * that returned a bounded tier for everything.
+   */
+  const goals = [
+    'finish my thesis',
+    'run a marathon',
+    'learn spanish',
+    'ship the redesign',
+    'read more',
+    'wake up at 6',
+    'write every morning',
+    'study for the LSAT',
+    'call my parents weekly',
+    'train for a triathlon',
+  ]
+  const verdicts = goals.map((g) => classifyDomain(g))
+  assert.equal(verdicts.filter((v) => v === 'open').length, goals.length)
+  assert.equal(verdicts.filter((v) => v === 'unknown').length, 0)
+})
+
+test('positive control — the unknown path is exercised, not merely declared', () => {
+  /*
+   * **`unknown` is unreachable through the only production call site**, because
+   * `classifyInput` tests readability before domain. That is correct — the value
+   * is for callers that do not readability-gate first, SITE-033's server mirror
+   * above all — but it means its handling is **code nobody has run**, which is
+   * worse than a value that simply cannot occur.
+   *
+   * So the path is driven directly here, against a constructed `unknown`, before
+   * SITE-033 makes it reachable in production. Every branch that can see a tier
+   * is exercised: the predicates, the escalation seam, and the bounded set.
+   */
+  const constructed: DomainTier = classifyDomain('')
+  assert.equal(constructed, 'unknown', 'the fixture must actually be unknown')
+
+  // Predicates
+  assert.equal(isBounded(constructed), false)
+  assert.equal(BOUNDED_DOMAINS.includes(constructed), false)
+
+  // The escalation seam, over every suggestion the model could make
+  for (const suggestion of [...BOUNDED_DOMAINS, 'open' as DomainTier, 'unknown' as DomainTier]) {
+    assert.equal(applyEscalation(constructed, suggestion), 'unknown', String(suggestion))
   }
+
+  // And it is not silently equal to the permissive verdict, which is the whole
+  // point of the value existing.
+  assert.notEqual(constructed, 'open')
 })
 
 test('no caller treats unknown as open', () => {

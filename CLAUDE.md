@@ -1451,6 +1451,95 @@ it protects nothing on a hand run — which is when a wrong green is most expens
 **any check reading built output asserts the output is newer than its sources, and says so in its
 own failure message.**
 
+**The classifier ruling was corrected the same day it was made, and the correction is the
+interesting half** (2026-09-19, Kian). **Unmatched-but-assessed returns `open`, and that stands.**
+
+The first ruling **named the fallback after the verdict**. A classifier that ran and matched no
+bounded domain **has said something** — *not bounded* — and ten of ten ordinary goals landing
+there is what a working classifier looks like, not a gap in one. A classifier that never ran has
+said nothing. **Collapsing those two was the error; returning `open` was not.**
+
+So **`unknown` means classification did not occur** — never called, could not complete, or handed
+input it cannot assess. That sentence is now in the type's own docstring, because without it the
+next reader either deletes the value as dead code or routes something to it. Its **unreachability
+through `input-class.ts:84` is correct rather than a defect**: `classifyInput` gates readability
+first, and `unknown` exists for callers that do not, SITE-033's server mirror above all.
+
+**It carries a positive control**, because a value that cannot occur and is handled by code
+nobody has run is worse than one that simply cannot occur. The test drives every branch that can
+see a tier — predicates, the escalation seam, the bounded set — against a constructed `unknown`,
+before SITE-033 makes it reachable in production.
+
+**The correction that matters most: the false-negative path is `open`, so the original ruling
+would not have fixed the thing it was ruled for.** *"my back and my finances"* is readable, was
+assessed, and got a clean verdict. Renaming that exit would have relabelled every **correct**
+verdict in order to catch the incorrect ones, and caught none of them, because a missed pattern
+is missed either way. **That is `SITE-116`**, filed to characterise the gap and **not** to widen
+the patterns.
+
+**And the filing hypothesis was wrong, which the measurement showed.** It was filed as *"patterns
+miss compound inputs"*. **Three of six compound inputs classify correctly**, and the two that
+miss — *"my back and my finances"*, *"study for the LSAT and stop panicking"* — miss for exactly
+the reason they miss **alone**. Compounding is not the discriminator; **signal strength is**: a
+bare possessive noun (*"my back"*, *"my finances"*), an inflected verb (*"hurting my knee"* where
+*"hurt my back"* matches), or an affect word with no clinical framing (*"panicking"*). Compound
+sentences are only where it gets noticed.
+
+**PRD §0.3e — a fifth failure shape, and the scan for it is in the sweep, now thirteen checks.**
+
+**A predicate defined by what a value is *not* inherits every value added after it.** `isBounded`
+read `tier !== 'open'` — correct with two kinds of member, wrong the instant a third existed, and
+**no line changed to cause it.** The defect was written months before the value that triggered it
+and would have shipped as a refusal shown to input nobody read. **Any predicate over a closed set
+enumerates the members it accepts, never the one it rejects.**
+
+**`scripts/check-predicates.mjs` found a second instance in the same file** on its first run:
+`applyEscalation`'s `deterministic !== 'open'` meant *"anything not open is bounded"*, an
+assumption the type never recorded, and it stayed correct only because the `unknown` guard sat
+above it. Now `isBounded(deterministic)`. **The scan's limits are stated in its own header rather
+than left to be discovered**: it matches `!==` against a §6.3 closed-set member, which is where
+the shape is both dangerous and findable, and it does not detect the shape in general — a switch
+with a default is the same defect and is not text-matchable. Proven both ways: a planted
+`!== 'legal'` exits 1, the enumerating form exits 0.
+
+**§14's display slope is amended to `9.72vw`, and v5 §14 is inlined at §11.4.** The inlining is
+the §11.1 problem again — SITE-002 and SITE-003 were both built against a table nobody in this
+repository could open.
+
+**The amendment fixes an oversight, not a decision.** 8vw reached the 140px ceiling only at a
+1750px viewport, so at 1440px display rendered at **115.2px — 82% of its ceiling**, and §12.3a's
+*"at its clamp ceiling, not a comfortable middle"* was unmeetable at any width anybody verifies.
+**SITE-003's own reasoning is the proof**: lead and body were deliberately interpolated to land
+their maxima at exactly 1440px *"so the scale is settled at both verification widths rather than
+caught mid-interpolation at either"* — and display was carried over verbatim, producing **the
+exact case that reasoning exists to prevent**, in the largest element on the page. Floor and
+ceiling unchanged; 375px still renders 40px. Verified: **320/375/411 → 40px · 1440 → 139.97px ·
+1920 → 140px**, two lines at 1440, overflow clean at all six widths.
+
+**The clamp test was rewritten to assert the rule rather than the number.** It read
+`assert.equal(themeValue('text-display'), 'clamp(40px, 8vw, 140px)')` — which **caught** the
+change, correctly, and **said nothing about whether the new value was right**, which is the half
+that matters. It now asserts §14's floor and ceiling verbatim and **computes** that the slope
+reaches the ceiling at 1440px, so it disagrees with a wrong slope instead of recording whichever
+one the stylesheet holds.
+
+**The 12%-of-frame question does not fight the 0.92 line box — it fights the clamp's axis.**
+Reported, not ruled. At a typical 0.72 cap ratio: **12% of a 900px frame needs a 150px font;
+12% of 1080 needs 180px** — against a 140px ceiling. **§14's clamp is driven by viewport *width*
+and 12% is measured against frame *height*, so one clamp can satisfy it at exactly one aspect
+ratio.** The same 1440px-wide viewport needs 150px at 900 tall and 180px at 1080. The 0.92
+collision is a ratio of a face's own metrics to the line box and is **scale-invariant**, so
+raising the ceiling changes nothing about it; nor does it change line count, since `max-w-[18ch]`
+is measured in the font's own units. Closing it needs a height-aware term, a restatement of 12%
+against width, or accepting that 12% describes one reference frame.
+
+**The typeface measurement procedure is in `docs/typeface-decision.md`**, ordered so the
+collision check runs **before any judgement** — *"do not look at the page yet"*, because an
+opinion formed first is one the numbers then have to argue with. If a candidate fails at 0.92,
+**the line height moves, not the candidate**: 0.92 was a correction of the browser's 1.5, not a
+measurement of these faces, and the two candidates may need different values — itself a finding,
+since §11.4 gives one number for the role.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**
@@ -1614,10 +1703,10 @@ milestone's phase is the project it sits in.
 The SP decomposition is fully preserved; milestones are ordered and show
 progress, which projects do not.
 
-**115 issues total: P0 = 92, P1 = 17, P2 = 6.** The original 84, plus four design
+**116 issues total: P0 = 92, P1 = 18, P2 = 6.** The original 84, plus four design
 review gates (SITE-085…088) defined in addendum §3, plus PRE-1 Part B's twenty
-(SITE-089…108), plus **SITE-109…115**, all created 2026-09-19. Creation order runs
-001…084, then 085…088, then 089…108, then 109…115, in strict sequence throughout;
+(SITE-089…108), plus **SITE-109…116**, all created 2026-09-19. Creation order runs
+001…084, then 085…088, then 089…108, then 109…116, in strict sequence throughout;
 the mapping stays positional and append-only.
 
 **SITE-114 and SITE-115 are §6.1c's, and they are two issues rather than one on purpose.**

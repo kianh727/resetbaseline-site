@@ -44,6 +44,22 @@ Generalised: **a criterion satisfiable by the absence of the thing it measures i
 
 The site's own artifacts are exposed. `SITE-EVAL-021`'s *"all validate"* passes on zero requests. `SITE-EVAL-027`'s *"each demonstrates its assigned behavior"* passes if the assertion is presence-of-render rather than presence-of-behavior. **Standing rule at §12.4.**
 
+#### 0.3e A fifth shape — the predicate defined by what a value is not
+
+**Recorded 2026-09-19 (Kian).**
+
+`isBounded` read `return tier !== 'open'`. That was **correct** while `DomainTier` had exactly two kinds of member, and it became **wrong the instant a third existed** — `isBounded('unknown')` returned `true`, so input the classifier never read would have rendered a refusal.
+
+**No line changed to cause it.** The defect was written into the predicate months before the value that triggered it, and it would have shipped as a behaviour nobody chose, in the path that decides whether a visitor is told the site refuses to help them.
+
+Generalised: **a predicate defined by what a value is *not* inherits every value added after it.** The negative form quietly asserts a closed set that the author had in mind and the type did not record, and every later addition joins the accepting branch by default.
+
+**The rule: any predicate over a closed set enumerates the members it accepts, never the one it rejects.** `BOUNDED_DOMAINS.includes(tier)` cannot acquire a member by accident; `tier !== 'open'` acquires every one.
+
+This is the sibling of §0.3b. There, a check could not fail because it agreed with itself by construction. Here, a check cannot *start* failing, because its accepting branch grows silently with the type.
+
+**Where it can be a scan, it should be** — a comparison against a single member of one of §6.3's closed vocabularies, used as a test for membership in the rest, is exactly this shape and is findable in source.
+
 #### 0.3d A fourth shape — the check that measures the last build
 
 **Recorded 2026-09-19 (Kian).** Distinct from §0.3, and hit independently in both repositories on the same day.
@@ -612,7 +628,7 @@ An entry leaves Block 2 by passing DS-18 and moving to Block 1. It never leaves 
 
 ## 11. Carried forward unchanged
 
-**The Peak** (v5 §7, P1) · **Motion** (**inlined at §11.1**) · **Type and tokens** (v5 §14) · **Mobile** (v5 §9) · **Degradation** (v5 §15, the builder never degrades) · **Providers** (v5 §12) · **The wall** (v5 §11) · **Scope-kill rules** **K-1…K-7**.
+**The Peak** (v5 §7, P1) · **Motion** (**inlined at §11.1**) · **Type and tokens** (**inlined at §11.4**) · **Mobile** (v5 §9) · **Degradation** (v5 §15, the builder never degrades) · **Providers** (v5 §12) · **The wall** (v5 §11) · **Scope-kill rules** **K-1…K-7**.
 
 **Corrected 2026-09-19: the range was written K-1…K-8, and there is no K-8.** v5 §17 defines K-1 through K-7 and stops. This is the DS-11…DS-17 shape at a smaller scale — a range citing a rule that was never written, which cannot be failed and therefore reads as passed. `CLAUDE.md` §4 had it right at K-1…K-7 throughout.
 
@@ -699,6 +715,7 @@ Three consequences, binding:
 
 **Ruled, and in effect: the budget gate exists before the builder is built, not after it.** SITE-078 enforces the full performance budgets in CI at P1 — after every builder issue has landed. A ceiling first checked at the end is a criterion satisfiable by the absence of the thing it measures (§0.3), and a dependency that breaks the budget would be discovered at SITE-076 rather than in the PR that added it. **The bundle-size check is therefore in the CI sweep from the first product commit, at 120 kB, failing the build.** It measures the exported chunks each document actually references — every route, not only `/`, because a check that watches one page can be walked around by putting the import on another — and excludes the `noModule` polyfill chunk, which no browser supporting ES modules fetches. SITE-078 still owns the remaining budgets; this is the bundle ceiling arriving early, not SITE-078 moving.
 
+
 ### 11.3 Section handoffs — one property carries across
 
 **Applied 2026-09-19.** Three camera stations move the view. What was never specified is what happens to **content** at each boundary, and without it every section fades in independently and the page reads as stacked blocks rather than one surface.
@@ -727,6 +744,73 @@ Three of the four carriers as first drafted rode the mountain, which is **P1**, 
 - **Each seam is legible at any scroll speed**, including an instant jump. A carrier that only works when scrolled slowly is a carrier that doesn't work — and a jump-to-anchor is the case that proves it.
 - **Reduced motion:** carriers do not animate. Sections render at their end states.
 
+
+### 11.4 Type and tokens — v5 §14, carried forward and now inlined
+
+**Inlined 2026-09-19 (Kian)**, for the reason §11.1 was: §11 carried this forward *by reference* to a document §1 removes from the working tree, and a requirement readable only from git history is the same failure as a citation to a superseded section. SITE-002 and SITE-003 were both built against a table nobody in this repository could open.
+
+**The text below is v5 §14 verbatim, with one amended row. It is a requirement of this document, not provenance.**
+
+#### Type and tokens — v5 §14, inlined verbatim
+
+**Technical drawing:** enormous display type against very small, very precise metadata, hairline rules, real measurements. Density against scale, not scale alone.
+
+| Role | Size | Treatment |
+|---|---|---|
+| Display | ~~`clamp(40px, 8vw, 140px)`~~ → **`clamp(40px, 9.72vw, 140px)`** — amended 2026-09-19, see below | 500, `-0.04em` |
+| Section head | `clamp(32px, 5vw, 88px)` | 500, `-0.035em` |
+| Lead | 18–22px | 400, `--bone-60` |
+| Body | 16–17px, max 62ch | 400 |
+| Metadata | 11px | `+0.06em`, `--bone-38` |
+
+Metadata is always real: dates, occurrence counts, durations, authority tiers. Never decorative numbers.
+
+| Token | Value |
+|---|---|
+| `--void` | `#0A0A0A` |
+| `--surface` | `#0E0C18` |
+| `--lavender` | `#8B7DFF` |
+| `--lavender-lit` | `#C9C0FF` |
+| `--bone` | `#F2F0EC` |
+| `--bone-60` | `rgba(242,240,236,.6)` |
+| `--bone-38` | `rgba(242,240,236,.38)` |
+| `--edge` | `rgba(242,240,236,.08)` |
+| `--veto` | `#C4614F` — **refusal and veto states only** |
+
+*(v4's "three appearances total" cap on `--veto` is removed — it conflicted with scenarios where a refusal and a contention veto both fire.)*
+
+**Typeface:** PP Neue Montreal (licensed) or Satoshi (free). Decided at P0 item 1, compared at display scale.
+
+#### The display slope — amended 2026-09-19 (Kian)
+
+**`8vw` → `9.72vw`. The 40px floor and the 140px ceiling are unchanged.**
+
+**8vw reaches 140px only at a 1750px viewport.** Measured on the build: **375px → 40px · 1440px → 115.2px · 1750px → 140px.** So at 1440px — the primary verification width — display rendered at **82% of its ceiling**, and §12.3a's requirement that display sit *at its specified clamp ceiling, not a comfortable middle* could not be met at any width anybody verifies.
+
+**This was an oversight, not a decision, and SITE-003's own reasoning is the proof.** That issue set the lead and body interpolations deliberately:
+
+> both are `intercept + slope·vw`, landing on the range minimum at exactly 375px and the maximum at exactly 1440px, **so the scale is settled at both verification widths rather than caught mid-interpolation at either**.
+
+Display was carried over verbatim and left at 8vw — **producing the exact case that reasoning exists to prevent**, in the largest element on the page, while the two smaller roles beside it were corrected.
+
+`9.72vw` lands 140px at 1440px. The floor is unaffected: 40px still governs below 411px, so **375px renders at 40px exactly as before.**
+
+#### The 12%-of-frame question — reported, not ruled
+
+§12.3a's comparison condition is *cap height at 12% of frame*. **No measured face reaches it at the amended ceiling either**, and the reason is structural rather than a matter of picking a bigger number.
+
+At a typical grotesque cap-height ratio of **0.72** (measured range 0.651–0.738 across four faces):
+
+| Frame height | Cap for 12% | Font size required | Against the 140px ceiling |
+|---|---|---|---|
+| 900px | 108px | **150px** | 10px over |
+| 1080px | 130px | **180px** | 40px over |
+
+**The two specifications are expressed against different axes, and that is the fight.** §14's clamp is driven by viewport **width**; 12% is measured against frame **height**. A single clamp can satisfy 12% at exactly one aspect ratio and will miss it at every other — the same 1440px-wide viewport needs 150px at 900 tall and 180px at 1080 tall.
+
+**It does not fight the 0.92 line box.** Whether a face collides at 0.92 is a ratio of its own vertical metrics to the line box and is **scale-invariant** — raising the ceiling changes nothing about it. Nor does it change the line count: `max-w-[18ch]` is measured in the font's own units, so the headline holds its two lines at any size. At 150px the two lines occupy 276px inside a 70svh fold of 630px, which fits.
+
+**So the constraints do not fight each other; the 12% figure fights the clamp's axis.** Ruling that out needs one of: a height-aware term in the clamp, a restatement of 12% against width, or acceptance that 12% describes one reference frame rather than a rule. **Not decided here.**
 
 ---
 

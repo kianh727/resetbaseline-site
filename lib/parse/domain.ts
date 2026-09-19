@@ -7,14 +7,22 @@
  *
  * Five bounded domains: injury · medical · mental health · finance · legal.
  *
- * **Three answers, not two** (ruled 2026-09-19, Kian). `open` is a **positive
- * verdict** — *not bounded, safe to plan normally* — and handing it to input the
- * classifier could not assess is a clean bill of health nobody issued. Input
- * that is not a string, or is empty, or is whitespace, returns **`unknown`**.
+ * **Three answers, and the third is about whether classification happened at
+ * all** (ruled 2026-09-19, corrected the same day, Kian).
  *
- * The asymmetry in §5 is the whole argument: a false positive is an odd demo, a
- * false negative builds a plan around an injury. A permissive default on the
- * un-assessable path is the shape that produces the second.
+ * - **A bounded tier** — it ran, and matched.
+ * - **`open`** — it ran, and matched nothing. **A real verdict**: not bounded,
+ *   safe to plan normally. Ten of ten ordinary goals land here, and that is what
+ *   a working classifier looks like rather than a gap in one.
+ * - **`unknown`** — **classification did not occur.** It was never called, could
+ *   not complete, or was handed input it cannot assess.
+ *
+ * **The first ruling collapsed the last two and was wrong to.** *"Unmatched"*
+ * named the fallback after the verdict: a classifier that ran and found no
+ * bounded signal has said something, and a classifier that never ran has said
+ * nothing. Returning `unknown` for the first would have made `open` unreachable
+ * and — with `unknown` routed to the clarification beat — sent every visitor
+ * with a perfectly clear goal to a clarifying question.
  *
  * **Err toward bounded.** SITE-014's accept names false negatives as the
  * failure mode that matters, and the two errors are not symmetric: a false
@@ -31,6 +39,32 @@
  * is derived from its own reference cannot fail.
  */
 
+/**
+ * **`unknown` means classification did not occur — not that it occurred and
+ * found nothing.** That distinction is the entire reason the value exists, and
+ * it is written here because without it the value reads as dead code.
+ *
+ * **It is currently unreachable through the only production call site, and that
+ * is correct rather than a defect.** `classifyInput` tests readability before
+ * domain, so degenerate input never reaches this classifier. `unknown` is for
+ * the callers that do not readability-gate first — SITE-033's server mirror
+ * above all — and for the failure modes a pure function does not have today but
+ * a network-boundary one will.
+ *
+ * **Two things follow, and both are easy to get wrong:**
+ *
+ * - **Do not delete it as dead code.** Its unreachability is a property of one
+ *   caller's ordering, not of the type.
+ * - **Do not route anything to it to make it reachable.** In particular it is
+ *   not the clarification beat's input: that is `vague`, which is a statement
+ *   about what the visitor wrote, and this is a statement about whether anything
+ *   read it.
+ *
+ * Because a value that cannot occur is handled by code nobody has run, its
+ * handling carries a **positive control** in `tests/domain.test.ts` — the path
+ * is exercised against a constructed `unknown` before SITE-033 makes it
+ * reachable in production.
+ */
 export type DomainTier =
   | 'unknown'
   | 'open'
@@ -103,23 +137,23 @@ const PATTERNS: readonly (readonly [DomainTier, RegExp])[] = [
  * @returns the domain tier. Pure, synchronous, no network, no model.
  */
 export function classifyDomain(text: string): DomainTier {
-  // Input the classifier cannot assess. Not a verdict — it never looked.
+  // Input this classifier cannot assess: it never looked, so it has nothing to
+  // report. Not a verdict, and not the same thing as looking and finding nothing.
   if (typeof text !== 'string' || text.trim() === '') return 'unknown'
   for (const entry of PATTERNS) {
     if (entry[1].test(text)) return entry[0]
   }
   /*
-   * **Assessed, and no bounded signal found.** This stays `open` pending a
-   * ruling, and the reason is recorded here rather than left as an assumption:
-   * **every ordinary goal exits through this line.** Ten of ten sample goals do.
-   * Returning `unknown` here would make `open` unreachable from this function,
-   * and — with `unknown` routed to the clarification beat — would send every
-   * visitor with a perfectly clear goal to a clarifying question.
+   * **Assessed, and no bounded signal found. This is a verdict, and it is
+   * `open`** — confirmed by ruling 2026-09-19 after the first ruling collapsed
+   * it with `unknown`.
    *
-   * A false negative also leaves through this line, which is the argument for
-   * changing it. But the fix for a false negative is **pattern coverage**: "my
-   * back and my finances" is readable and was assessed, so a classifier with
-   * complete patterns returns `injury` here, not `unknown`.
+   * **A false negative also leaves through this line**, and that is a real
+   * problem with a different fix. *"my back and my finances"* is readable and was
+   * assessed; a classifier with complete patterns returns `injury` here. **The
+   * fix is pattern coverage, not the return value** — renaming this exit would
+   * have relabelled every correct verdict in order to catch the incorrect ones,
+   * and caught none of them, because a missed pattern is missed either way.
    */
   return 'open'
 }
@@ -139,7 +173,15 @@ export function applyEscalation(deterministic: DomainTier, modelSuggestion: Doma
    * be the model deciding what a refusal applies to, which is refusal authority
    * by another route (§5).
    */
-  if (deterministic === 'unknown') return 'unknown'
-  if (deterministic !== 'open') return deterministic
+  if (isUnknown(deterministic)) return 'unknown'
+  /*
+   * **A bounded verdict is final.** Written as membership rather than as
+   * `!== 'open'`, per §0.3e — and this is the second instance in one file. The
+   * negative form here would mean "anything that is not open is bounded", which
+   * was true of a two-value type and is an assumption the type never recorded.
+   * It happened to stay correct only because the `unknown` guard sits above it;
+   * a sixth non-bounded value would have been treated as a refusal.
+   */
+  if (isBounded(deterministic)) return deterministic
   return isBounded(modelSuggestion) ? modelSuggestion : 'open'
 }

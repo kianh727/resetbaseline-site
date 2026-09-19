@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · divergences · lavender · typecheck · lint · test · build · bundle · overflow · builder
+    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · build · bundle · overflow · builder
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,6 +63,9 @@ jobs:
 
       - name: Lavender is light, never paint (§6.3b)
         run: npm run check:lavender
+
+      - name: Predicates enumerate what they accept (§0.3e)
+        run: npm run check:predicates
 
       - name: Typecheck
         run: npm run typecheck

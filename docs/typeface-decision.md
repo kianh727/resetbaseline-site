@@ -107,3 +107,53 @@ So the 12% figure and §14's clamp do not currently meet. That is recorded here 
 Criterion 1 is pass/fail and face-specific. Criteria 2 and 3 change the layout rather than the look. **A face judged from memory is §0.1's failure mode exactly**, and a face judged from a stand-in is the same failure with a measurement attached to make it look like evidence.
 
 **What landing the decision needs:** the four `.woff2` files in `public/fonts/`, a run of this same table with both candidates in it, and a look at `/type` at 1440px and 375px. The harness, the metadata primitive and the `--font-candidate` seam are all built and waiting.
+
+---
+
+## The procedure — run this first when the files arrive
+
+**Recorded 2026-09-19 so it is executed rather than rediscovered.** The 0.92 collision is a pass/fail that would otherwise be found by looking at a broken hero, which is the expensive way to find it.
+
+### 0. Before anything
+
+Drop the four `.woff2` files into `public/fonts/` and set `--font-candidate`. **Do not look at the page yet.** The first measurement is numeric, and an opinion formed before it is an opinion the numbers then have to argue with.
+
+### 1. The collision check — run this before any judgement
+
+For each candidate, at the display size §11.4's clamp produces at 1440px:
+
+```
+ink   = actualBoundingBoxAscent('Hbdfhkl') + actualBoundingBoxDescent('gjpqy')
+box   = fontSize * 0.92
+ratio = ink / box
+```
+
+**`ratio > 1.0` means the H1's two lines collide.** Three of four stand-ins measured 1.010 – 1.057, so this is not a hypothetical.
+
+If a candidate fails: **the line height is the thing that moves, not the candidate.** 0.92 was set by SITE-003 against the browser's 1.5, without either face's vertical metrics; it was a correction of a default, not a measurement of these faces. Record the smallest line height that clears the ink for each candidate, and note that the two candidates may need different values — which is itself a finding, because §11.4's table gives one number for the role.
+
+### 2. The four comparison measurements
+
+Run the same table as the 2026-09-19 stand-in run, with both candidates in it:
+
+| | what it decides |
+|---|---|
+| `cap / size` | the optical size at a given px — two faces at 140px are not the same size |
+| `x-height / cap` | whether display type reads dense or airy; §11.4's *"density against scale"* |
+| set width of the H1, in em | the line count inside `max-w-[18ch]` — a **layout** outcome |
+| advance change at `-0.04em` | whether the tracking tightens or closes counters, which sidebearings decide |
+
+**Set width is the one that can force a redesign rather than a preference**: a candidate 15% wider than the widest stand-in measured takes the headline to three lines, and the fold was composed for two.
+
+### 3. Then, and only then, look
+
+`/type` at **1440px and 375px**, both candidates, real text at display scale. The harness already reports which families the browser actually loaded — check that line first, because two identical columns read as *"these faces are alike"* when the truth is *"neither file is present."*
+
+### 4. Record
+
+The choice, and **which of the four measurements decided it.** A verdict with no measurement attached is the thing §0.1 exists to prevent, and it is indistinguishable a month later from a preference.
+
+### What must not happen
+
+- **No verdict from a substitute.** The 2026-09-19 run used stand-ins deliberately, to find *which properties discriminate* — not to pick. A measurement attached to the wrong face makes a guess look like evidence.
+- **No verdict from the licence cost.** It is the one axis decidable without the files and it is not the axis §11.4 names.

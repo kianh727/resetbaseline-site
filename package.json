@@ -16,7 +16,8 @@
     "check:builder": "node scripts/check-builder.mjs",
     "check:eval-stubs": "node scripts/check-eval-stubs.mjs",
     "check:divergences": "node scripts/check-divergences.mjs",
-    "check:lavender": "node scripts/check-lavender.mjs"
+    "check:lavender": "node scripts/check-lavender.mjs",
+    "check:predicates": "node scripts/check-predicates.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

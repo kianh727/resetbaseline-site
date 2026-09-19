@@ -25,7 +25,6 @@ function themeValue(name) {
 
 /** §14's table, verbatim where it is exact. */
 const EXACT = {
-  'text-display': 'clamp(40px, 8vw, 140px)',
   'text-section': 'clamp(32px, 5vw, 88px)',
   'text-meta': '11px',
 }
@@ -40,10 +39,48 @@ const TREATMENT = {
   'text-meta--letter-spacing': '0.06em',
 }
 
-test('display and section-head clamps are §14 verbatim', () => {
+test('section-head clamp is §11.4 verbatim', () => {
   for (const [name, value] of Object.entries(EXACT)) {
     assert.equal(themeValue(name), value, `--${name} must be exactly ${value}`)
   }
+})
+
+/*
+ * Display is asserted as a **rule**, not as a string, because its slope was
+ * amended (§11.4, 2026-09-19) and the previous test recorded the number instead
+ * of the reason — so it caught the change, which is right, and said nothing
+ * about whether the new value was correct, which is the half that matters.
+ *
+ * The rule: **floor and ceiling are §14 verbatim, and the slope lands the
+ * ceiling at exactly 1440px** — the primary verification width. That is
+ * SITE-003's own criterion for lead and body, applied to the role it was
+ * originally not applied to.
+ */
+test('display: §14 floor and ceiling verbatim, ceiling reached at exactly 1440px', () => {
+  const expr = themeValue('text-display')
+  const m = /^clamp\(\s*([\d.]+)px\s*,\s*([\d.]+)vw\s*,\s*([\d.]+)px\s*\)$/.exec(expr)
+  assert.ok(m, `--text-display should be clamp(<min>px, <slope>vw, <max>px); got ${expr}`)
+
+  const [, minPx, slopeVw, maxPx] = m
+  assert.equal(Number(minPx), 40, '§14 floor, verbatim')
+  assert.equal(Number(maxPx), 140, '§14 ceiling, verbatim')
+
+  // The slope is whatever reaches the ceiling at 1440. Computed here rather
+  // than restated, so the test disagrees with a wrong slope instead of
+  // recording whatever the stylesheet says.
+  const atVerificationWidth = (Number(slopeVw) / 100) * 1440
+  assert.ok(
+    Math.abs(atVerificationWidth - 140) < 0.5,
+    `at 1440px the slope yields ${atVerificationWidth.toFixed(1)}px; §12.3a requires the ` +
+      `140px ceiling. 8vw yielded 115.2px — 82% of it — which is the defect this amends.`,
+  )
+
+  // And the floor must still govern 375px, so the amendment cannot have moved
+  // the mobile rendering as a side effect.
+  assert.ok(
+    (Number(slopeVw) / 100) * 375 < Number(minPx),
+    'the 40px floor must still govern at 375px',
+  )
 })
 
 test('weights and tracking match §14 Treatment', () => {

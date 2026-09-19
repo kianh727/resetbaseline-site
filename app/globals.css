@@ -41,7 +41,8 @@
  * against very small, very precise metadata, hairline rules, real
  * measurements. Density against scale, not scale alone."
  *
- * Display and section-head carry their clamps verbatim from §14's table.
+ * Section-head carries its clamp verbatim from §11.4's table. Display's slope
+ * is §11.4's 2026-09-19 amendment; its floor and ceiling are verbatim.
  * Lead and body are given there as ranges (18–22px, 16–17px) rather than
  * clamps, so the interpolation between the two ends is this issue's to choose
  * — a refinement of a general higher tier, never a contradiction of it
@@ -62,7 +63,24 @@
  */
 @theme {
   /* §14 verbatim. */
-  --text-display: clamp(40px, 8vw, 140px);
+  /*
+   * §11.4, amended 2026-09-19: the slope is 9.72vw, not §14's original 8vw.
+   *
+   * 8vw reached the 140px ceiling only at a 1750px viewport, so at 1440px —
+   * the primary verification width — display rendered at 115.2px, 82% of its
+   * ceiling. §12.3a requires display at its ceiling rather than a comfortable
+   * middle, and that was unmeetable at any width anybody verifies.
+   *
+   * It was an oversight rather than a decision: SITE-003 set the lead and body
+   * interpolations to land their maxima at exactly 1440px "so the scale is
+   * settled at both verification widths rather than caught mid-interpolation at
+   * either", and display was carried over verbatim — producing the exact case
+   * that reasoning exists to prevent, in the largest element on the page.
+   *
+   * Floor and ceiling are unchanged. 40px still governs below 411px, so 375px
+   * renders at 40px exactly as before.
+   */
+  --text-display: clamp(40px, 9.72vw, 140px);
   --text-display--font-weight: 500;
   --text-display--letter-spacing: -0.04em;
   --text-display--line-height: 0.92;
