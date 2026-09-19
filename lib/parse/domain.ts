@@ -6,7 +6,15 @@
  * bounded (SITE-033); it can never de-escalate.
  *
  * Five bounded domains: injury · medical · mental health · finance · legal.
- * Anything else is `open`.
+ *
+ * **Three answers, not two** (ruled 2026-09-19, Kian). `open` is a **positive
+ * verdict** — *not bounded, safe to plan normally* — and handing it to input the
+ * classifier could not assess is a clean bill of health nobody issued. Input
+ * that is not a string, or is empty, or is whitespace, returns **`unknown`**.
+ *
+ * The asymmetry in §5 is the whole argument: a false positive is an odd demo, a
+ * false negative builds a plan around an injury. A permissive default on the
+ * un-assessable path is the shape that produces the second.
  *
  * **Err toward bounded.** SITE-014's accept names false negatives as the
  * failure mode that matters, and the two errors are not symmetric: a false
@@ -23,7 +31,14 @@
  * is derived from its own reference cannot fail.
  */
 
-export type DomainTier = 'open' | 'injury' | 'medical' | 'mental_health' | 'finance' | 'legal'
+export type DomainTier =
+  | 'unknown'
+  | 'open'
+  | 'injury'
+  | 'medical'
+  | 'mental_health'
+  | 'finance'
+  | 'legal'
 
 /** The five bounded tiers, in the order §4's table names them. */
 export const BOUNDED_DOMAINS: readonly DomainTier[] = [
@@ -34,8 +49,22 @@ export const BOUNDED_DOMAINS: readonly DomainTier[] = [
   'legal',
 ]
 
+/**
+ * **Membership in the declared set, not the absence of `open`.**
+ *
+ * This read `tier !== 'open'`, which was correct while there were exactly two
+ * answers and **silently wrong the moment a third arrived**: `isBounded('unknown')`
+ * would have returned `true`, and `unknown` would have been treated as a refusal
+ * everywhere without one line changing. A predicate defined by what a value is
+ * *not* inherits every value added after it.
+ */
 export function isBounded(tier: DomainTier): boolean {
-  return tier !== 'open'
+  return BOUNDED_DOMAINS.includes(tier)
+}
+
+/** True for the one value that is neither a verdict nor a refusal. */
+export function isUnknown(tier: DomainTier): boolean {
+  return tier === 'unknown'
 }
 
 /*
@@ -74,10 +103,24 @@ const PATTERNS: readonly (readonly [DomainTier, RegExp])[] = [
  * @returns the domain tier. Pure, synchronous, no network, no model.
  */
 export function classifyDomain(text: string): DomainTier {
-  if (typeof text !== 'string' || text.trim() === '') return 'open'
+  // Input the classifier cannot assess. Not a verdict — it never looked.
+  if (typeof text !== 'string' || text.trim() === '') return 'unknown'
   for (const entry of PATTERNS) {
     if (entry[1].test(text)) return entry[0]
   }
+  /*
+   * **Assessed, and no bounded signal found.** This stays `open` pending a
+   * ruling, and the reason is recorded here rather than left as an assumption:
+   * **every ordinary goal exits through this line.** Ten of ten sample goals do.
+   * Returning `unknown` here would make `open` unreachable from this function,
+   * and — with `unknown` routed to the clarification beat — would send every
+   * visitor with a perfectly clear goal to a clarifying question.
+   *
+   * A false negative also leaves through this line, which is the argument for
+   * changing it. But the fix for a false negative is **pattern coverage**: "my
+   * back and my finances" is readable and was assessed, so a classifier with
+   * complete patterns returns `injury` here, not `unknown`.
+   */
   return 'open'
 }
 
@@ -90,6 +133,13 @@ export function classifyDomain(text: string): DomainTier {
  * refusal-copy authority by another route.
  */
 export function applyEscalation(deterministic: DomainTier, modelSuggestion: DomainTier): DomainTier {
+  /*
+   * `unknown` is not escalable and not de-escalable. The model may not turn
+   * input the classifier could not read into a verdict of any kind — that would
+   * be the model deciding what a refusal applies to, which is refusal authority
+   * by another route (§5).
+   */
+  if (deterministic === 'unknown') return 'unknown'
   if (deterministic !== 'open') return deterministic
   return isBounded(modelSuggestion) ? modelSuggestion : 'open'
 }

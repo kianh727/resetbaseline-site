@@ -118,8 +118,10 @@ const FIXTURES: readonly (readonly [string, DomainTier])[] = [
   ['call my parents weekly', 'open'],
   ['stop doomscrolling', 'open'],
   ['train for a triathlon', 'open'],
-  ['', 'open'],
-  ['   ', 'open'],
+  // Ruled 2026-09-19: input the classifier cannot assess is `unknown`, not a
+  // clean bill of health. These two rows are what the ruling changed.
+  ['', 'unknown'],
+  ['   ', 'unknown'],
 ]
 
 test('every fixture classifies as expected', () => {
@@ -185,6 +187,10 @@ test('the model may not move one bounded tier to another', () => {
 test('isBounded agrees with the declared set', () => {
   for (const tier of BOUNDED_DOMAINS) assert.equal(isBounded(tier), true)
   assert.equal(isBounded('open'), false)
+  // The one that would have silently broken. `isBounded` read `tier !== 'open'`,
+  // so the moment a third answer existed it was bounded — and `unknown` would
+  // have rendered a refusal, with no line changed to cause it.
+  assert.equal(isBounded('unknown'), false)
 })
 
 /*
@@ -223,4 +229,93 @@ test('exactly one module classifies domains — the mirror cannot drift', () => 
     [],
     'a second classifier can drift from the first; import lib/parse/domain.ts instead',
   )
+})
+
+
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ')
+}
+
+function sourceFiles(dir: string): string[] {
+  const out: string[] = []
+  for (const entry of readdirSync(dir)) {
+    const path = join(dir, entry)
+    if (statSync(path).isDirectory()) out.push(...sourceFiles(path))
+    else if (/\.tsx?$/.test(path)) out.push(path)
+  }
+  return out
+}
+
+
+/* ------------------------------------------------------------------ *
+ * `unknown` — the third answer. Ruled 2026-09-19 (Kian).
+ * ------------------------------------------------------------------ */
+
+test('input the classifier cannot assess returns unknown, not open', () => {
+  // `open` is a positive verdict — not bounded, safe to plan normally. Issuing
+  // it for input nobody read is a clean bill of health nobody signed.
+  assert.equal(classifyDomain(''), 'unknown')
+  assert.equal(classifyDomain('   '), 'unknown')
+  assert.equal(classifyDomain('\t\n'), 'unknown')
+  assert.equal(classifyDomain(undefined as unknown as string), 'unknown')
+  assert.equal(classifyDomain(null as unknown as string), 'unknown')
+  assert.equal(classifyDomain(42 as unknown as string), 'unknown')
+})
+
+test('unknown is neither bounded nor open', () => {
+  // The distinction is the point. A test asserting only "not bounded" would
+  // pass if unknown were an alias for open, which is the thing being removed.
+  assert.equal(isBounded('unknown'), false)
+  assert.notEqual(classifyDomain(''), 'open')
+})
+
+test('the model cannot escalate or de-escalate unknown', () => {
+  // Turning input the classifier could not read into a verdict is the model
+  // deciding what a refusal applies to — refusal authority by another route.
+  for (const suggestion of [...BOUNDED_DOMAINS, 'open' as DomainTier, 'unknown' as DomainTier]) {
+    assert.equal(applyEscalation('unknown', suggestion), 'unknown', String(suggestion))
+  }
+})
+
+test('an assessed goal with no bounded signal is still open, not unknown', () => {
+  // Pending Kian's ruling, and asserted so the current behaviour is a stated
+  // choice rather than a recorded output. Every ordinary goal exits here.
+  for (const goal of ['finish my thesis', 'run a marathon', 'learn spanish', 'ship the redesign']) {
+    assert.equal(classifyDomain(goal), 'open', goal)
+  }
+})
+
+test('no caller treats unknown as open', () => {
+  /*
+   * The scan, not the convention. "Handle it explicitly" is exactly the
+   * instruction that decays — it is followed by whoever read it and by nobody
+   * afterwards, and the failure is silent because collapsing unknown into open
+   * type-checks and passes every behavioural test.
+   *
+   * What it looks for is the two shapes that collapse the distinction:
+   * comparing a tier against `'open'` to mean "not bounded", and defaulting a
+   * tier to `'open'`. Both are how a third value gets quietly absorbed.
+   */
+  const offences: string[] = []
+  for (const file of [...sourceFiles('lib'), ...sourceFiles('components'), ...sourceFiles('app')]) {
+    if (file === 'lib/parse/domain.ts') continue
+    const source = stripComments(readFileSync(file, 'utf8'))
+    if (/!==\s*'open'|===\s*'open'/.test(source)) {
+      offences.push(`${file}: compares a tier against 'open'`)
+    }
+    if (/\?\?\s*'open'|\|\|\s*'open'|=\s*'open'/.test(source)) {
+      offences.push(`${file}: defaults a tier to 'open'`)
+    }
+  }
+  assert.deepEqual(
+    offences,
+    [],
+    `${offences.join(', ')}. \`open\` is a verdict and \`unknown\` is the absence ` +
+      `of one; use isBounded() or isUnknown() rather than comparing to 'open'.`,
+  )
+})
+
+test('the caller scan catches a collapse — negative control', () => {
+  const planted = stripComments("const safe = tier !== 'open' ? refuse() : proceed()")
+  assert.equal(/!==\s*'open'|===\s*'open'/.test(planted), true)
 })

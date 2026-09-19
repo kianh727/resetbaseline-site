@@ -211,3 +211,75 @@ body {
   padding-left: calc(var(--gutter) + var(--safe-left));
   padding-right: calc(var(--gutter) + var(--safe-right));
 }
+
+/*
+ * Grain — PRD v7.3 §12.3a, P0.
+ *
+ * *"A fine animated grain overlay across the entire page including UI, at
+ * roughly 0.03 strength, 1:1 pixel scale. This is a CSS or small canvas overlay,
+ * **not** the shader pass in v5 §7.4 — it does not wait for WebGL and it renders
+ * in every tier including D."*
+ *
+ * **It lives with the tokens, not with the Peak.** §12.3a pulled it out of the
+ * P1 post chain for a reason: it is what makes a dark surface read as
+ * photographed rather than rendered, and a dark page without it is the most
+ * visible difference between this build and its reference frames. Gating that on
+ * WebGL would withhold the single cheapest quality win from exactly the devices
+ * that get least of everything else.
+ *
+ * **Zero JavaScript, so it costs nothing against the 120 kB ceiling** and cannot
+ * be in the LCP path. The texture is an inline `feTurbulence` data URI: one
+ * decode, no network request, no image file to forget to deploy.
+ *
+ * **1:1 pixel scale** — `background-size` is the tile's own 160px, never
+ * `cover`. Scaling the tile is what turns grain into mottling, and it is the
+ * difference between film and a gradient with texture on it.
+ *
+ * **It steps rather than slides.** `steps(1, end)` on a keyframe set that jumps
+ * the background origin: sliding reads as something moving across the page,
+ * stepping reads as the surface being re-exposed each frame, which is what grain
+ * actually is. Four positions, deliberately not a multiple of the tile, so the
+ * cycle does not visibly repeat.
+ *
+ * **Static under reduced motion**, which is v5 §8.3 verbatim — *"grain renders
+ * statically"* — now inlined at §11.1. The texture is the point; the movement is
+ * atmosphere, and it is the part someone asked not to receive.
+ */
+@keyframes grain-shift {
+  0%,
+  100% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -37px 23px;
+  }
+  50% {
+    background-position: 19px -41px;
+  }
+  75% {
+    background-position: -29px -13px;
+  }
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  /* Never intercepts a click. The overlay covers every control on the page. */
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  background-repeat: repeat;
+  animation: grain-shift 0.6s steps(1, end) infinite;
+  /* Compositing hint: the overlay repaints every 150ms and must not drag the
+     page's own paint with it. */
+  will-change: background-position;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+  }
+}

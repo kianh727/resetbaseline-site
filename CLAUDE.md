@@ -1335,6 +1335,122 @@ along with its violation. **One allowlist entry, named explicitly rather than by
 ships. A pattern would let any future dev route paint with lavender. **Proven three ways** — the
 Tailwind utility exits 1, the CSS property exits 1, and a lit edge exits 0.
 
+**§12.3a's four retroactive items, 2026-09-19. Two built, one reported as a contradiction,
+one stopped on purpose.**
+
+**Grain is built, and it is CSS with zero JavaScript.** `body::after`, a fixed overlay at
+`opacity: 0.03`, an inline `feTurbulence` data URI at a **160px tile with `background-size` set
+to that same 160px** — never `cover`, because scaling the tile is what turns grain into mottling.
+It **steps rather than slides**: `steps(1, end)` across four offsets, because sliding reads as
+something moving across the page and stepping reads as the surface being re-exposed, which is
+what grain is. `pointer-events: none`, verified by `elementFromPoint` on the `Run` button rather
+than by inspection. **Static under reduced motion**, which is v5 §8.3 verbatim — *"grain renders
+statically"* — now readable at §11.1. It costs **nothing** against the 120 kB ceiling and cannot
+be in the LCP path, and it renders in **every tier including D**, which is why §12.3a moved it
+out of the P1 post chain: gating the cheapest quality win on WebGL withholds it from exactly the
+devices that get least of everything else.
+
+**Hairlines were already correct.** Measured in a browser: every rule on the page is
+`rgba(242, 240, 236, 0.08)` at 1px. Whether 0.08 reads as *visible* is a `VIS` verdict and not
+one a session records.
+
+**Metadata contrast was already correct too** — the `@utility metadata` carries 11px / 0.06em /
+`--bone-38` and resolves at those values. **One real bug found and fixed while checking**:
+`components/plan/flat-plan.tsx` and the `/plan` route used `className="meta"`, which is not the
+utility's name, so those labels rendered at 16px with normal tracking. Mine, from the previous
+commit, caught by measuring rather than by reading.
+
+**Display type is a contradiction between two tier-one sections, and it is reported rather than
+resolved.** §12.3a requires *"display type at its specified clamp ceiling, not a comfortable
+middle."* §14 specifies `clamp(40px, 8vw, 140px)`, and **8vw reaches 140px only at a 1750px
+viewport.** Measured: **375px → 40px · 1440px → 115.2px · 1750px → 140px.** So at the primary
+verification width the build renders **82% of the ceiling** — and it is not a comfortable middle
+anybody chose, it is §14's clamp evaluated correctly.
+
+**SITE-003's own precedent is the argument for changing it**, which is why this is a real
+question rather than a nitpick: lead and body were deliberately interpolated to reach their
+maxima at *exactly* 1440px, *"so the scale is settled at both verification widths rather than
+caught mid-interpolation at either."* **Display was left verbatim and is caught mid-interpolation
+at 1440px** — the one case that reasoning was written to avoid. Landing the ceiling at 1440
+means a slope of about **9.72vw**, which changes a number §14 states verbatim. **That is a §10
+amendment and Kian's.**
+
+**The typeface comparison ran, and produced criteria rather than a verdict** — which is what was
+asked for. `docs/typeface-decision.md` carries the table. Four stand-ins measured at display
+scale; none is in the candidates' register, and **the point was to find which properties
+discriminate, not to pick.**
+
+**The decisive criterion is one nobody would reach from description: ink height against the 0.92
+line box.** Line height 0.92 is below 1.0, so a face whose ascender-plus-descender exceeds the
+line box **collides between lines** — and **three of four measured faces exceed it**, by up to
+5.7%. The H1 sets on two lines, so a collision lands in the most prominent element on the site.
+SITE-003 chose 0.92 for a good reason and chose it **without either candidate's vertical
+metrics**, which are the thing that decides whether 0.92 is tight or broken.
+
+The others, by how much they separate faces: **cap-height ratio** spreads 13% (two faces at the
+same px are not the same optical size) · **set width** spreads 25% for the same headline, which
+decides the line count inside `max-w-[18ch]` and is a **layout** outcome rather than a taste one ·
+**x-height over cap-height** · **tracking response at −0.04em**, which depends on sidebearings and
+so cannot be predicted from the other four.
+
+**A finding that is not about the typeface: no measured face reaches 12% cap height at §14's
+rendered size, or at the clamp ceiling.** The required size is **146–166px** against a **140px**
+ceiling; at the ceiling, cap height lands at **10.8–11.5%** of a 900px frame. Reported, not
+resolved — it is the same §14 question as the clamp slope.
+
+**`classifyDomain` has three answers now** (ruled 2026-09-19, Kian). `open` is a **positive
+verdict** — *not bounded, safe to plan normally* — and input the classifier could not assess was
+receiving a clean bill of health nobody issued. Empty, whitespace and non-string input return
+**`unknown`**.
+
+- **`isBounded` was a latent bug and is fixed.** It read `tier !== 'open'`, correct with two
+  answers and **silently wrong the moment a third arrived**: `isBounded('unknown')` would have
+  returned `true` and `unknown` would have rendered a refusal, with **no line changed to cause
+  it.** A predicate defined by what a value is *not* inherits every value added after it. It is
+  now membership in the declared set.
+- **`unknown` is not escalable.** The model may not turn input the classifier could not read into
+  a verdict of any kind — that is the model deciding what a refusal applies to.
+- **A scan, not a convention.** *"Handle it explicitly"* is the instruction that decays, and
+  collapsing `unknown` into `open` type-checks and passes every behavioural test. The scan fails
+  on any file outside `lib/parse/domain.ts` comparing a tier to `'open'` or defaulting to it.
+- **The rule is generalised into PRD §6.4**, because it should outlive this function: **a
+  classifier's unmatched case returns a distinct value and never the permissive one.** The
+  permissive value is the one a caller forgets to handle and the one whose mishandling is
+  invisible.
+
+**Two things stopped short of the ruling's literal wording, and both need Kian.**
+
+1. **The *assessed but unmatched* case still returns `open`.** The ruling says *unmatched input
+   returns unknown*. Measured before changing it: **ten of ten ordinary goals exit through that
+   line** — *"finish my thesis"*, *"run a marathon"*, *"learn spanish"*. Returning `unknown`
+   there makes `open` **unreachable from the function**, and combined with *"unknown routes to
+   the clarification beat"* it sends **every visitor with a perfectly clear goal** to a clarifying
+   question. The two clauses of the ruling are incoherent together, so the un-assessable half is
+   built and the unmatched half is held.
+2. **`unknown` does not overlap with §6.4's `unreadable`, so there is nothing to collapse.**
+   `classifyInput` tests readability **before** domain, so degenerate input never reaches the
+   classifier — which means `unknown` is currently **unreachable through the only production call
+   site**. It earns its keep at SITE-033's server mirror and at any caller that does not
+   readability-gate first; the scan is what makes that safe. Flagged because a value that cannot
+   occur is itself a §0.3 shape.
+
+**Also: the false-negative path is `open`, not `unknown`, and this change does not close it.**
+*"my back and my finances"* is readable and was assessed, so a classifier with complete patterns
+returns `injury` there. **Pattern coverage is the fix for false negatives**; the return-value
+change is about the path where nothing was read at all.
+
+**PRD §0.3d — a fourth failure shape, and it was hit in both repositories on the same day.**
+**A check that reads a build artifact is measuring the last build, not the current source.** The
+app session credited unrelated breakage to its own assertion against a stale `dist/`; this repo's
+`check-builder.mjs` went green on a parser change against an export built before the change
+existed. **Neither was found by a failing run — both by a pass that should not have happened**,
+which is what earns it a separate entry from §0.3: that one is caught by *does this pass against
+nothing?*, and this one passes against something, just not the thing under test. **CI is safe by
+accident**, because a build step running immediately before is job ordering, not a guarantee, and
+it protects nothing on a hand run — which is when a wrong green is most expensive. The habit:
+**any check reading built output asserts the output is newer than its sources, and says so in its
+own failure message.**
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

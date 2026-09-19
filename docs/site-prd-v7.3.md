@@ -44,6 +44,20 @@ Generalised: **a criterion satisfiable by the absence of the thing it measures i
 
 The site's own artifacts are exposed. `SITE-EVAL-021`'s *"all validate"* passes on zero requests. `SITE-EVAL-027`'s *"each demonstrates its assigned behavior"* passes if the assertion is presence-of-render rather than presence-of-behavior. **Standing rule at §12.4.**
 
+#### 0.3d A fourth shape — the check that measures the last build
+
+**Recorded 2026-09-19 (Kian).** Distinct from §0.3, and hit independently in both repositories on the same day.
+
+**A check that reads a build artifact is measuring the last build, not the current source.**
+
+The app session hit it with a stale `dist/` in a mutation run and **credited unrelated breakage to its own assertion** — the assertion was reporting on code that no longer existed. This repository hit it with `check-builder.mjs`, which reads `out/`: a change to the deadline parser went **green** against an export built before the change existed.
+
+**Neither was found by a failing run. Both were found by a pass that should not have happened**, which is what earns this its own entry. §0.3 is caught by asking *does this pass against nothing?* — this one passes against something, just not the thing under test.
+
+**CI is usually safe by accident, and that is not a guarantee.** A build step running immediately before the check is job ordering. It holds until someone reorders the job, it says nothing about a run started by hand, and a hand run is when a wrong green is most expensive: it is the run somebody is using to decide their change is finished.
+
+**The habit: any check reading built output asserts the output is newer than its sources, and says so in its own failure message.** Not in a comment and not in the CI config — in the failure text the person reads, because the person reading it is about to conclude the work is done.
+
 #### 0.3c Parsing, and the two rules it owes the visitor
 
 **Recorded 2026-09-19 (Kian), from SITE-013 and SITE-019.** Both are about the same moment: the site parsing what a person typed and showing them what it understood. That moment is the site's differentiation, and both failures invert it.
@@ -457,6 +471,23 @@ The earlier line read *"all response copy authored."* That cannot survive contac
 **Fallback is silent and authored.** On any validation failure, on timeout, or on the spend cap, the beat renders from the authored question set with no user-visible error and no dead state. Free text remains available regardless of which path produced the question.
 
 **What does not move.** Classification stays deterministic, client and server (§6.5). All other copy on the site stays authored — this widens the model's surface by exactly one field, for exactly one input class, and nothing else.
+
+#### A classifier's unmatched case returns a distinct value, never the permissive one
+
+**Ruled 2026-09-19 (Kian). A standing rule, not a note about one function.**
+
+`classifyDomain` returned `open` for input it could not assess. **`open` is a positive verdict** — *not bounded, safe to plan normally* — so empty, whitespace or non-string input was receiving a clean bill of health nobody issued. It now returns **`unknown`**: a third value that is neither a verdict nor a refusal.
+
+The argument is the asymmetry that already makes this classifier err toward bounded: **a false positive is an odd demo; a false negative builds a plan around an injury.** A permissive default on the un-assessable path is the shape that produces the second, and it produces it **silently**, because a permissive default is indistinguishable from a considered verdict at every call site.
+
+**The rule generalises past this function and is meant to outlive it.** Any classifier, parser or resolver on this site returns a distinct value for *did not, or could not, decide* — never the safest-looking member of its own output set. The permissive value is the one a caller forgets to handle, and it is the one whose mishandling is invisible.
+
+**Two constraints on the new value:**
+
+- **No caller may treat it as the permissive one**, enforced by a scan rather than by convention. *"Handle it explicitly"* is the instruction that decays: it is followed by whoever read it and by nobody afterwards, and collapsing the two type-checks and passes every behavioural test.
+- **It is not escalable.** The model may not turn input the classifier could not read into a verdict of any kind — that is the model deciding what a refusal applies to, which is refusal authority by another route (§6.5).
+
+**Open, and not decided here: what the *assessed but unmatched* case returns, and where `unknown` routes.** See the note at the end of this subsection.
 
 ### 6.5 Determinism
 
