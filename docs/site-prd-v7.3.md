@@ -44,6 +44,20 @@ Generalised: **a criterion satisfiable by the absence of the thing it measures i
 
 The site's own artifacts are exposed. `SITE-EVAL-021`'s *"all validate"* passes on zero requests. `SITE-EVAL-027`'s *"each demonstrates its assigned behavior"* passes if the assertion is presence-of-render rather than presence-of-behavior. **Standing rule at §12.4.**
 
+#### 0.3b A third shape — the check that derives its input from its own reference
+
+**Recorded 2026-09-19 (Kian).**
+
+SITE-004 was nearly resolved by deriving the five `capability_type` values from the action verbs (`create_commitment`, `create_reminder`, …), guarded by a CI assertion that *"the derivation still matches the verb list."*
+
+**That assertion cannot fail.** It derives its input from the verb list and compares the result to the verb list. It is a pure function of its own reference, so it agrees with itself by construction and reports agreement as if it were verification.
+
+Generalised: **a check whose input is derived from its own reference cannot fail.** It is not a weak check; it is not a check. It will pass on a correct system, on a broken one, and on a system where the reference itself is wrong.
+
+The tell is that the check has only one source. A real check needs **two independent sources that must agree** — the thing and a statement about the thing, arrived at separately. What would actually have caught a sixth primitive is the layout-rule coverage check, which compares the manifest's declared types against the site's own rules: two sources, written by different people, for different reasons.
+
+The habit: **before writing an assertion, name its two sources.** If naming the second one means restating the first, the check is this shape and the work is to find a real second source, not to word the assertion better.
+
 #### 0.3a A second shape — the guard that hides what it guards
 
 **Recorded 2026-09-19 (Kian). Distinct from the above, and it will recur.**
@@ -369,7 +383,13 @@ The third field is a widening of one beat's copy, not a softening of the boundar
 
 **Rejected:** cross-repo build. Needs an app-repo token, couples build times, breaks on app dependency changes.
 
-**Nothing generated may read `artifact_divergences`** — it records stale counts (33, 72) against current counts (45, 76) in the same object.
+**Nothing generated may read `artifact_divergences`** — it records stale counts (33, 72) against current counts (45, 76) in the same object. **Enforced by `scripts/check-divergences.mjs` in CI, not left as prose**: the ban was a sentence with nothing behind it until the manifest was about to enter the repository. Construction, not convention.
+
+**Ruled 2026-09-19 (Kian): the app adds the object vocabulary to `CONTRACT_MANIFEST`.** The delivered manifest is an action and event vocabulary — 45 action types, 76 event types — and carries **no `capability_type`, no `authority_tier` and no `belief_tier`**. §6.2 requires the five capability types derived rather than hand-listed, and §6.1a renders `authority_tier` in every object's metadata at P0.
+
+**Verb-derivation was rejected**, not deferred. It yields `capability_type` and nothing else: `authority_tier` has no verb to derive from, so that option leaves a P0 render with no contract source. Its proposed CI guard was also §0.3b's shape — *"the derivation still matches the verb list"* derives from the verb list and compares to the verb list.
+
+**PR #3 is held unmerged rather than merged and superseded** — one complete delivery, so there is no window in which the vocabulary-free file sits in the repository for someone to write a green check against.
 
 ---
 

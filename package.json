@@ -13,7 +13,8 @@
     "check:dev-routes": "node scripts/check-dev-routes.mjs",
     "check:manifest": "node scripts/check-manifest.mjs",
     "check:overflow": "node scripts/check-overflow.mjs",
-    "check:eval-stubs": "node scripts/check-eval-stubs.mjs"
+    "check:eval-stubs": "node scripts/check-eval-stubs.mjs",
+    "check:divergences": "node scripts/check-divergences.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

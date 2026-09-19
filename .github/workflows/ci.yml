@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · typecheck · lint · test · build · bundle · overflow
+    name: eval-stubs · divergences · typecheck · lint · test · build · bundle · overflow
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,6 +53,13 @@ jobs:
       # missing stub check should be the first thing anyone hears about.
       - name: Eval stub checks
         run: npm run check:eval-stubs
+
+      # PRD v7.3 §6.6. Nothing generated may read `artifact_divergences`: it
+      # records stale counts against current counts in the same object. The ban
+      # was prose until the manifest was about to enter the repo; this is the
+      # construction behind it.
+      - name: Divergences ban
+        run: npm run check:divergences
 
       - name: Typecheck
         run: npm run typecheck

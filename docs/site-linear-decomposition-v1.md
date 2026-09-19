@@ -268,11 +268,19 @@ Project SP-01 · P0 · Deps SITE-002
 **SITE-004 · Contracts manifest, generated types, and drift guard**
 Project SP-01 · P0 · Deps SITE-001
 *Scope* Commit `contracts-manifest.json` to the site repo — the app's `CONTRACT_MANIFEST` verbatim, plus `captured_at` and the app repo commit SHA. Generate the site's plan-model types from it at build time. Add a CI drift check per PRD v7.3 §6.6: the primary mechanism fetches the manifest the app repo publishes to a stable path on `main` and fails the site build on any diff; the fallback uses staleness thresholds against `captured_at` — warn at 30 days, fail at 60.
-*Accept* Types generate from the manifest. A deliberately altered manifest fails CI. Every `capability_type` in the manifest has a layout rule; a type without one fails the build.
+*Accept* **Rewritten 2026-09-19 (Kian), before the manifest landed, so the vacuous shape is deleted rather than guarded.** The old criterion — *"every `capability_type` in the manifest has a layout rule"* — would have iterated an empty set and passed, because the delivered manifest carries no `capability_type` at all. Three parts, all required:
+
+1. **The manifest declares a non-empty `capability_type` list.** An absent or empty list **fails the build with a message naming the manifest**, not the layout rules — the fault is in the input, and an error pointing at the rules would send the reader to the wrong file.
+2. **Every declared `capability_type` has a layout rule, and the counts match in both directions.** A rule with no type is as much a failure as a type with no rule; one-way coverage passes a rule set that has quietly drifted past the contract.
+3. **Positive control: a fixture manifest carrying a sixth unknown type must fail the build, and this runs in CI, not once by hand.** Without it, parts 1 and 2 are untested assertions about an input that has never varied.
+
+Types still generate from the manifest, and a deliberately altered manifest still fails CI.
 *Tests* CI: type generation; one negative test proving the drift guard fires. Unit: layout-rule coverage across all `capability_type` values.
 *Verify* —
 *PRD* v7.3 §6.2, §6.6, §12.3
-*Non-goals* No `@baseline/contracts` package import. No cross-repo build of the app — explicitly rejected in §6.6. **Nothing generated may read `artifact_divergences`**, which records stale counts (33 and 72) against current counts (45 and 76) in the same object.
+*Non-goals* No `@baseline/contracts` package import. No cross-repo build of the app — explicitly rejected in §6.6. **Nothing generated may read `artifact_divergences`**, which records stale counts (33 and 72) against current counts (45 and 76) in the same object — **enforced by `scripts/check-divergences.mjs` in CI rather than left as prose.**
+
+**Ruled 2026-09-19 (Kian): the app adds the object vocabulary to `CONTRACT_MANIFEST`. Not verb-derivation.** Two reasons, both fatal to the alternative. Verb-derivation yields `capability_type` and nothing else, while **`authority_tier` has no verb to derive from** and §6.1a renders it in every object's metadata at P0 — so the derivation option leaves a P0 render with no contract source, and the size of the app change cannot choose between them. And the CI assertion proposed to guard it **could not fail**: *"the derivation still matches the verb list"* derives from the verb list and compares the result to the verb list.
 
 **SITE-005 · Base layout, nav, safe areas, overflow guards**
 Project SP-01 · P0 · Deps SITE-002, SITE-003

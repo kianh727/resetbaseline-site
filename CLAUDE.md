@@ -281,7 +281,7 @@ Eval types: `AUTO` automated regression · `VIS` visual/manual acceptance · `FT
 first-time-user comprehension · `PERF` performance measurement · `ANLY`
 analytics/conversion measurement.
 
-**Two failure shapes are catalogued, and both are habits rather than one-time checks.**
+**Three failure shapes are catalogued, and all are habits rather than one-time checks.**
 
 1. **A criterion satisfiable by the absence of the thing it measures is measuring the
    container** (PRD §0.3). Ask of every check: *does this pass against a stub that does
@@ -294,6 +294,15 @@ analytics/conversion measurement.
    before measuring, and say in its output that it did.** Ask of every retry, fallback, catch
    block, default value and CSS guard: *if this were broken, would the thing protecting it
    also hide it?*
+
+3. **A check whose input is derived from its own reference cannot fail** (PRD §0.3a's sibling
+   at §0.3b, recorded 2026-09-19). SITE-004 was nearly resolved by deriving the five
+   `capability_type` values from the action verbs, guarded by an assertion that *"the
+   derivation still matches the verb list"* — which derives from the verb list and compares
+   to the verb list. It agrees with itself by construction and reports that as verification.
+   **Before writing an assertion, name its two sources.** If naming the second means
+   restating the first, it is this shape, and the work is to find a real second source rather
+   than to word the assertion better.
 
 **Subjective design quality is not pretended to be automatable.** `VIS` and `FTU`
 verdicts are judged by a human and **recorded, not inferred.** A session may prepare
@@ -690,13 +699,41 @@ file must contain** for the site to do it. The app session delivered `CONTRACT_M
 verbatim, which is exactly what was asked. A spec that fully constrains the container and not
 the contents is the same shape as a check that passes on an empty one.
 
-**Reported, not resolved (§9).** Nothing was merged, nothing was hand-listed, and the manifest
-was **not copied onto this branch** — PR #3 targets `main`, and duplicating the file would
-collide when both land. Three ways out, all Kian's: the app adds the object vocabulary to
-`CONTRACT_MANIFEST` (an app-repo change); the PRD is amended so the site derives the five from
-the action verbs with a CI assertion that the derivation still matches; or §6.2 is amended to
-something the manifest can actually support. **Until one is chosen, SITE-4 stays blocked and the
-layout-rule check must not be written** — writing it now produces a green gate over nothing.
+**Ruled 2026-09-19 (Kian): the app adds the object vocabulary. Not verb-derivation.**
+
+**Verb-derivation was rejected on its merits, not deferred.** It yields `capability_type` and
+nothing else — **`authority_tier` has no verb to derive from**, and §6.1a renders it in every
+object's metadata at P0, so that option leaves a P0 render with no contract source. The size of
+the app change could not choose between the options, because one of them does not do the job.
+And its proposed CI guard **could not fail**: *"the derivation still matches the verb list"*
+derives from the verb list and compares to the verb list. That is now catalogued as §0.3b, the
+third failure shape (§7).
+
+**PR #3 is held unmerged rather than merged and superseded** — one complete delivery, so there
+is no window in which the vocabulary-free file sits in the repository for someone else to write
+a green check against. The manifest is **not** copied to this branch and the layout-rule check
+is **not** written.
+
+**SITE-004's accept criterion is rewritten now, before the file lands, so the vacuous shape is
+deleted rather than guarded.** Three parts: the manifest declares a **non-empty**
+`capability_type` list, and an absent or empty one fails **naming the manifest** rather than the
+layout rules, because the fault is in the input; every declared type has a rule and **the counts
+match in both directions**, since a rule with no type is as much a failure as a type with no
+rule; and a **positive control in CI** — a fixture manifest carrying a sixth unknown type must
+fail the build, without which the first two parts are untested assertions about an input that
+has never varied.
+
+**`artifact_divergences` is banned by construction now, not prose.** `scripts/check-divergences.mjs`
+is in the sweep and fails on any source file referencing the key; proven negatively with a probe
+in `lib/`. The manifest itself is exempt — holding the key is not reading it — and the docs are
+out of scope because a check that failed on the sentence banning the key is the veto rule
+catching its own definition, a shape this repo has hit twice.
+
+**One instruction not carried out, and why.** The ruling asked for the §0.3b principle to be
+filed in `BAS-190`. **That is a write to the app's Linear team, which §13 forbids without
+exception** — the one sanctioned cross-team action is the manifest-publication issue, and even
+that requires asking first. The principle is recorded here and in PRD §0.3b; **filing it
+app-side needs the app session or Kian.**
 
 **`SITE-5` is done in code; its device verification is not, and cannot be from a session.**
 Root layout, nav, safe areas, overflow guards.
