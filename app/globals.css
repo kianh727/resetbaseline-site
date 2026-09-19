@@ -1,9 +1,50 @@
 @import "tailwindcss";
 
 /*
- * SITE-001 establishes the stylesheet entry point only.
- * Design tokens are SITE-002; the type scale is SITE-003. Nothing is defined here.
+ * SITE-002 · Design tokens.
+ *
+ * The nine tokens of PRD §14, carried forward unchanged by v7.3 §11.
+ * Values are exact and are asserted by tests/tokens.test.mjs — if a value
+ * here and a value there disagree, the test fails rather than the site
+ * quietly shipping a colour nobody approved.
+ *
+ * Each token is declared twice, deliberately, because SITE-002's scope asks
+ * for both forms:
+ *   - `@theme` under Tailwind's `--color-*` namespace, which is what
+ *     generates `bg-void`, `text-bone-60` and the rest.
+ *   - `:root` under the bare names §14 uses, so a stylesheet or an inline
+ *     style can reference `var(--void)` as the PRD writes it.
+ *
+ * The type scale is SITE-003. No component styling here (SITE-002 non-goal).
  */
+
+@theme {
+  --color-void: #0a0a0a;
+  --color-surface: #0e0c18;
+  --color-lavender: #8b7dff;
+  --color-lavender-lit: #c9c0ff;
+  --color-bone: #f2f0ec;
+  --color-bone-60: rgba(242, 240, 236, 0.6);
+  --color-bone-38: rgba(242, 240, 236, 0.38);
+  --color-edge: rgba(242, 240, 236, 0.08);
+
+  /* Refusal and veto states only. Enforced by eslint.config.mjs and by
+   * tests/tokens.test.mjs, which scans every source file rather than
+   * trusting the lint rule to have covered the file type. */
+  --color-veto: #c4614f;
+}
+
+:root {
+  --void: var(--color-void);
+  --surface: var(--color-surface);
+  --lavender: var(--color-lavender);
+  --lavender-lit: var(--color-lavender-lit);
+  --bone: var(--color-bone);
+  --bone-60: var(--color-bone-60);
+  --bone-38: var(--color-bone-38);
+  --edge: var(--color-edge);
+  --veto: var(--color-veto);
+}
 
 html {
   /* Native scroll. No smooth-scroll override, here or anywhere (PRD §7.5, SITE-070). */
@@ -13,4 +54,6 @@ html {
 body {
   /* Zero horizontal scroll at 320px is a P0 acceptance criterion (SITE-005, SITE-057). */
   overflow-x: clip;
+  background: var(--void);
+  color: var(--bone);
 }

@@ -31,6 +31,49 @@ const eslintConfig = [
           ],
         },
       ],
+
+      /*
+       * SITE-002 · `--veto` is refusal and veto states only (PRD §14).
+       *
+       * This catches the utility class and the CSS variable in TS and TSX.
+       * It cannot see a stylesheet, so tests/tokens.test.mjs scans every
+       * file type as well — the lint rule is the fast feedback, the test is
+       * the one that cannot be routed around by changing file extension.
+       */
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "Literal[value=/(^|[^a-z-])(bg|text|border|fill|stroke|ring|outline|decoration|shadow|accent|caret)-veto([^a-z-]|$)|--veto/]",
+          message:
+            'The --veto token is for refusal and veto states only (PRD §14). See SITE-017, SITE-018, SITE-038.',
+        },
+        {
+          selector: "TemplateElement[value.raw=/(^|[^a-z-])(bg|text|border|fill|stroke|ring|outline|decoration|shadow|accent|caret)-veto([^a-z-]|$)|--veto/]",
+          message:
+            'The --veto token is for refusal and veto states only (PRD §14). See SITE-017, SITE-018, SITE-038.',
+        },
+      ],
+    },
+  },
+  {
+    /*
+     * The paths where a veto colour is the correct thing to reach for.
+     * SITE-017 and SITE-018 own the authored refusals and their render path;
+     * SITE-038 owns the contention veto. The token swatch route must render
+     * all nine tokens, so it is listed too.
+     */
+    files: [
+      'app/tokens/page.tsx',
+      'app/**/refusal/**',
+      'app/**/veto/**',
+      'components/**/refusal/**',
+      'components/**/veto/**',
+      // The two files that police the token necessarily name it.
+      'eslint.config.mjs',
+      'tests/**',
+    ],
+    rules: {
+      'no-restricted-syntax': 'off',
     },
   },
 ]
