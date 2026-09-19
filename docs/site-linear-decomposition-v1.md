@@ -1057,7 +1057,7 @@ Project SP-15 · P1 · Deps SITE-076
 *Tests* Automated: full budget suite.
 *Verify* Reported number recorded per release.
 *PRD* §16, §18.2
-*Non-goals* —
+*Non-goals* The core bundle ceiling. Ruled pulled forward (PRD §11) and already in the CI sweep at 120 KB from the first product commit; this issue adds the remaining budgets around it, and must not re-implement or relax it.
 
 ---
 

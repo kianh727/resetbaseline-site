@@ -11,6 +11,13 @@
  *
  * Deliberately not a client component. Nothing here is interactive, so this
  * page adds nothing to the core bundle (§11, 120 KB).
+ *
+ * `page.dev.tsx`, not `page.tsx`: `dev.tsx` is only in `pageExtensions` when
+ * NODE_ENV is not production (next.config.ts), so this route exists under
+ * `npm run dev` and is never built into the static export. It is a
+ * development surface; shipping it would put a URL nobody designed on the
+ * marketing site. The route is absent from production rather than built and
+ * then deleted — there is no output to forget to prune.
  */
 
 type Swatch = {

@@ -368,10 +368,11 @@ Seven, from PRD §22. Any of these in a diff is a defect, not a tradeoff.
 15.5.25 App Router, React 19, TypeScript strict, Tailwind v4, `output: 'export'`.
 Pinned to the 15 line because the issue specifies Next 15; 16.x is out of scope.
 
-**`.github/workflows/ci.yml` is the sweep** §7 refers to — typecheck, lint, build,
-each run bare, plus an assertion that `out/index.html` exists so a build that silently
-stops being an export fails rather than serving the previous deploy. **Green on
-`1311f02`, 43s.** Adding a check there adds it to the sweep; nothing else does.
+**`.github/workflows/ci.yml` is the sweep** §7 refers to — typecheck, lint, test, build,
+each run bare, plus three assertions on the export: that `out/index.html` exists, so a
+build that silently stops being an export fails rather than serving the previous deploy;
+that `out/tokens` does **not**, so a development-only route cannot ship; and the core
+bundle budget. Adding a check there adds it to the sweep; nothing else does.
 
 Three decisions recorded rather than left implicit:
 
@@ -406,14 +407,32 @@ settling spring is hand-rolled on WAAPI/CSS), no client-side schema validator (v
 server-side on `/api/plan`), no date library (SITE-023 already specifies hand-rolled DST-safe
 math with its own fixture suite).
 
-**Recommended, not ruled:** pull the bundle-size CI check forward to the first product commit.
-SITE-078 enforces it at P1, after every builder issue has landed — a ceiling first checked at
-the end is a criterion satisfiable by the absence of the thing it measures (§0.3), and a
-dependency that breaks the budget would surface at SITE-076 rather than in the PR that added
-it. **Awaiting a ruling; not in effect.**
+**Ruled and in effect: the bundle check is in the sweep now, at 120 KB, failing the build.**
+SITE-078 would have enforced it at P1, after every builder issue had landed — a ceiling first
+checked at the end is a criterion satisfiable by the absence of the thing it measures (§0.3),
+and a dependency that breaks the budget would surface at SITE-076 rather than in the PR that
+added it. `scripts/check-bundle.mjs` runs after the build and measures **every exported
+route**, not only `/`: a check that watches one page can be walked around by putting the
+import on another. It gzips the chunks each document actually references rather than reading
+Next's summary line, and excludes the `noModule` polyfill chunk, which no browser supporting
+ES modules fetches — counting it would measure 38.6 KB nobody downloads. **Measured at
+100.2 KB, 19.8 KB remaining.** SITE-078 still owns the remaining §16 budgets; its non-goals
+now say so.
 
-**Next in sequence is `SITE-2`** (design tokens and Tailwind theme), which depends only
-on `SITE-1`.
+**`/tokens` is a development-only route.** `app/tokens/page.dev.tsx`, with `dev.tsx` in
+`pageExtensions` only outside production — so it exists under `npm run dev` and is never
+built into the export. Absent rather than built-and-pruned: a prune step is a thing to
+forget, and forgetting it ships a URL nobody designed on the marketing site.
+
+**Both gates were proven negatively.** Forcing `dev.tsx` into the production extensions put
+`/tokens` back in `out/` and the assertion exited 1. Installing `zod` and `framer-motion`
+behind a probe route put that route at 147.3 KB and the budget check exited 1, naming the
+route and the 27.3 KB overage. Probe and both dependencies removed; `package-lock.json` is
+unchanged.
+
+**`SITE-2` is done** — the nine §14 tokens, declared once as Tailwind theme values and
+aliased under the bare names, with the `--veto` confinement policed by both a lint rule and
+a file scan. **Next in sequence is `SITE-3`** (type scale and the typeface decision).
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as

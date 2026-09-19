@@ -5,6 +5,10 @@ name: CI
 # does. Later issues extend it — SITE-004 the contracts drift guard, SITE-057
 # the overflow and touch-target audit, SITE-078 the performance budgets,
 # SITE-106 the eval-stub run, SITE-107 the ban-list check.
+#
+# The 120 KB core bundle ceiling is already here, pulled forward from
+# SITE-078 by ruling: it costs nothing while the number is 103, and it names
+# the commit that adds the first runtime dependency rather than the last.
 
 on:
   push:
@@ -25,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: typecheck · lint · test · build
+    name: typecheck · lint · test · build · bundle
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,3 +64,16 @@ jobs:
       # would serve the previous one.
       - name: Assert static export produced out/
         run: test -d out && test -f out/index.html
+
+      # /tokens is a development-only route (next.config.ts pageExtensions).
+      # If it reappears in the export, a URL nobody designed is reachable on
+      # the marketing site.
+      - name: Assert no development route shipped
+        run: test ! -e out/tokens
+
+      # The 120 KB core bundle ceiling (PRD v7.3 §11), measured on the
+      # exported chunks the entry document actually references. Pulled forward
+      # to the first product commits deliberately: a ceiling first checked at
+      # the end catches the thirtieth dependency, not the first.
+      - name: Core bundle budget
+        run: npm run check:bundle

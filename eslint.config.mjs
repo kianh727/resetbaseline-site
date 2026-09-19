@@ -63,7 +63,7 @@ const eslintConfig = [
      * all nine tokens, so it is listed too.
      */
     files: [
-      'app/tokens/page.tsx',
+      'app/tokens/page.dev.tsx',
       'app/**/refusal/**',
       'app/**/veto/**',
       'components/**/refusal/**',

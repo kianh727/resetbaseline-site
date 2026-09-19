@@ -66,7 +66,7 @@ test('there are exactly nine tokens — no tenth has been added quietly', () => 
  */
 const VETO_ALLOWED = new Set([
   'app/globals.css', // where it is defined
-  'app/tokens/page.tsx', // the swatch route, which must render all nine
+  'app/tokens/page.dev.tsx', // the swatch route, which must render all nine
   'tests/tokens.test.mjs', // this file, which names the token in order to police it
 ])
 
