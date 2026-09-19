@@ -11,6 +11,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   next,
   can,
@@ -112,5 +113,49 @@ test('the machine is pure — the same pair always gives the same answer', () =>
     for (const event of EVENTS) {
       assert.equal(next(state, event), next(state, event))
     }
+  }
+})
+
+
+/*
+ * The audit's finding, 2026-09-19 — §12.4 run against a stub.
+ *
+ * Planting a second route to `walled` showed the guarantee is **two-part**, and
+ * that neither part covers the other's case:
+ *
+ * - A **declared** event reaching `walled` from a state it should not — say
+ *   `tuning: { tune: 'walled' }` — is caught by the exhaustive test above, by
+ *   name. That is the half that was known.
+ * - An **undeclared** event added to the table — `tuning: { scrolled_to_end:
+ *   'walled' }` — is invisible to that test, because the test iterates the
+ *   declared event list. It is caught by **typecheck** (TS2353), because the
+ *   table's value type is `Partial<Record<BuilderEvent, BuilderState>>`.
+ *
+ * So the table's closure is load-bearing and was **incidental** — a property of
+ * how the type happened to be written, asserted nowhere. Widen that type to
+ * `Record<string, BuilderState>` and the exhaustive test still passes while the
+ * wall becomes reachable by anything.
+ *
+ * This test pins the half the type system was carrying alone.
+ */
+test('the event union is closed — the half typecheck was carrying by itself', () => {
+  const source = readFileSync('lib/builder-machine.ts', 'utf8').replace(/\/\*[\s\S]*?\*\//g, ' ')
+
+  assert.match(
+    source,
+    /Partial<Record<BuilderEvent, BuilderState>>/,
+    'the transition table must be typed over BuilderEvent, not over string. An ' +
+      'open key type lets an undeclared event reach `walled` with the exhaustive ' +
+      'test still green — it iterates declared events only.',
+  )
+
+  // And the declared set is the one the exhaustive test iterates, so the two
+  // halves cannot drift apart without this failing.
+  for (const event of EVENTS) {
+    assert.match(
+      source,
+      new RegExp(`'${event}'`),
+      `${event} is iterated by the exhaustive test but does not appear in the machine`,
+    )
   }
 })

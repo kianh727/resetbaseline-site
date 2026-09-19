@@ -1729,6 +1729,62 @@ type stripping means **no parameter properties in code a test imports**. `Provid
 written with one and the suite refused to parse it. The constraint is in the file that governs
 this repository and it was still worth a comment at the point it bites.
 
+**The §12.4 stub audit ran. Two findings, and the first is about the audit rather than the evals.**
+
+**There is no machine-readable link between an eval and its implementation.** Ten eval IDs appear
+in `tests/`, `scripts/`, `lib/`, `components/` and `app/` — and **every one of them is prose in a
+comment**, not a declaration that a file implements that eval. So *"audit every eval against a
+stub"* cannot be executed mechanically today: the mapping exists in judgement and in prose, and
+nowhere a script can read.
+
+**And the drift runs the other way too.** Fifteen CI checks and twenty test files exist; on the
+most generous reading about **eleven of seventy-nine evals** have an implementation. Most of the
+verification in this repository does not trace to an eval, and most evals do not trace to a
+check. **SITE-106's open half is wider than it recorded** — it said the gate checks the document
+and not the code; the audit's finding is that nothing connects the two at all.
+
+**Of the evals that do have implementations, the negative proofs were re-run rather than trusted:**
+
+| Eval | Implementation | Stub result |
+|---|---|---|
+| EVAL-007 · frame complete and empty | `check-builder.mjs` | fails on a conditional row, and on `animate-pulse` |
+| EVAL-008 · deadline mid-typing | `check-builder.mjs` | fails when the parse needs a request |
+| EVAL-017 · settling spring exclusive | eslint + `settle.test.ts` | fails outside the allowlist; passes inside it |
+| EVAL-029 · occurrence math | `occurrences.test.ts` | fails on a millisecond stride, in three zones |
+| EVAL-046 · overflow sweep | `check-overflow.mjs` | fails on a 1200px probe, clip lifted |
+| EVAL-050 · reduced motion | `check-motion.mjs` | fails in both directions |
+| EVAL-051 · load budgets | `check-bundle.mjs` | fails at a tightened threshold |
+| EVAL-064 · scroll remains native | eslint import ban | fails on a `lenis` import |
+| **EVAL-033 · wall unreachable except by activation** | `builder-machine.test.ts` | **see below** |
+
+**EVAL-033 is the finding, and my first reading of it was wrong in the useful direction.**
+
+Planting a second route to `walled` — `tuning: { scrolled_to_end: 'walled' }` — **the exhaustive
+test passed.** For about a minute that looked like the most important guarantee on the site
+failing its own §12.4 check.
+
+It is not. **Typecheck catches that case** (TS2353), because the table's value type is
+`Partial<Record<BuilderEvent, BuilderState>>`. A **declared** event reaching `walled` from a state
+it should not — `tuning: { tune: 'walled' }` — is caught by the exhaustive test, by name.
+
+**So the guarantee is two-part, and neither part covers the other's case.** The exhaustive test
+iterates the *declared* event list, so an undeclared key is invisible to it; the type closes the
+key space, so a wrongly-routed declared event is invisible to it. **The table's closure was
+load-bearing and incidental** — a property of how the type happened to be written, asserted
+nowhere. Widen it to `Record<string, BuilderState>` and the exhaustive test stays green while the
+wall becomes reachable by anything.
+
+A test now pins that half, and it is proven negatively: widening the key type exits 1, naming the
+reason. **The lesson generalises past this table: when a guarantee rests on a type and a test
+together, the test is not the guarantee — and the part the type carries is the part nobody
+re-checks.**
+
+**One eval has no implementation at all and should:** **EVAL-052 · headline is LCP.** SITE-007's
+accept was verified through a `PerformanceObserver` registered before navigation — **in an ad-hoc
+run that left no artifact.** There is no standing check, so nothing would notice the Peak, a
+font, or a hero image displacing the H1. It is small — the measurement already exists in the
+shape SITE-007 used — and it is **scoped, not built** here.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**
