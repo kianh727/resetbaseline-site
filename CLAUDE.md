@@ -676,8 +676,52 @@ notch, so what was verified is that the tokens resolve, the calc holds, and the 
 correct at every width — not that the nav clears a notch. **That verdict needs a device and
 is Kian's to record** (§7: `VIS` verdicts are judged by a human and recorded, never inferred).
 
-**Next in sequence is `SITE-6`** (reduced-motion and render-tier primitives), then `SITE-106`
-(the eval-stub audit). `SITE-4` resumes the moment the manifest lands.
+**`SITE-6` is done.** `useReducedMotion()` and `useRenderTier()`, with §15's ladder as a pure
+function.
+
+- **Detection is split from measurement.** `detectTier(caps)` is pure, so the ladder is tested
+  against a capability matrix rather than against whatever browser runs the suite — which
+  would assert one row of the table, and not the interesting one. `readCapabilities()` is the
+  only part that touches the DOM.
+- **The ladder is evaluated worst-first**, because every rung is a reason to be *lower*. That
+  also makes `save-data` unconditional: a user who asked for less data gets D whatever their
+  hardware could manage. Reading it as one input among several would let a fast desktop
+  override an explicit request.
+- **The pre-detection tier is D, the floor.** Upgrading after paint can only add atmosphere;
+  starting at A and demoting would render the most expensive thing first on the weakest
+  device. Nothing visual depends on it — the Peak is never in the LCP path.
+- **Unreported `hardwareConcurrency` is treated as 2**, which lands on C. Guessing high would
+  promote an unknown device into A's full post chain; guessing low costs it some atmosphere.
+  Only one of those is recoverable.
+- **The WebGL probe releases its context** via `WEBGL_lose_context`. A probe that leaves a live
+  context behind costs a GPU allocation for the session on exactly the low-end devices it
+  exists to identify.
+- **One row §15 does not name, decided and recorded rather than decided silently:** a *desktop*
+  with WebGL2 and three cores. Not A (under four cores), not C (over two cores, WebGL2). It
+  lands on B, and there is a test named after the gap so the next reader comparing this to
+  §15's table finds the answer instead of the hole.
+- **Deliberately not built: the mid-session demotion.** §15 permits one, on two frame-budget
+  breaches within 10s, never promoting back. It needs a frame-budget monitor, which needs the
+  scene, and this issue's non-goals are "no consumers yet, no 3D". It belongs with the Peak's
+  performance work.
+
+**Both accept criteria verified end to end in a browser, not just as unit tests.** A temporary
+dev-only probe route consumed both hooks: `?tier=A|B|C|D` forced all four, lowercase `c`
+resolved to C, an invalid `?tier=E` fell through to detection rather than pinning a tier nobody
+chose, and `prefers-reduced-motion` tracked the preference in both directions. Probe removed.
+The suite was also proven negatively — moving the C threshold from `<= 2` to `<= 1` fails test
+10 by name.
+
+**`node --test` now runs TypeScript directly**, via Node 22's native type stripping. No
+ts-node, no build step, no dependency, and `tsconfig` gains `allowImportingTsExtensions` because
+type stripping needs the explicit `.ts` specifier. This is the mechanism every later logic
+suite uses — SITE-023's DST-safe occurrence math above all.
+
+**The bundle is unchanged at 100.2 KB.** The hooks are client code but have no consumers yet,
+so nothing imports them into a route.
+
+**Next in sequence is `SITE-106`** (the eval-stub audit), which is the last of SP-01 that is not
+blocked. `SITE-4` resumes the moment the manifest lands.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
