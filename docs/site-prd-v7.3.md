@@ -395,10 +395,46 @@ Handles every `capability_type` the contracts define — exactly five: `commitme
 | `authority_tier` | `auto · provisional · explicit` |
 | Outcome (recorded) | `complete · partial · missed · cancelled_intentionally · unknown` |
 | `belief_tier` | `hypothesis · pattern · observed_fact` |
+| `recurrence_rule` | `daily · weekdays · weekends · weekly_on_days · every_n_days` |
 
 **`rescheduled`** is a **derived display value**, not a stored outcome and not an action outcome. Nothing writes it; `displayOutcome` derives it when an occurrence is `pending` and was moved, and a resolution always wins — moved then completed is `complete`. The site **may** describe it as a state a user sees. It **must not** list it alongside the five resolvable values as something the system records.
 
 **Banned entirely:** `AuthorityDecision` values (`execute · confirm · forbidden`) — rendering them alongside `provisional` puts two meanings of one word on the page · `pending` · `sensitivity_class` values and anything keyed by them · reason codes, validation errors, internal event names · user-visible confidence numbers.
+
+#### 6.3c Recurrence rules — the closed set
+
+**Ruled 2026-09-19 (Kian), closing the defect SITE-113 recorded.** §6.4 and §6.5 specified a deterministic recurrence choice over a set no artifact enumerated. This is that set.
+
+| Rule | Meaning |
+|---|---|
+| `daily` | every day |
+| `weekdays` | Monday through Friday |
+| `weekends` | Saturday and Sunday |
+| `weekly_on_days` | an explicit set of weekdays |
+| `every_n_days` | `n` between 2 and 14 |
+
+**Five. Nothing outside this list is selectable, and the site renders no recurrence value that is not one of them.**
+
+**Selection is deterministic, from the parse (§6.5). The model never sees this list and never chooses from it.**
+
+#### The selection function is total
+
+**Every input either maps to exactly one rule, or produces no recurrence at all.** There is **no default rule**, and **nothing falls through to `daily`** — a fallthrough default is how a parser starts asserting a schedule the visitor never described.
+
+Two edges, stated because they are where a parser invents things:
+
+- **Named days that do not form a shorthand set are `weekly_on_days` with those days — never the nearest shorthand.** *"Monday, Wednesday, Friday"* is **not** `weekdays`. Rounding a three-day set up to a five-day one adds two commitments the visitor did not make, and it does it while appearing to understand them, which is §0.3c's failure applied to frequency instead of dates.
+- **An unparseable frequency produces no recurrence.** A commitment with no recurrence is a **valid object** — it is the untimed case the app already models — so nothing is forced. §6.1a's Problem line for a commitment is *"an intention with no occasion"*, which describes exactly this object; inventing an occasion to avoid returning nothing would be the site answering a question the visitor did not answer.
+
+#### Weekdays are named, not numbered
+
+**The internal representation is the string `Monday`, never an integer**, and this is a deliberate refusal rather than a style preference.
+
+The app's `byweekday` convention is **disputed between its own layers and unresolved**. The site has no reason to inherit that dispute, and an integer representation would mean the site is silently taking a position on it — a position that is invisible in the type, wrong half the time, and produces a plan off by one day with nothing to indicate why.
+
+**A named representation cannot be wrong about a convention the site never adopted.**
+
+If SITE-004's manifest later carries a weekday vocabulary, **adapt at the boundary** — one conversion in one place — and leave the internal representation named. That the internal form is deliberately not numeric is recorded here so it is not "tidied" into an enum by someone who finds strings inelegant.
 
 ### 6.3a Gate copy — app selections are opaque · **MUST**
 
@@ -795,9 +831,9 @@ Display was carried over verbatim and left at 8vw — **producing the exact case
 
 `9.72vw` lands 140px at 1440px. The floor is unaffected: 40px still governs below 411px, so **375px renders at 40px exactly as before.**
 
-#### The 12%-of-frame question — reported, not ruled
+#### Cap height is measured against width — amended 2026-09-19 (Kian)
 
-§12.3a's comparison condition is *cap height at 12% of frame*. **No measured face reaches it at the amended ceiling either**, and the reason is structural rather than a matter of picking a bigger number.
+§12.3a's comparison condition was written as *cap height at 12% of frame*. **Measured against frame *height*, that cannot be satisfied by this clamp**, and the reason is structural rather than a matter of choosing a bigger number.
 
 At a typical grotesque cap-height ratio of **0.72** (measured range 0.651–0.738 across four faces):
 
@@ -806,11 +842,13 @@ At a typical grotesque cap-height ratio of **0.72** (measured range 0.651–0.73
 | 900px | 108px | **150px** | 10px over |
 | 1080px | 130px | **180px** | 40px over |
 
-**The two specifications are expressed against different axes, and that is the fight.** §14's clamp is driven by viewport **width**; 12% is measured against frame **height**. A single clamp can satisfy 12% at exactly one aspect ratio and will miss it at every other — the same 1440px-wide viewport needs 150px at 900 tall and 180px at 1080 tall.
+**The clamp is driven by viewport width; 12% was measured against viewport height. One clamp can satisfy that at exactly one aspect ratio** — the same 1440px-wide viewport needs 150px at 900 tall and 180px at 1080.
 
-**It does not fight the 0.92 line box.** Whether a face collides at 0.92 is a ratio of its own vertical metrics to the line box and is **scale-invariant** — raising the ceiling changes nothing about it. Nor does it change the line count: `max-w-[18ch]` is measured in the font's own units, so the headline holds its two lines at any size. At 150px the two lines occupy 276px inside a 70svh fold of 630px, which fits.
+**Ruled: the height framing is dropped, and 12% is restated against width.** A type scale that changes with viewport *height* is wrong on its own terms: **the same page in a shorter window would render a different headline size, for no reason a reader can perceive.** Nothing else in §11.4 is height-aware, and making display alone so would make the type scale the one element that moves when nothing about the reading changed.
 
-**So the constraints do not fight each other; the 12% figure fights the clamp's axis.** Ruling that out needs one of: a height-aware term in the clamp, a restatement of 12% against width, or acceptance that 12% describes one reference frame rather than a rule. **Not decided here.**
+**Restated: cap height reaches approximately 7% of viewport width at 1440px** — 140px at a 0.72 ratio gives 100.8px of cap, which is 7.0% of 1440. That is the same measurement the 12% figure was reaching for, expressed against the axis the clamp actually uses, and it is satisfied by `9.72vw` as amended above rather than requiring a ceiling the budget and the fold cannot hold.
+
+**It never fought the 0.92 line box.** Whether a face collides at 0.92 is a ratio of its own vertical metrics to the line box and is **scale-invariant** — no ceiling changes it. Nor does the ceiling change the line count, because `max-w-[18ch]` is measured in the font's own units. The two constraints were never in tension; the figure was measured against the wrong axis.
 
 ---
 

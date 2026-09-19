@@ -1540,6 +1540,81 @@ opinion formed first is one the numbers then have to argue with. If a candidate 
 measurement of these faces, and the two candidates may need different values — itself a finding,
 since §11.4 gives one number for the role.
 
+**`SITE-113` is closed and `SITE-23` is done. The recurrence set is PRD §6.3c.**
+
+**Five rules, and nothing outside them is selectable:** `daily` · `weekdays` · `weekends` ·
+`weekly_on_days` · `every_n_days` (n between 2 and 14). Added to §6.3's closed-vocabulary table
+as `recurrence_rule`. **Selection is deterministic from the parse; the model never sees the list.**
+
+- **The selection function is total: exactly one rule, or none.** No default, and **nothing falls
+  through to `daily`** — `daily` is the most expensive wrong guess available, since it multiplies
+  a plan the visitor never agreed to by seven. `null` is a real answer: a commitment with no
+  recurrence is the object §6.1a calls *"an intention with no occasion"*.
+- **Named days are never rounded to a shorthand.** *"Monday, Wednesday, Friday"* is
+  `weekly_on_days` with three days, not `weekdays` — rounding a three-day set to a five-day one
+  **adds two commitments the visitor did not make** while appearing to understand them, which is
+  §0.3c's failure applied to frequency instead of dates.
+- **An out-of-range interval returns nothing rather than a clamped rule.** Clamping *"every 90
+  days"* to 14 would schedule six times more often than asked.
+- **Weekdays are named, never numbered** (§6.3c). The app's `byweekday` convention is disputed
+  between its own layers and unresolved; an integer here would silently take a position on it,
+  invisibly in the type, wrong half the time, producing a plan off by one day with nothing to
+  show why. **A named representation cannot be wrong about a convention the site never adopted.**
+  A test scans the source so it is not "tidied" into an enum. If SITE-004's manifest later carries
+  a weekday vocabulary, **adapt at the boundary** and leave the internal form named.
+
+**`SITE-23` · the generator.** Walks the calendar a day at a time and asks each day whether the
+rule includes it — slower than stride arithmetic and **right on exactly the days stride
+arithmetic is wrong.** `getDay()` is touched in one function and converted to a name immediately.
+**41 table fixtures plus 24 named cases**, counts asserted before dates everywhere, because an
+expansion producing nothing agrees with an empty expectation.
+
+**`every_n_days` anchors on the commitment's creation date — recorded as my choice**, per the
+standing instruction. §6.3c does not specify an anchor. Anchoring on the window start instead
+would make the same rule produce different dates depending on when the plan is rendered, which is
+the determinism §6.5 requires reading as a bug.
+
+**Two fixtures of mine were wrong and the table caught both.** One expected five occurrences
+where the leap day lands on the cycle and the span's last day does not. **The other named a DST
+transition and did not contain one** — 30 Nov to 3 Dec, while the US fall-back is 1 November. A
+DST fixture with no DST in it is §0.3 in a single table row: it would have passed forever.
+
+**The finding that matters most, and it is about the environment rather than the code.**
+
+Planting the classic date bug — replacing calendar stepping with `+ 86_400_000` — gives:
+
+| zone | result |
+|---|---|
+| `UTC` | **0 failures. Suite green.** |
+| `America/New_York` | 8 failures |
+| `Europe/London` | 8 failures |
+| `Australia/Lord_Howe` | 8 failures |
+
+**CI containers default to UTC**, so a suite of DST fixtures run only there **cannot fail on the
+defect it was written for.** The fixtures were correct and thorough; the *environment* made them
+inert. That is §0.3's family with the container as the missing thing — the criterion was
+satisfiable by the absence of a timezone.
+
+**`scripts/check-timezones.mjs` is in the sweep, which is fourteen checks**, running the
+date-sensitive suites in four zones. `Australia/Lord_Howe` is there deliberately: its DST shift is
+**thirty minutes**, so any arithmetic assuming a whole-hour transition is wrong there and nowhere
+else, and *"round to the nearest hour"* is a plausible thing for someone to add. The zones and the
+measurement are named in the script's own header, so the next person asking *"why four zones?"*
+finds the answer rather than deleting three.
+
+**The `/plan` review route now renders generated occurrences rather than hand-written day
+numbers.** The first version listed days, which made it a drawing of a plan rather than a
+rendering of one — a composition reviewed against hand-picked dates cannot show that the dates
+are right.
+
+**§12.3a's 12%-of-frame condition is restated against width** (ruled 2026-09-19, Kian). It was
+measured against frame **height** while the clamp is driven by **width**, so one clamp could
+satisfy it at exactly one aspect ratio — 150px at 900 tall, 180px at 1080, against a 140px
+ceiling. **A type scale that changes with viewport height is wrong on its own terms: the same page
+in a shorter window would render a different headline size for no reason a reader can perceive.**
+Restated as **cap height at roughly 7% of viewport width at 1440px**, which `9.72vw` already
+satisfies. It never fought the 0.92 line box — that collision is scale-invariant.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

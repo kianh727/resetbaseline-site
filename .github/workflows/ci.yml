@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · build · bundle · overflow · builder
+    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -75,6 +75,9 @@ jobs:
 
       - name: Unit tests
         run: npm test
+
+      - name: Date-sensitive suites in real DST zones
+        run: npm run check:timezones
 
       - name: Build
         run: npm run build
