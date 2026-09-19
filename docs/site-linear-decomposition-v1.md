@@ -9,11 +9,13 @@
 > describe sixteen Linear *projects*. Those sixteen groupings are preserved as
 > **milestones** inside three projects. Read the addendum first.
 >
-> Everything else here — all 84 issue scopes, acceptance criteria, tests,
-> verification requirements, the dependency graph, and the critical path —
-> stands unchanged.
+> Everything else here — all 84 original issue scopes, acceptance criteria, tests
+> and verification requirements — stands unchanged. The four review gates in
+> addendum §3 add four edges; **PRE-1 Part B adds SITE-089…108** and two more
+> (SITE-106 → SITE-085, SITE-108 → SITE-061). The critical path has been re-walked
+> over all 108 and is unchanged at 29.
 
-Derived from `docs/site-prd-v5.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
+Derived from `docs/site-prd-v7.3.md`. The PRD is product truth; this is execution truth. Where they conflict, the PRD wins.
 
 **IDs are provisional decomposition IDs, not Linear IDs.**
 
@@ -34,7 +36,7 @@ Governing principle, encoded in every priority and dependency below:
 **Purpose** Scaffold, design system, contract wiring, and the primitives every later project consumes.
 **Dependencies** None.
 **Entry** Repo created, Cloudflare Pages project provisioned.
-**Exit** A deployed empty shell with tokens, type scale, both candidate typefaces renderable, `@baseline/contracts` imported and breaking the build on schema drift, and reduced-motion + tier primitives available as hooks.
+**Exit** A deployed empty shell with tokens, type scale, both candidate typefaces renderable, `contracts-manifest.json` committed with types generated from it and the §6.6 drift check breaking the build on divergence, and reduced-motion + tier primitives available as hooks.
 **PRD** §14, §15, §16, §20 P0/1
 **Non-goals** No builder logic. No 3D. No copy beyond the hero headline used to compare typefaces.
 
@@ -65,7 +67,7 @@ Governing principle, encoded in every priority and dependency below:
 
 **Purpose** The semantic plan model, the layout abstraction, `FlatLayout`, and the object rendering that makes structure legible.
 **Dependencies** SP-01
-**Exit** A hand-fed `Plan` renders as an ascending route with dated occurrence marks, a protection band, and a timer segment — coherent and compelling with zero 3D and zero LLM. Reviewable as a standalone demo.
+**Exit** A hand-fed `Plan` renders under **PRD v7.3 §6.3b's band grammar** — a recurrence as a horizontal band with its occupied days as marks inside it, protection as a second denser band below — coherent and compelling with zero 3D and zero LLM. Reviewable as a standalone demo. ~~*an ascending route with dated occurrence marks, a protection band, and a timer segment*~~ — **superseded 2026-09-19 by §6.3b**, which supersedes any description of a route, path, summit or ascent anywhere in this repository.
 **PRD** §6, §8.1, §8.2
 **Non-goals** No projection. No Peak. No generation. `FlatLayout` is the reference implementation, not a fallback.
 
@@ -141,6 +143,45 @@ Governing principle, encoded in every priority and dependency below:
 
 ---
 
+### SP-17 · Website Sections — **P0**
+
+**Project** Website P0 — Interactive Builder
+**Purpose** The sections that make this a website rather than a demo: §2 "Where Baseline
+is right now", §3 "What it won't do", §7 Pricing, §8 FAQ, §9 Who's building this,
+§10 Join, §11 Footer, plus `/pricing`, `/faq`, `/privacy`, `/terms`, metadata and the OG
+card.
+**Priority** P0
+**Dependencies** SP-01 (tokens, type scale, base layout). SP-08 for §10 Join, which
+renders the capture form SP-08 implements — the section is SP-17's, the capture is
+SP-08's. Otherwise parallelizable with the builder milestones; these sections share no
+code with the builder.
+**Entry criteria** Tokens, type scale and base layout merged. Capture check reported
+(complete). **R-2 reported** — FAQ answers 3 and 12 depend on the app PRD's permission
+list and export/delete specification, and no FAQ copy is written before it lands.
+**Exit criteria** Every P0 section renders at 1440px and 375px. Every claim describing
+app behavior carries a dated DS-18 verdict naming its verifying issue. Every §2 Block 2
+entry names a real owning issue and states no date (DS-18a). §2 carries a visible date
+and its blocks reflect current build state (DS-18b). All four routes render and are
+linked from the footer. No Apple-supplied UI appears as Baseline's.
+**PRD** v7.3 §3, §4, §7, §8, §9, §10, §12 DS-18 / DS-18a / DS-18b
+**Non-goals**
+- **§4 "What Baseline knows" is held content, not scheduled work.** It is gated on
+  belief accumulation working on a real account (v7.3 §15.1) and until then appears only
+  as a §2 Block 2 roadmap entry. It is not in SP-17's scope and it is not in any
+  milestone's scope while held — when its gate clears it lands in SP-14. Do not schedule
+  it.
+- §5 Day 1 → Day 30 and §6 Method are P1 and belong to SP-14.
+- **"What's underneath" does not exist.** It was cut in v7.3; its surviving rows moved
+  into §2 Block 1, §2 Block 2, and §3. Any issue or reference to it is stale.
+- ~~No copy is written before R-2 reports.~~ **R-2 has reported in full** (see this block's Entry criteria above) — the gate has cleared and nothing is held on it. Held and roadmap content lives in
+  `docs/site-copy/roadmap-source.md`.
+
+**Milestone ordering note:** SP-17 is numbered after SP-16 because milestone numbering is
+append-only, but it is a **P0 milestone in the Website P0 — Interactive Builder project**
+and runs alongside SP-02…SP-10, not after SP-16.
+
+---
+
 ### SP-12 · Peak Geometry + Lighting — **P1**
 
 **Purpose** The mesh, the light rig, cursor authority, and the material that makes it read machined rather than photographed.
@@ -175,7 +216,7 @@ Governing principle, encoded in every priority and dependency below:
 
 **Purpose** Tier detection, lazy scene loading, and budget enforcement.
 **Dependencies** SP-12
-**Exit** Core bundle ≤120KB gzip; scene lazy and uncounted; all four tiers force-testable by flag; Lighthouse mobile ≥90 with the Peak live.
+**Exit** Core bundle ≤120 kB gzip (decimal, ruled 2026-09-19); scene lazy and uncounted; all four tiers force-testable by flag; Lighthouse mobile ≥90 with the Peak live.
 **PRD** §15, §16
 **Non-goals** Live mid-session demotion is P2.
 
@@ -224,14 +265,22 @@ Project SP-01 · P0 · Deps SITE-002
 *PRD* §14, §23 item 3
 *Non-goals* No body copy typesetting yet.
 
-**SITE-004 · Contracts package wiring and drift guard**
+**SITE-004 · Contracts manifest, generated types, and drift guard**
 Project SP-01 · P0 · Deps SITE-001
-*Scope* Import `@baseline/contracts`. Re-export `AgentEvent`, action verbs, object types, enums, authority tiers. Add a CI check that fails the build on contract drift.
-*Accept* Deliberately altering a contract type fails CI.
-*Tests* CI: typecheck against contracts. One negative test proving the guard fires.
+*Scope* Commit `contracts-manifest.json` to the site repo — the app's `CONTRACT_MANIFEST` verbatim, plus `captured_at` and the app repo commit SHA. Generate the site's plan-model types from it at build time. Add a CI drift check per PRD v7.3 §6.6: the primary mechanism fetches the manifest the app repo publishes to a stable path on `main` and fails the site build on any diff; the fallback uses staleness thresholds against `captured_at` — warn at 30 days, fail at 60.
+*Accept* **Rewritten 2026-09-19 (Kian), before the manifest landed, so the vacuous shape is deleted rather than guarded.** The old criterion — *"every `capability_type` in the manifest has a layout rule"* — would have iterated an empty set and passed, because the delivered manifest carries no `capability_type` at all. Three parts, all required:
+
+1. **The manifest declares a non-empty `capability_type` list.** An absent or empty list **fails the build with a message naming the manifest**, not the layout rules — the fault is in the input, and an error pointing at the rules would send the reader to the wrong file.
+2. **Every declared `capability_type` has a layout rule, and the counts match in both directions.** A rule with no type is as much a failure as a type with no rule; one-way coverage passes a rule set that has quietly drifted past the contract.
+3. **Positive control: a fixture manifest carrying a sixth unknown type must fail the build, and this runs in CI, not once by hand.** Without it, parts 1 and 2 are untested assertions about an input that has never varied.
+
+Types still generate from the manifest, and a deliberately altered manifest still fails CI.
+*Tests* CI: type generation; one negative test proving the drift guard fires. Unit: layout-rule coverage across all `capability_type` values.
 *Verify* —
-*PRD* §12, §18.2
-*Non-goals* No provider implementation.
+*PRD* v7.3 §6.2, §6.6, §12.3
+*Non-goals* No `@baseline/contracts` package import. No cross-repo build of the app — explicitly rejected in §6.6. **Nothing generated may read `artifact_divergences`**, which records stale counts (33 and 72) against current counts (45 and 76) in the same object — **enforced by `scripts/check-divergences.mjs` in CI rather than left as prose.**
+
+**Ruled 2026-09-19 (Kian): the app adds the object vocabulary to `CONTRACT_MANIFEST`. Not verb-derivation.** Two reasons, both fatal to the alternative. Verb-derivation yields `capability_type` and nothing else, while **`authority_tier` has no verb to derive from** and §6.1a renders it in every object's metadata at P0 — so the derivation option leaves a P0 render with no contract source, and the size of the app change cannot choose between them. And the CI assertion proposed to guard it **could not fail**: *"the derivation still matches the verb list"* derives from the verb list and compares the result to the verb list.
 
 **SITE-005 · Base layout, nav, safe areas, overflow guards**
 Project SP-01 · P0 · Deps SITE-002, SITE-003
@@ -250,6 +299,28 @@ Project SP-01 · P0 · Deps SITE-001
 *Verify* —
 *PRD* §8.3, §15
 *Non-goals* No consumers yet. No 3D.
+
+**SITE-106 · Eval-stub audit — no criterion satisfiable by absence**
+Project SP-01 · P0 · Deps SITE-001
+*Scope* The §12.4 standing rule made operational: every automated eval is run against a **stub that does nothing** before it is accepted. One passing against the stub is measuring the container and is rewritten. Audit the three known exposures first — **SITE-EVAL-021** (*"all validate"* passes on zero requests), **SITE-EVAL-027** (passes if the assertion is presence-of-render), **SITE-EVAL-037** (passes if no events are expected).
+*Accept* Every eval in the suite has a recorded stub result. **No eval is accepted without one.** The three named exposures are rewritten or recorded as verified non-exposures with evidence.
+*Tests* CI: the stub run is a job, not a manual step, and a new eval without a stub result fails it.
+*Verify* —
+*PRD* v7.3 §12.4, §0.3
+*Non-goals* **This audit runs before the eval suite is trusted for anything, including SITE-085.** It does not rewrite the three exposures itself where the rewrite belongs to their owning issue — it establishes the verdict and opens the work.
+
+**Ruled 2026-09-19 (Kian): this is a standing gate, not a one-time audit.** Re-run at each design review and before the P0 gate, the same trigger as `CLAUDE.md` §1's fourth-rule reconciliation.
+
+**The gate reads the document, not the code.** It establishes that every eval has answered how it fails against a stub. **It does not establish that any eval was actually run against a stub.** Nobody may read the green gate as proof that stubs were run — that half is open, is not papered over, and is only discharged eval by eval as each one is implemented.
+
+**SITE-107 · Ban-list CI check — terms, app names, staleness**
+Project SP-01 · P0 · Deps SITE-001
+*Scope* PRE-2 automated from P0 onward. One job, three checks, each failing the build: **(a)** any §10 banned term in authored copy; **(b)** any match of the committed app-name list against any authored copy string, **site-wide, not gate-scoped** — Screen Time returns opaque tokens and no depicted Baseline UI may name an app (§6.3a MUST); **(c)** staleness of the app-name list against its `captured_at`, warning at 90 days and failing at 180, with a failure message that says what to do.
+*Accept* A match is a failure, never a warning. The app-name list **ships non-empty**, seeded with the social and video apps a writer reaches for — an empty list fails nothing, and a check that passes on absence is §0.3 turned on itself. Legitimate platform names (App Store, iOS, Apple) are explicit exceptions **in the list**, never suppressions at the call site.
+*Tests* CI: a negative test per check proving each fails on a planted violation, including one proving the seeded list catches a planted app name.
+*Verify* —
+*PRD* v7.3 §14 PRE-2, §10, §6.3a
+*Non-goals* The list is **hand-maintained in this repo and not a fetched source** — no authoritative list of app names exists to fetch, and inventing one is a mechanism nobody asked for. The staleness treatment buys visibility, not freshness. Adding a name is a copy decision, not a lint tweak. Does not replace the manual pre-launch review, which catches a section that *implies* a capability without naming it.
 
 ---
 
@@ -376,6 +447,24 @@ Project SP-03 · P0 · Deps SITE-013, SITE-015
 *PRD* §3.3
 *Non-goals* No generation trigger on keystroke.
 
+**SITE-102 · Input classification — seven classes**
+Project SP-03 · P0 · Deps SITE-001
+*Scope* Deterministic pre-generation classifier over the closed set `empty · unreadable · out_of_scope · vague · multi_goal · bounded · actionable`. Runs before `/api/plan` so unusable input never reaches generation. Authored response copy per class.
+*Accept* Classification is deterministic and identical client and server. **No class is assigned by the model.** Garbage input never produces a network request.
+*Tests* Unit: fixture suite across all seven classes, client/server parity, and a negative test asserting zero fetches for `empty` and `unreadable`.
+*Verify* —
+*PRD* v7.3 §6.4, §4
+*Non-goals* Not the domain classifier — SITE-014 is orthogonal and both run. No LLM involvement in classification. **Amended 2026-09-19 by PRD v7.3 §6.4:** this issue's response copy is authored, per class, as stated — but the `vague` class's *clarification question* is no longer part of it. That field is generated on `/api/plan` and belongs to SITE-030 and SITE-103. The classifier itself still generates no copy and still calls no model; what changed is which artefact the vague-path question comes from, not how the class is decided.
+
+**SITE-103 · The clarification beat**
+Project SP-03 · P0 · Deps SITE-102, SITE-015
+*Scope* **Amended 2026-09-19 by PRD v7.3 §6.4: the question and its three options are generated, not authored.** They arrive as a third field on the existing `/api/plan` call — no second round trip. `vague` input gets **one** question, three tap answers plus free text, then builds. An authored question is a keyword-selected question, which demonstrates a form rather than *it asks once*; this beat is the site's only demonstration of the latter, so the question has to be about the goal actually typed.
+*Accept* **Never more than one clarification per session**, enforced in the state machine rather than the UI. Never blocks past 8s — on timeout the build proceeds on the original input. **The generated field satisfies all five §6.4 constraints** — under 90 chars; exactly three options, each under 24; every option tappable without typing; no preamble; ends in a question mark. **On any validation failure, timeout, or spend cap it falls back silently to the authored question set**, with no user-visible error and no dead state. Free text is available on either path.
+*Tests* Automated: a second `vague` submission in one session raises no second question; the 8s bound asserted with the answer withheld; the five constraints asserted per §6.4; a negative test proving each failure mode lands on the authored set silently (SITE-EVAL-079).
+*Verify* **Clip at 1440px and 375px.** Must read as one question asked well, not as a form.
+*PRD* v7.3 §6.4
+*Non-goals* No multi-turn dialogue. No free-text-only fallback. **Amended 2026-09-19 by PRD v7.3 §6.4** — the question and its three answers were authored constants and are now generated; the authored set survives only as the silent fallback. This remains a non-goal in the sense that matters: **no multi-turn dialogue, and no second model call.** The question is one field on the one request already being made.
+
 ---
 
 ## SP-04 · Execution Plan Renderer
@@ -400,10 +489,10 @@ Project SP-04 · P0 · Deps SITE-020
 
 **SITE-022 · FlatLayout adapter**
 Project SP-04 · P0 · Deps SITE-021
-*Scope* Deterministic 2D composition — ascending route with dated marks, protection band, timer segment.
+*Scope* Deterministic 2D composition under **PRD v7.3 §6.3b's closed visual vocabulary**: a horizontal band per recurring window, lit marks for scheduled days and dark marks for unscheduled ones inside it, and a second denser band below for protection. Charcoal and translucent, geometrically level, bleeding off both frame edges; lavender only as a thin lit line on the upper boundary and on active marks, **never as fill**; dark marks **never crossed out, never rust, never styled as disabled**. **Nothing else ever gets a band.** ~~*ascending route with dated marks, protection band, timer segment*~~ — **superseded 2026-09-19 by §6.3b.**
 *Accept* **Renders a coherent, compelling plan with zero 3D and zero LLM.** Reviewable as a standalone product demo.
 *Tests* Unit: anchor determinism for a fixed plan.
-*Verify* **Screenshot at 1440px and 375px.** Design review gate: is this compelling on its own? If not, the whole P0 is at risk.
+*Verify* **Screenshot at 1440px and 375px.** The design review gate is SITE-085, whose criterion was **amended 2026-09-19 by PRD v7.3 §12.4a**: not *"is this compelling on its own?"* — every answer to that is defensible — but **"does any part of this look like it came out of a generator?"**, against **sixteen** yes/no questions — the ten generator tells plus **§6.3b's six band-grammar questions, added 2026-09-19** — where any single yes rejects the work. **The review set MUST include at least one frame where most marks are dark, and the output MUST state which frame carried it.** If it fails, the whole P0 is at risk.
 *PRD* §6, §2 DS-6
 *Non-goals* Not a degraded mode. This is the reference implementation.
 
@@ -427,7 +516,7 @@ Project SP-04 · P0 · Deps SITE-006
 
 **SITE-025 · Route and occurrence mark rendering**
 Project SP-04 · P0 · Deps SITE-022, SITE-023, SITE-024
-*Scope* Route stroke-reveal 450ms; occurrence marks land with 45ms stagger, settling spring, ~600ms total. **Interruptible.** Each mark labeled with its real date at 11px.
+*Scope* **The band does not animate in — it is present from first paint of the plan** (§6.3b, ruled 2026-09-19). Occurrence marks land inside it over ~600ms with 45ms stagger and the settling spring. **Interruptible.** Each mark labeled with its real date at 11px. ~~*Route stroke-reveal 450ms*~~ — **superseded.** A route stroke drawing itself was a thing coming into existence over time, which made it a completeness meter in motion as well as in composition; **a recurring window is not a thing that happens, it is a thing that is the case.** The beat survives intact — it moved from the frame to the marks inside it.
 *Accept* **Tune controls are interactive before the fan-out completes.** Interrupting mid-animation leaves no orphaned state.
 *Tests* Automated: control enablement fires on data availability, not animation completion.
 *Verify* **Screenshot and clip at both widths.** Motion timing review — does the fan-out read as ten real dated objects existing?
@@ -436,12 +525,21 @@ Project SP-04 · P0 · Deps SITE-022, SITE-023, SITE-024
 
 **SITE-026 · Timer, gate, and tracker object rendering**
 Project SP-04 · P0 · Deps SITE-025
-*Scope* Timer as a thickened route segment with real duration; gate as a protection band with hard edges; tracker as an off-route node. Each carries type and authority tier as 11px metadata.
+*Scope* **Buildable now: the gate half.** Gate as §6.3b's second, denser band below, with hard edges, rendering `3 apps · 6:00–7:30am` and never an app name (§6.3a MUST). Each object carries type and authority tier as 11px metadata. ~~*Timer as a thickened route segment with real duration; tracker as an off-route node*~~ — **superseded 2026-09-19 by §6.3b.** **Ruled 2026-09-19 (Kian): a timer and a tracker get no band, and that is the grammar working rather than a gap** — a band means a recurring time window, a timer is a duration with no recurrence and a tracker is a direction with no occasion (§6.1a's own Problem lines), so neither has a window and *"nothing else ever gets a band"* applies to both by name. **Do not invent a band variant for either.** The timer and tracker half waits on **a visual treatment that is not a band**, which is Kian's to rule and is **not blocking** — build the gate half now and leave the rest.
 *Accept* Authority tiers are contract-derived, not passed in. Gate always renders `explicit`.
 *Tests* Unit: tier derivation is a pure function of object type.
 *Verify* **Screenshot at both widths.**
-*PRD* §4, §5.2 (v4 lineage), §14
+*PRD* §4, §5.2 (v4 lineage), §6.3b, §14
 *Non-goals* No activation behavior.
+
+**SITE-104 · Problem-line object metadata**
+Project SP-04 · P0 · Deps SITE-026
+*Scope* Every plan object carries its type, its authority tier, and the app PRD's own **Problem line** as 11px metadata beneath it. Verbatim, one per primitive: commitment *an intention with no occasion* · reminder *the cue arrives too late, or not at all* · timer *starting is expensive; sessions run unbounded* · gate *cue-driven distraction survives intention* · tracker *a direction with no feedback*.
+*Accept* All five lines are authored constants traced to the app PRD §22–26. A `capability_type` without a Problem line fails the build, as it already does without a layout rule.
+*Tests* Unit: every `capability_type` in `contracts-manifest.json` resolves a Problem line; a negative test proves the build fails when one is missing.
+*Verify* **Screenshot at both widths.** The line must read as metadata, not as a caption.
+*PRD* v7.3 §6.1a, §6.2
+*Non-goals* **No section anywhere lists the five primitives** — that would imply five working primitives and is what got "What's underneath" cut. No paraphrase; the lines are quoted or absent. Not a tooltip, not on hover.
 
 ---
 
@@ -458,7 +556,7 @@ Project SP-05 · P0 · Deps SITE-004, SITE-020
 
 **SITE-028 · Five authored scenarios**
 Project SP-05 · P0 · Deps SITE-027
-*Scope* `thesis`, `gym`, `lsat`, `mornings`, `back` per §5, authored against frozen contracts. Every verb in the closed vocabulary; every enum real; occurrence counts from the real generator.
+*Scope* `thesis`, `gym`, `lsat`, `mornings`, `back` per §5, authored against frozen contracts. Every verb drawn from the 45 action types in `contracts-manifest.json`; every enum value real; occurrence counts from the real generator. Scenarios use only the five `capability_type` values — `commitment · reminder · timer · gate · tracker` — and only the five resolvable outcomes (`complete · partial · missed · cancelled_intentionally · unknown`).
 *Accept* All five validate against contract schema. Each demonstrates its stated distinct behavior.
 *Tests* Automated: schema validation of all five; assertion that each contains its signature behavior (veto, refusal, timer, gate-first, long-horizon).
 *Verify* **Play all five end to end and review.** These are demo scripts, not filler.
@@ -476,12 +574,12 @@ Project SP-05 · P0 · Deps SITE-028
 
 **SITE-030 · `/api/plan` route and prompt**
 Project SP-05 · P0 · Deps SITE-028
-*Scope* Edge route calling Claude. Constrained system prompt, few-shot on the five scenarios, closed action vocabulary, JSON only, `max_tokens: 1000`, 300-char input cap.
-*Accept* **Total generated surface is one commitment title (≤48 chars) and one window selection from a closed set.** Nothing else.
-*Tests* Automated: prompt-output contract test over 30 varied inputs; assertion that no other field originates from the model.
+*Scope* Edge route calling Claude. Constrained system prompt, few-shot on the five scenarios, action vocabulary restricted to the 45 types in `contracts-manifest.json`, JSON only, `max_tokens: 1000`, 300-char input cap.
+*Accept* **Amended 2026-09-19 by PRD v7.3 §6.5. The generated surface is three fields, not two:** one commitment title (≤48 chars), one window selection from a closed set, and — **for `vague` input only** — one clarification question with its three options, under §6.4's five constraints. Nothing else. **Each of the three validates and falls back independently**: a failed title does not discard a valid window, and a failed question does not discard a valid title.
+*Tests* Automated: prompt-output contract test over 30 varied inputs; assertion that no fourth field originates from the model; independent-fallback test asserting that one invalid field does not discard the other two.
 *Verify* —
-*PRD* §4, §12
-*Non-goals* The model never returns dates, counts, tiers, refusals, or copy.
+*PRD* v7.3 §6.4, §6.5, §4, §12
+*Non-goals* The model never returns dates, counts, tiers, refusals, or any copy other than the title and — for `vague` input — the clarification question. The clarification question is not a fourth beat: classification still decides **whether** it runs, and the model only writes the sentence once that decision is made.
 
 **SITE-031 · Schema validation layer**
 Project SP-05 · P0 · Deps SITE-030
@@ -570,16 +668,16 @@ Project SP-07 · P0 · Deps SITE-037
 *Tests* Unit: selection state.
 *Verify* **Screenshot at both widths.**
 *PRD* §3.7, §9
-*Non-goals* No permissions API calls of any kind.
+*Non-goals* No permissions API calls of any kind. The chips are the **site's own input affordance** and legitimately carry recognisable names (v7.3 §6.3a); what they must not do is survive into the assembled object.
 
 **SITE-040 · Gate assembly**
 Project SP-07 · P0 · Deps SITE-039, SITE-026
-*Scope* Selections assemble a real `Gate` object at `explicit` tier, rendering as the protection band with app names and window.
-*Accept* Tier is contract-derived and always `explicit`.
+*Scope* Selections assemble a real `Gate` object at `explicit` tier, rendering as the protection band with **a count and the window — `3 apps · 6:00–7:30am`**, never app names. Screen Time returns opaque tokens; the app knows a count and nothing else (PRD v7.3 §6.3a, §10 MUST).
+*Accept* Tier is contract-derived and always `explicit`. **No app name appears in the rendered gate object**, at any width, in any state.
 *Tests* Unit: tier derivation.
 *Verify* **Screenshot at both widths.**
-*PRD* §3.7, §4
-*Non-goals* No activation.
+*PRD* §3.7, §4, v7.3 §6.3a
+*Non-goals* No activation. **Never name an app in the object.** v5–v7.2 specified `Instagram, TikTok blocked · 6:00–7:30am` — a UI state the app is structurally incapable of producing. That specification is void.
 
 **SITE-041 · Activate affordance**
 Project SP-07 · P0 · Deps SITE-040
@@ -611,6 +709,15 @@ Project SP-08 · P0 · Deps SITE-042
 *Verify* **Screenshot at 1440px.** Must read as a boundary, not an event.
 *PRD* §11.2, §11.3, §8.2
 *Non-goals* No mobile behavior.
+
+**SITE-105 · Wall handoff line**
+Project SP-08 · P0 · Deps SITE-043, SITE-046
+*Scope* One authored line, shown **after submit**, closing the divergence R-2 found between the builder's four beats and onboarding's three: *"Your plan is saved. When you get in, you'll set the blocking up yourself — Baseline won't do it for you on day one."*
+*Accept* Present on both the desktop wall and the mobile sheet, after submit only — never before, and never in place of the boundary copy. The builder keeps its fourth beat; app PRD §25 constrains agent *proposal* of a gate, not user creation, and the fourth beat is the user naming apps.
+*Tests* Automated: the line is absent pre-submit and present post-submit in both wall variants.
+*Verify* **Screenshot at 1440px and 375px, post-submit.** It must read as an instruction, not an apology.
+*PRD* v7.3 §6.1b, §11
+*Non-goals* Does not name an app (§6.3a). **Conditional on the §15.2 read** — if a new account cannot create a gate at all on day one, the fourth beat is cut, protection leaves the builder, and the wall moves to a timer or reminder. Do not build against the alternative until that read reports.
 
 **SITE-044 · Wall — mobile bottom sheet**
 Project SP-08 · P0 · Deps SITE-043
@@ -777,10 +884,19 @@ Project SP-11 · P0 · Deps SITE-059, SITE-052
 *PRD* §2, §18.1
 *Non-goals* No code changes — this issue produces evidence. Failures open new issues.
 
+**SITE-108 · DS-18 verdict register**
+Project SP-11 · P0 · Deps SITE-090, SITE-093, SITE-095
+*Scope* The dated record DS-18 requires. Every §2 Block 1 line, every §3 line, and every FAQ answer describing app behavior carries a verdict: the claim, the capability it traces to, the date verified, the verifying issue, and the verdict. **A PRD line is not evidence.** Also carries DS-18a (every Block 2 entry names a real owning issue and states no date) and DS-18b (§2's visible date, and the rule that a change to what is true moves the line between blocks in the same commit).
+*Accept* No claim ships without a verdict row. **A claim whose verdict is false is rewritten, not held** — FAQ 12 is the worked example: export and delete are unbuilt, not unproven, so the answer became a roadmap one and "Export and delete" became a Block 2 entry owned by `BAS-125`. An entry with no owning issue is a wish and does not ship — **and `BAS-125` is unverified**: in Linear it resolves to a picker/app-group token-storage issue, not export and delete. **That entry does not ship until the identifier is confirmed app-side**, because DS-18a requires a real owning issue and a wrong one fails it.
+*Tests* CI: a Block 1 or §3 line, or an FAQ answer flagged as describing app behavior, with no verdict row fails the build. A Block 2 entry with no owning issue, or carrying a date, fails.
+*Verify* **The register reviewed in full before the user study.** Q4 depends on §2 being true.
+*PRD* v7.3 §12.1 DS-18 / DS-18a / DS-18b, §0.1
+*Non-goals* Does not verify the capabilities itself — it records verdicts produced elsewhere. Does not cover §4 or §5, which are P1 and gated (§15.1).
+
 **SITE-061 · First-time user study**
-Project SP-11 · P0 · Deps SITE-060
-*Scope* Execute §2.1 with six users (two mobile, four desktop), score against the §18.3 rubric.
-*Accept* **5/6 reach the wall unprompted · 4/6 tune without being told · 5/6 give a passing comprehension answer.**
+Project SP-11 · P0 · Deps SITE-060, SITE-108, **SITE-109** (copy pass — added 2026-09-19 per §15.4; a study run on example text measures the structure and nothing else)
+*Scope* Execute §2.1 with six users (two mobile, four desktop), score against the §18.3 rubric. **Q4 — *"Is this finished?"* — is asked and scored** (v7.3 §12.2); Q3 stays held with §4.
+*Accept* **5/6 reach the wall unprompted · 4/6 tune without being told · 5/6 on each live comprehension question.** A participant who thinks the product is complete is a Q4 failure and means §2 failed.
 *Tests* n/a
 *Verify* Recordings, timings, and scored transcripts archived.
 *PRD* §2.1, §18.3
@@ -841,7 +957,7 @@ Project SP-12 · P1 · Deps SITE-065
 
 **SITE-067 · Named anchor set**
 Project SP-13 · P1 · Deps SITE-062
-*Scope* Author named vertices: `summit`, `route[0..n]`, `band_l/r`, `timer_start/end`.
+*Scope* Author named vertices. ~~*`summit`, `route[0..n]`, `band_l/r`, `timer_start/end`*~~ — **superseded 2026-09-19 by PRD v7.3 §6.3b**, which supersedes any description of a route, path, summit or ascent. **The vertex set is undefined under the grammar and is Kian's to rule**; a P1 issue, so it blocks nothing at P0.
 *Accept* Anchors are stable across mesh edits or the build fails.
 *Tests* Automated: anchor presence assertion.
 *Verify* —
@@ -888,14 +1004,14 @@ Project SP-14 · P1 · Deps SITE-070
 *PRD* §7.5, §8.3
 *Non-goals* Seven-station choreography is P2.
 
-**SITE-072 · Sections 2, 4, 5, 6**
+**SITE-072 · §6 Method — four principles, collapsed**
 Project SP-14 · P1 · Deps SITE-071
-*Scope* "What you didn't see", "What it won't do", "Method" with progressive disclosure, "Join". Copy per §13, audited against §19 bans.
-*Accept* **Zero banned words. Zero ALL-CAPS eyebrows. No identical rounded cards in a row.**
+*Scope* **Re-scoped against PRD v7.3; the entry below was stale until 2026-09-19.** This issue was authored against the pre-v7.3 section map and covered four sections. Three moved: §2 "Where Baseline is right now" and §3 "What it won't do" are P0 in SP-17 (SITE-089…093), and §10 Join is P0 in SP-17 (SITE-097). "What you didn't see" / "What's underneath" was **cut entirely** in v7.3 §4.1 — its surviving rows went into §2 Block 1, §2 Block 2 and §3. §5 Day 1 → Day 30 has its own issue, SITE-073. **What remains is §6 Method**, which v7.3 §2 keeps at P1: four principles, collapsed by default, expanding on interaction. Copy per §13, audited against §19 bans.
+*Accept* **Zero banned words. Zero tracked-out ALL-CAPS eyebrows. No identical rounded cards in a row.** The collapsed state is the default and is readable on its own; expansion adds detail rather than supplying the meaning.
 *Tests* Automated: copy audit against the §19 word list.
-*Verify* **Screenshot each at both widths.**
-*PRD* §13, §19
-*Non-goals* No ADHD-specific positioning. Wide funnel preserved.
+*Verify* **Screenshot collapsed and expanded, at 1440px and 375px.**
+*PRD* v7.3 §2 (§6 row), §13, §19
+*Non-goals* No ADHD-specific positioning; the wide funnel is preserved. **No fade-and-slide-up on the section.** Not §2, §3 or §10 — those are P0 and owned elsewhere. **Does not describe capabilities** — §6 is method, and any claim about what the app does belongs to §2 and carries a DS-18 verdict. **K-5 applies with force**: if the four principles can't be understood without explanatory copy, redesign the disclosure rather than adding the copy.
 
 **SITE-073 · Day 1 → Day 30**
 Project SP-14 · P1 · Deps SITE-072
@@ -906,14 +1022,14 @@ Project SP-14 · P1 · Deps SITE-072
 *PRD* §13, §8.3
 *Non-goals* —
 
-**SITE-074 · Metadata, OG card, legal pages**
-Project SP-14 · P1 · Deps SITE-072
-*Scope* Rewritten title/description matching current positioning, generated 1200×630 OG card, favicon set, `theme-color`, `/privacy`, `/terms`.
-*Accept* **`og:image` no longer points at a `lovable.app` URL.** No copy references pre-pivot environment/blocker positioning.
-*Tests* Automated: metadata assertions; URL-domain check.
-*Verify* Preview cards in a social debugger.
-*PRD* §13, §18.2
-*Non-goals* No blog, no `/pricing`.
+**SITE-074 · Favicon set and `theme-color`**
+Project SP-17 · **P0** · Deps SITE-005
+*Scope* **Re-scoped and re-prioritised; the entry below was stale until 2026-09-19.** Ruled P0, and **the SITE-088 gate is dropped** — a favicon is visible on first load, which is before any P1 work exists, and the Peak integration review gated this issue when it was metadata-and-legal, a scope that no longer lives here. Moved from SP-14 (P1) to SP-17 (P0) and re-pointed at SITE-005. Metadata and the OG card went to **SITE-100**; `/privacy` and `/terms` to **SITE-099**. What remains: the favicon set across the sizes a modern browser and an iOS home-screen install actually request, plus `theme-color`.
+*Accept* Icons resolve at every declared size with no 404. `theme-color` matches the site's near-black background so browser chrome does not flash a mismatched colour on load.
+*Tests* Automated: every declared icon path resolves; `theme-color` matches the token.
+*Verify* Installed to an iOS home screen and checked in a mobile browser with chrome visible.
+*PRD* v7.3 §13, §18.2
+*Non-goals* **Not metadata, not the OG card, not the legal routes** — SITE-100 and SITE-099 own those. No app-store assets, no blog, no marketing imagery. Its old non-goal *"no `/pricing`"* is **void**: `/pricing` exists and is P0 (v7.3 §7, SITE-094). Icons are static assets, not JavaScript, so this costs nothing against the 120 kB ceiling (§11).
 
 ---
 
@@ -931,7 +1047,7 @@ Project SP-15 · P1 · Deps SITE-066, SITE-006
 **SITE-076 · Scene lazy load and budget enforcement**
 Project SP-15 · P1 · Deps SITE-075
 *Scope* Scene bundle loads on `requestIdleCallback` after LCP, split from core.
-*Accept* **Core ≤120KB gzip, scene ≤140KB gzip and excluded from first load. Enforced in CI.**
+*Accept* **Core ≤120 kB gzip, scene ≤140 kB gzip and excluded from first load. Enforced in CI.** kB is decimal — 120,000 bytes (ruled 2026-09-19); the earlier binary reading was an accident of the tool.
 *Tests* Automated: bundle-size CI gate on both budgets separately.
 *Verify* Lighthouse trace confirming the headline is LCP with the Peak live.
 *PRD* §16
@@ -953,7 +1069,7 @@ Project SP-15 · P1 · Deps SITE-076
 *Tests* Automated: full budget suite.
 *Verify* Reported number recorded per release.
 *PRD* §16, §18.2
-*Non-goals* —
+*Non-goals* The core bundle ceiling. Ruled pulled forward (PRD §11) and already in the CI sweep at 120 kB — decimal, 120,000 bytes — from the first product commit; this issue adds the remaining budgets around it, and must not re-implement or relax it.
 
 ---
 
@@ -970,6 +1086,138 @@ Project SP-15 · P1 · Deps SITE-076
 **SITE-083 · Live tier demotion** — P2 · Deps SITE-075 · One demotion on two frame-budget breaches within 10s; never promote back. *Tests* automated breach simulation. *PRD* §15.
 
 **SITE-084 · Emailed plan delivery** — P2 · Deps SITE-048, SITE-046 · Plain-text email containing the plan. *PRD* §21.
+
+---
+
+## SP-17 · Website Sections — **P0**
+
+The sections that make this a website rather than a demo. Parallelizable with the builder milestones after SP-01; they share no code with the builder. **No copy here is final prose** — §15.4 is Kian's pass; these issues build the structure and carry the example text.
+
+**SITE-089 · §2 section shell, dated line, three-block frame**
+Project SP-17 · P0 · Deps SITE-005
+*Scope* "Where Baseline is right now" as three hairline-ruled blocks with technical-drawing metadata, and a **visible date** at the top of the section at 11px.
+*Accept* The date renders and is a build-time constant, not a runtime `now()` — a section that dates itself is always fresh and therefore never honest. Reads as a status report, not a disclaimer.
+*Tests* Automated: the date is present and sourced from a committed constant.
+*Verify* **Screenshot at 1440px and 375px.**
+*PRD* v7.3 §3.2, §3.3, §12.1 DS-18b
+*Non-goals* **No screenshots, no device frames, anywhere in §2** — the default shield is Apple's design and presenting it as Baseline's is the exact error this section exists to prevent. No apology tone. Does not describe the builder again.
+
+**SITE-090 · §2 Block 1 — What works today**
+Project SP-17 · P0 · Deps SITE-089
+*Scope* Four claims, every one true today: no morning briefing or daily check-in · a sentence becomes a commitment and the schedule underneath it · at the time you set, the apps you named go quiet, through Screen Time · no streaks, scores, or completeness meters.
+*Accept* **Every line carries a DS-18 verdict** (SITE-108). Lines 1 and 4 are true **by absence** and cannot regress — recorded as such. Line 3 is the one V1 capability the capture report confirmed working end to end.
+*Tests* CI: a Block 1 line with no verdict row fails the build.
+*Verify* **Screenshot at both widths**, and the verdicts reviewed alongside.
+*PRD* v7.3 §3.2, §12.1 DS-18
+*Non-goals* **Names no app** (§6.3a) — *"the apps you named"* is correct because the user named them and Baseline didn't read them. States nothing about occurrences the app does not generate (§6.1). No fifth line until the contention veto passes its verdict (§15.1).
+
+**SITE-091 · §2 Block 2 — What we're building next**
+Project SP-17 · P0 · Deps SITE-089
+*Scope* Five roadmap entries, each a capability name and **one clause**: the interception screen · occurrence generation · conversational resolution · proposals · what Baseline knows. Plus "export and delete", owned by `BAS-125` (v7.3 §8 FAQ 12) — **identifier unverified, so this entry is held and does not ship until Kian confirms it app-side.** Carry the reference as inert text with the note; do not resolve it by picking a different number.
+*Accept* **Every entry names a real owning issue and states no date** — no quarter, no "soon" (DS-18a). An entry with no issue is a wish and does not ship. Entries are capability names, not features or benefits.
+*Tests* CI: an entry with no owning issue, or matching a date or `soon`, fails the build.
+*Verify* **Screenshot at both widths.**
+*PRD* v7.3 §3.2, §10, §12.1 DS-18a
+*Non-goals* **Nothing post-V1 appears here** — V1.1, V2 and Later are banned outright, HealthKit and Calendar included. Block 2 shrinks as things land; an entry leaves by passing DS-18 and moving to Block 1, never because someone decides it's close.
+
+**SITE-092 · §2 Block 3 — What you'd be joining**
+Project SP-17 · P0 · Deps SITE-089
+*Scope* The block that answers the actual decision — *do I want in on this early*. Free, small, honest about its edges, a say in what lands next.
+*Accept* Matches the CTA. Nothing else on the page tells someone what joining early means.
+*Tests* —
+*Verify* **Screenshot at both widths.**
+*PRD* v7.3 §3.1, §3.2
+*Non-goals* No social proof until it's real. No count of waitlist members.
+
+**SITE-093 · §3 — What it won't do**
+Project SP-17 · P0 · Deps SITE-005
+*Scope* Four refusals, full-bleed, near-black, type at maximum scale, `--veto` accent: no streaks · no completeness meters · silence is never failure · it refuses what it shouldn't guess at. **The memorable screen; spend the boldness here.**
+*Accept* Needs **no runtime** and cannot regress — every line is true today by the absence of the mechanism, and all four sit on the app's explicit-cut list. *"Silence is never failure"* is written to describe what Baseline **won't do**, not what it records, so it stays true whether or not occurrences generate.
+*Tests* CI: each line carries a DS-18 verdict.
+*Verify* **Screenshot at 1440px and 375px.** This is the screen people remember.
+*PRD* v7.3 §4, §12.1 DS-18
+*Non-goals* Promoted P1 → P0 by v7.3; it is not optional and not deferrable. No shame framing in the copy that names shame framing as the thing refused.
+
+**SITE-094 · §7 Pricing and `/pricing`**
+Project SP-17 · P0 · Deps SITE-005
+*Scope* Free beta, paid at launch, trial with no free tier, pricing announced before launch. `type PricingState = 'free_beta' | 'announced'` — **both branches built**, `free_beta` launches.
+*Accept* Both states render by config; switching is a config change, not a deploy of new copy.
+*Tests* Unit: both branches render; automated snapshot of each.
+*Verify* **Screenshot of both states at both widths.**
+*PRD* v7.3 §7
+*Non-goals* No price is stated while the state is `free_beta`. No countdown, no urgency device.
+
+**SITE-095 · §8 FAQ and `/faq`**
+Project SP-17 · P0 · Deps SITE-005
+*Scope* Twelve questions, answers under 60 words, accordion with **all answers in the DOM**. FAQ 3 carries the permission list — two OS permissions, Screen Time asked only at first Gate, microphone a permanent no rather than a deferral, and the app PRD's own *"Maximum OS prompts during onboarding: one. No permission carousel exists because there is nothing to stack."*
+*Accept* **FAQ 4 is an unqualified no** — HealthKit and Calendar are V1.1 and banned site-wide, Block 2 included. **FAQ 12 ships the roadmap answer**, not "export and delete, both at launch": the routes are unbuilt, not unproven. **FAQ 10 is held with §4** and restores when §4 promotes. FAQ 1 is written from the primitives' Problem lines (§6.1a), not from marketing language.
+*Tests* CI: all answers present in the DOM with the accordion closed; every answer describing app behavior carries a DS-18 verdict.
+*Verify* **Screenshot at both widths, open and closed.**
+*PRD* v7.3 §8, §12.1 DS-18
+*Non-goals* **Names no app** (§6.3a) — FAQ 3's strongest line is that Baseline *cannot see* which apps you chose, which is architectural rather than promised. No question is answered with a capability that has no verdict.
+
+**SITE-096 · §9 — Who's building this**
+Project SP-17 · P0 · Deps SITE-005
+*Scope* Two people, real names, real roles, the real reason, and `hello@resetbaseline.com`.
+*Accept* **No social proof until it's real** — no logos, no counts, no testimonials, no "as seen in".
+*Tests* —
+*Verify* **Screenshot at both widths.**
+*PRD* v7.3 §9
+*Non-goals* No photographs decided here. No funding or company-stage claims.
+
+**SITE-097 · §10 — Join**
+Project SP-17 · P0 · Deps SITE-005, SITE-046
+*Scope* The conversion section. **The section is SP-17's; the capture form it renders is SP-08's** (SITE-046) — this issue owns the section, not the mechanism.
+*Accept* Renders the SP-08 capture form without reimplementing it. Terminal action reads from the §15.3 config so all three branches — waitlist, TestFlight, App Store — are reachable.
+*Tests* Automated: the section uses the SP-08 capture path; no second write path exists.
+*Verify* **Screenshot at both widths.**
+*PRD* v7.3 §2, §11.5
+*Non-goals* No second capture implementation. Writes to the **staging** Supabase project, never production — inherited from SITE-046 and restated because this is the section someone would wire directly.
+
+**SITE-098 · §11 — Footer**
+Project SP-17 · P0 · Deps SITE-094, SITE-095, SITE-096, SITE-099
+*Scope* Product (Where Baseline is · Pricing · FAQ) · Company (Who's building this · email) · Legal (Privacy · Terms). Status line: *Private beta, free · iPhone · no connectors.*
+*Accept* **All four routes are linked from the footer** — this is SP-17's exit criterion and the footer is where it is verified.
+*Tests* Automated: every route resolves from a footer link; no dead link.
+*Verify* **Screenshot at both widths.**
+*PRD* v7.3 §9
+*Non-goals* No newsletter form. No social icons — there is nothing to link to and a dead icon row is social proof that isn't real.
+
+**SITE-099 · `/privacy` and `/terms`**
+Project SP-17 · P0 · Deps SITE-005
+*Scope* Both legal routes rendering real content, reachable and linked.
+*Accept* Both render at both widths. Privacy is consistent with what the site actually collects — the §11.5 capture fields and nothing else.
+*Tests* Automated: both routes resolve and are non-empty.
+*Verify* **Screenshot at both widths.**
+*PRD* v7.3 §2
+*Non-goals* **No `placeholder` or lorem, ever** — a legal route with filler is worse than an absent one. Legal text is Kian's, not a session's; this issue builds the routes and flags the content as required.
+
+**SITE-100 · Metadata and the OG card**
+Project SP-17 · P0 · Deps SITE-098
+*Scope* Title, description, and the Open Graph card for `/` and each route.
+*Accept* Metadata describes the product **as it is today** — a DS-18 surface like any other. No claim in metadata that is not in Block 1.
+*Tests* CI: metadata strings pass the SITE-107 ban check, app-name check included.
+*Verify* Card rendered and reviewed at the real crop.
+*PRD* v7.3 §10, §12.1 DS-18
+*Non-goals* **Names no app** and shows **no Apple-supplied UI** (§10). Nothing from Block 2 appears in metadata — metadata reads as present tense wherever it is shared.
+
+**SITE-101 · `docs/site-copy/roadmap-source.md`**
+Project SP-17 · P0 · Deps —
+*Scope* The single source for held and roadmap content: Block 2's entries with their owning issues, §4's held specification, FAQ 10's held answer, and the "goals eat each other" line pending its verdict.
+*Accept* Held content lives here and **nowhere in the rendered site**. Each entry carries what would have to be true for it to ship and which issue owns that.
+*Tests* CI: no string in this file appears in rendered copy except via a Block 2 entry.
+*Verify* —
+*PRD* v7.3 §3.2, §5, §15.1, §15.4
+*Non-goals* Not a content-management system. Not rendered. Its job is to stop held content being rediscovered and shipped by someone who doesn't know why it was held.
+
+**SITE-109 · Copy pass — every rendered sentence**
+Project SP-17 · **P0** · Deps SITE-101 · **Blocks SITE-061** · Owner **Kian** · No date set
+*Scope* **Created 2026-09-19 by PRD v7.3 §15.4's ruling.** Final prose for §2's three blocks, §3's four refusals, the twelve FAQ answers, §7, §9, and `docs/site-copy/roadmap-source.md`. What exists today is *specified structure with example text* — the shape of each sentence and roughly what it says, not the sentence. This issue writes the sentences.
+*Accept* Every rendered string on the site is final prose, signed off by its author. No example text survives into a built page. §19's copy bans clean. §6.3a's gate-copy MUST holds in every variant written — **no depicted Baseline UI names an app**, because Screen Time returns opaque tokens.
+*Tests* CI: the §19 ban list and the app-name list (SITE-107) run against final copy, not against example text.
+*Verify* **The study does not run before this lands.** A six-user study on example text measures the structure and nothing else — the participants would be reading placeholder sentences and scoring comprehension of the skeleton.
+*PRD* v7.3 §15.4, §2, §3, §6.3a, §8, §19
+*Non-goals* Not a redesign. Not a scope change to any section — the sections and their blocks are fixed by their own issues; this writes what they say. **No gate catches the result**: §12.4a checks format tells, the study checks comprehension, §12.4 checks evals against stubs, and none of them asks whether the prose is worth reading. That is why this issue exists and why §15.4 calls it the largest unmitigated risk in the project.
 
 ---
 
@@ -992,9 +1240,10 @@ Project SP-15 · P1 · Deps SITE-076
 | SP-11 | P0 Validation Gate | P0 | 2 | SP-09, SP-10 |
 | SP-12 | Peak Geometry + Lighting | P1 | 5 | **SP-11 passing** |
 | SP-13 | Plan → Peak Projection | P1 | 3 | SP-12 |
-| SP-14 | Camera, Scroll + Sections | P1 | 5 | SP-13 |
+| SP-14 | Camera, Scroll + Sections | P1 | 4 | SP-13 |
 | SP-15 | P1 Performance + Degradation | P1 | 4 | SP-12 |
 | SP-16 | Signature Polish | P2 | 6 | SP-14, SP-15 |
+| SP-17 | Website Sections | **P0** | 15 | SP-01, SP-08 (§10 Join) |
 
 ### Issue count
 
@@ -1015,23 +1264,58 @@ SITE-001 scaffold
   → SITE-015 transformation frame → SITE-016 progressive fill
   → SITE-020 plan model → SITE-021 PlanLayout → SITE-022 FlatLayout
   → SITE-023 occurrence generator → SITE-025 route + marks
+  → SITE-026 objects → SITE-085 flat demo design review
   → SITE-027 provider interface → SITE-028 scenarios → SITE-029 StaticProvider
   → SITE-030 /api/plan → SITE-031 validation → SITE-032 timeout
   → SITE-033 fallback orchestration
   → SITE-037 live regeneration
   → SITE-040 gate assembly → SITE-042 activation trigger
   → SITE-043 wall → SITE-046 capture
-  → SITE-050 instrumentation
+  → SITE-050 instrumentation → SITE-052 funnel
+  → SITE-086 builder loop review
   → SITE-053 mobile pass → SITE-059 failure sweep
-  → SITE-060 DS verification → SITE-061 user study
+  → SITE-060 DS verification → SITE-087 pre-gate composition review
+  → SITE-061 user study
   ══════════ P1 GATE ══════════
   → SITE-062 mesh → SITE-063 light → SITE-068 projection → SITE-071 stations
 ```
 
-**Longest chain: 27 issues.** Everything not on it can parallelize.
+> **Longest chain: 29 issues — walked, not read. Re-walked after PRE-1 Part B.**
+>
+> **Do not recount this from the block above.** That block is a narrative
+> presentation of the critical path, not the dependency graph, and counting it
+> gives the wrong answer. This figure comes from walking every `Deps` edge across
+> all 88 issues. Two previous figures were derived by counting a presentation:
+> the "27" this line replaced, and a "36" proposed during the PRE-1 pass. Both
+> were wrong. **Re-derive from the `Deps` lines or not at all.**
+>
+> True longest path: SITE-001 → 004 → 020 → 021 → 022 → 025 → 035 → 037 → 039 →
+> 040 → 041 → 042 → 043 → 044 → 047 → 050 → 052 → 060 → **087** → 061 → 062 →
+> 067 → 068 → 070 → 071 → 072 → 073 → **088** → 074.
+>
+> Pre-gate the walked figure is 26. Of the four review gates only SITE-087 and
+> SITE-088 fall on the longest path; SITE-085 and SITE-086 add real edges that do
+> not lengthen it, because the path does not run through SITE-027 or SITE-053.
+> Depth to the P0 gate (SITE-061) is 20, up from 19.
+>
+> **Part B added twenty issues and zero critical-path length.** The walk was re-run
+> over all 108 issues after SITE-089…108 landed, including the two new gate edges
+> (SITE-106 → SITE-085, SITE-108 → SITE-061), and the longest path is unchanged at
+> 29, with depth to the P0 gate still 20. That is the point of SP-17: the sections
+> depend on SITE-005 and nothing in the builder, so they parallelize against the
+> whole builder chain rather than extending it. The one exception, SITE-097 (§10
+> Join), depends on SITE-046 and still does not reach the path.
+>
+> **Re-walk from the `Deps` lines after any structural change**, never from the
+> block above, and replace the figure rather than adjusting it.
+
+Everything not on the longest chain can parallelize.
 
 ### Dependency rules, encoded
 
+- **The eval-stub audit precedes the first design gate** — SITE-106 blocks SITE-085. PRD v7.3 §12.4: the audit runs before the eval suite is trusted for anything.
+- **The DS-18 register precedes the user study** — SITE-108 blocks SITE-061. Q4 asks whether the product looks finished, and that question is only meaningful if §2 is true.
+- **Sections parallelize after SP-01** — SP-17's issues depend on SITE-005 and nothing in the builder, except SITE-097 (§10 Join) which renders SP-08's capture form (SITE-046).
 - **Builder before Peak** — SP-12 lists SITE-061 as a hard dependency. No P1 issue is reachable otherwise.
 - **Semantic model before any layout** — SITE-020 → SITE-021 → {SITE-022, SITE-068, SITE-069}.
 - **GeneratedProvider never blocking** — SITE-029 (StaticProvider) precedes SITE-030; SITE-033 depends on both; SITE-032 has a hard timeout.
@@ -1043,6 +1327,13 @@ SITE-001 scaffold
 - **Flat rendering first-class** — SITE-022 is the reference implementation and is reviewed as a standalone demo; SITE-058 proves the full loop with WebGL off.
 - **Projection reuses the model** — SITE-068 asserts the builder module graph is unchanged on adapter swap.
 - **P2 never blocks** — SP-16 depends on SP-14 and SP-15 and gates nothing.
+- **Design review gates add four edges not present in the original 84** (addendum §3):
+  SITE-085 depends on SITE-026 and blocks SITE-027 ·
+  SITE-086 depends on SITE-052 and blocks SITE-053 ·
+  SITE-087 depends on SITE-060 and blocks SITE-061 ·
+  SITE-088 depends on SITE-073 and blocks SITE-074.
+  These must be created in Linear. The decomposition's original "unchanged graph"
+  language predates them and is corrected in item 6.
 
 ### Recommended implementation order
 
@@ -1078,7 +1369,7 @@ SITE-079 through SITE-084. Ships or gets cut when P0 and P1 pass (K-7). Explicit
 
 ### Unresolved decomposition questions
 
-1. **Does `@baseline/contracts` publish consumably today?** SITE-004 assumes the app's generated types can be imported by a separate repo. If not, an unplanned packaging issue precedes the entire tree.
+1. **`@baseline/contracts` packaging — resolved, no longer blocking.** The site consumes `contracts-manifest.json` rather than importing the package (PRD v7.3 §6.6). Four packaging blockers exist in the app repo (`private: true`, `dist/` gitignored and untracked, no `files` field, `tsconfig` extends outside the package) with **zero code coupling** — the package has no workspace-relative runtime imports. Publishing properly remains worth doing and remains Kian's decision; it is informational for this tree, not gating. **One app-repo change is still required for the drift check's primary mechanism** — the app publishing its manifest to a stable path on `main`. See §6.6 for the fallback if that change isn't made.
 2. **Six users for SITE-061 within a reasonable window** — the gate is only as good as recruitment. Sourcing is unspecified.
 3. **`raw_goal` retention policy** — §11.5 captures it and §10 excludes it from analytics, but the PRD sets no retention period. Likely needs a privacy-page line, which touches SITE-074.
 4. **Whether Tier B mobile gets the Peak at all** is PRD open decision 5, resolved by post-launch data — so SITE-077 may become obsolete. Built anyway; cheap to remove.

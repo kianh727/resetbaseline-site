@@ -1,0 +1,114 @@
+name: CI
+
+# SITE-001. This file is what CLAUDE.md §7 means by "the sweep is the CI job
+# list, not a number". Adding a check here adds it to the sweep; nothing else
+# does. Later issues extend it — SITE-004 the contracts drift guard, SITE-057
+# the overflow and touch-target audit, SITE-078 the performance budgets,
+# SITE-107 the ban-list check. SITE-106's eval-stub run is already here.
+#
+# The 120 KB core bundle ceiling is already here, pulled forward from
+# SITE-078 by ruling: it costs nothing while the number is 103, and it names
+# the commit that adds the first runtime dependency rather than the last.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch cancels the first; the last commit is the
+# one whose result matters.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  check:
+    name: eval-stubs · divergences · lavender · typecheck · lint · test · build · bundle · overflow · builder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` fails on a lockfile that disagrees with package.json, which is
+      # the point — an out-of-date lockfile should stop the build.
+      - run: npm ci
+
+      # Each step runs bare and its exit status is the result. Never pipe a
+      # check through a filter: a pipeline reports whether the filter
+      # succeeded, so a failing check whose output happens not to match looks
+      # exactly like a passing one (CLAUDE.md §7).
+      # SITE-106. §12.4 made operational: every eval states how it fails against
+      # a stub that does nothing, and an eval added without one fails CI rather
+      # than review. Runs before the build because it needs no artifacts and a
+      # missing stub check should be the first thing anyone hears about.
+      - name: Eval stub checks
+        run: npm run check:eval-stubs
+
+      # PRD v7.3 §6.6. Nothing generated may read `artifact_divergences`: it
+      # records stale counts against current counts in the same object. The ban
+      # was prose until the manifest was about to enter the repo; this is the
+      # construction behind it.
+      - name: Divergences ban
+        run: npm run check:divergences
+
+      - name: Lavender is light, never paint (§6.3b)
+        run: npm run check:lavender
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # The static export is what Cloudflare Pages serves. If `out/` is missing
+      # the build silently stopped being an export, and every later deploy
+      # would serve the previous one.
+      - name: Assert static export produced out/
+        run: test -d out && test -f out/index.html
+
+      # Routes whose page file is `page.dev.tsx` exist under `npm run dev` and
+      # must not be in the export. The list is derived from the source tree,
+      # not written down in this file, so adding one cannot leave it
+      # unguarded.
+      - name: Assert no development route shipped
+        run: npm run check:dev-routes
+
+      # The 120 KB core bundle ceiling (PRD v7.3 §11), measured on the
+      # exported chunks the entry document actually references. Pulled forward
+      # to the first product commits deliberately: a ceiling first checked at
+      # the end catches the thirtieth dependency, not the first.
+      - name: Core bundle budget
+        run: npm run check:bundle
+
+      # SITE-005. Zero horizontal scroll at 320px is a P0 acceptance criterion,
+      # and §9 puts it at every width the site supports. This needs a real
+      # browser because an overflow is a layout outcome, not something visible
+      # in the CSS that caused it.
+      - name: Install Chromium for the overflow check
+        run: npx playwright-core install --with-deps chromium
+
+      - name: Horizontal overflow at 320/375/390/768/1440/1920
+        run: npm run check:overflow
+
+      # SITE-015 / SITE-019. The frame renders complete and empty at t=0 with
+      # the network blocked (DS-10), and the deadline materialises mid-typing
+      # with zero requests (§3.3). Both need a real browser: "no spinner
+      # exists" is a claim about the rendered DOM, not about the source.
+      - name: Builder guarantees — anti-spinner and live parse
+        run: npm run check:builder
