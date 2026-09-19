@@ -664,9 +664,14 @@ DS-18b are defined in v7.3 §12.1 and their evals are written above (SITE-EVAL-0
 superseded PRD in git history, ever states them. v5 defines DS-1…DS-10 and stops. PRD v7.3
 §12.1 previously opened with *"DS-1…DS-17 stand"*; **that line is withdrawn in the PRD
 itself**, because it cited eleven gates of which seven were never written. DS-15 and DS-16
-appear only as citations (DS-15 at §6.6 and §12.3 for the contracts drift guard, DS-16 in v7.2
+appeared only as citations (DS-15 at §6.6 and §12.3 for the contracts drift guard, DS-16 in v7.2
 as forbidding unbacked claims) and DS-17 only as a range endpoint — **a citation is not a
 definition.**
+
+**Every citation of DS-15 is struck (ruled 2026-09-19, Kian)** — from PRD §12.3, from SITE-004's
+`*PRD*` line, and from `CLAUDE.md` §2. A citation to a withdrawn gate is worse than none: a
+reader follows it, finds nothing, and cannot tell whether the check is unjustified or the
+definition is missing. The drift check itself is unaffected and keeps its own justification.
 
 **No eval was written for DS-15, DS-16 or DS-17, and none should be until they are defined.**
 Inferring a gate's definition from a citation would produce a gate verified against nothing —

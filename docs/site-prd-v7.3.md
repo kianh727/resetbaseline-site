@@ -392,7 +392,7 @@ Twelve questions, plain answers under 60 words, accordion with all answers in th
 9. What if I miss days? — *Nothing. No streaks, no score, no catch-up.*
 10. What does it know about me, and can I see it? — **Held with §4.** Restore when §4 promotes.
 11. How is this different from asking ChatGPT to plan my week?
-12. Can I get my data out? — **Answer changed. DS-18 failure.** Export and delete are **unbuilt**, not unproven: no export endpoint, no deletion route, `requestAccountDeletion`'s only callers are its own tests, and `SettingsView` renders both as rows with no action closure — inert labels. The V1 inventory specifies both; BAS-125 is the work. *"Export and delete, both at launch"* cannot ship. The supportable answer is a roadmap one: *"Not yet. The deletion cascade is specified and every foreign key to your account is `ON DELETE CASCADE`; the routes are being built."* **"Export and delete" also becomes a §2 Block 2 entry, owning issue BAS-125.**
+12. Can I get my data out? — **Answer changed. DS-18 failure.** Export and delete are **unbuilt**, not unproven: no export endpoint, no deletion route, `requestAccountDeletion`'s only callers are its own tests, and `SettingsView` renders both as rows with no action closure — inert labels. The V1 inventory specifies both; BAS-125 is the work. *"Export and delete, both at launch"* cannot ship. The supportable answer is a roadmap one: *"Not yet. The deletion cascade is specified and every foreign key to your account is `ON DELETE CASCADE`; the routes are being built."* **"Export and delete" also becomes a §2 Block 2 entry, owning issue `BAS-125`** — **but that identifier is unverified and the entry does not ship until it is confirmed.** In Linear, `BAS-125` resolves to a picker/app-group token-storage issue, not export and delete; either this number is wrong or the app issue was renumbered. Kian is confirming it from the app side. **DS-18a requires a real owning issue, and a wrong one fails it**, so until the confirmation lands the entry is held and the reference is inert text.
 
 **Every answer describing app behavior carries a DS-18 verdict.** Questions 3 and 8 are verified true today. Question 12 is a verified **false**, which is why it was rewritten rather than held — a held answer implies a pending read, and there is nothing left to read.
 
@@ -488,7 +488,7 @@ Three consequences, binding:
 | **DS-11 … DS-17** | **A reference to nothing.** No artifact in this repository, and no superseded PRD in git history, ever states them. |
 | **DS-18 · DS-18a · DS-18b** | **Real.** Defined below. |
 
-Earlier revisions of this document opened this section with *"DS-1…DS-17 stand."* **That line was provenance, not authority, and it is withdrawn here** — it cited eleven gates of which seven were never written. DS-15 and DS-16 appear as citations (DS-15 at §6.6 and §12.3 for the contracts drift guard; DS-16 in v7.2 as forbidding unbacked claims) and DS-17 only as the endpoint of the range, but **a citation is not a definition** and none is recoverable.
+Earlier revisions of this document opened this section with *"DS-1…DS-17 stand."* **That line was provenance, not authority, and it is withdrawn here** — it cited eleven gates of which seven were never written. DS-15 and DS-16 appeared only as citations (DS-15 at §6.6 and §12.3 for the contracts drift guard; DS-16 in v7.2 as forbidding unbacked claims) and DS-17 only as the endpoint of the range, but **a citation is not a definition** and none is recoverable. **Ruled 2026-09-19 (Kian): every one of those citations is struck.** A citation to a withdrawn gate is worse than no citation — a reader follows it, finds nothing, and cannot tell whether the check is unjustified or the definition is merely missing. The checks they pointed at are real and keep their own justification; what is removed is the pointer to a gate that was never written.
 
 **Consequences, stated so this is not rediscovered:**
 
@@ -516,7 +516,7 @@ Thresholds: 5/6 wall · 4/6 tune · 5/6 on each live question.
 
 ### 12.3 Engineering
 
-v5 §18.2 in full, plus: every user-visible label traces to §6.3 · the drift check fails on divergence (cited above as DS-15, which §12.1 records as undefined) · input classification is deterministic and pre-generation · pricing renders both states by config · no section references anything on §10's lists · no Apple-supplied UI appears as Baseline's.
+v5 §18.2 in full, plus: every user-visible label traces to §6.3 · the drift check fails on divergence · input classification is deterministic and pre-generation · pricing renders both states by config · no section references anything on §10's lists · no Apple-supplied UI appears as Baseline's.
 
 ### 12.4a The generator tell — SITE-085's actual criterion
 
@@ -540,6 +540,8 @@ Ten tells. **Each is a yes/no. Any single yes rejects the work** — the reviewe
 | 10 | Evenly-weighted type with no metadata layer |
 
 **The reviewer must not be the implementer, and must not have watched the build.** Someone who watched a decision get made cannot see the result the way a first-time visitor does; they see the reasoning instead of the page. This is a staffing constraint on the gate, not a suggestion.
+
+**The reviewer is Kian (ruled 2026-09-19).** He is not the implementer, and he does not watch the build — he sees reports, not the work. That satisfies both clauses as written. **If a gate ever requires someone who has not been in the conversation at all, that is a real staffing problem and it is hit at SITE-085 rather than solved in advance.** It is named here so that when it is hit, it is recognised as the known limit rather than rediscovered as a surprise.
 
 **Applies equally at SITE-087 and SITE-088.** The same ten questions, the same rule, the same staffing constraint.
 
@@ -580,7 +582,7 @@ Part A v2 is specified in `pre-1-patch-part-a-v2.md` — items 1, 3, 5, 6, 7 (SP
 
 **SP-17's scope line is updated by this PRD:** it covers §2 "Where Baseline is right now" and §3 "What it won't do", not "A day, from the inside" and "What's underneath".
 
-Part B (item 4) — new issues for §2's three blocks, §3, §7, §8, §9, §11, legal routes, input classification, the clarification beat, held content, DS-18 and §12.4 owning issues, evals for DS-15 through DS-18, SITE-EVAL-070, and a critical-path re-walk. **No longer gated on the capture check, which is complete.** Gated only on Part A v2 being applied.
+Part B (item 4) — new issues for §2's three blocks, §3, §7, §8, §9, §11, legal routes, input classification, the clarification beat, held content, DS-18 and §12.4 owning issues, evals for **DS-18 and DS-18a/DS-18b** (Part B was scoped as *"DS-15 through DS-18"*; DS-15 through DS-17 turned out to be a reference to nothing, so no eval was written for them and none should be), SITE-EVAL-070, and a critical-path re-walk. **No longer gated on the capture check, which is complete.** Gated only on Part A v2 being applied.
 
 ### PRE-2 · Ban-list copy audit
 **Owner:** site session · Automated in CI from P0 onward, failing the build on any §10 banned term; plus a manual pre-launch review, because automation catches terms and not a section that *implies* a capability without naming it.
@@ -614,8 +616,8 @@ Implemented by **SITE-107**.
 
 ### 15.2 Read tasks
 
-- **R-2** — app PRD §14–26 bodies and the onboarding spec. Onboarding matters most: if the site's builder and the app's onboarding diverge in shape, the handoff from wall to first launch feels like two products.
-- **Weekly review** — in the V1 inventory, section not located. Needs a DS-18 verdict before appearing anywhere.
+- **R-2 — COMPLETE.** Reported in full, including the permission list and the export/delete specification. Its findings are built into this document: §6.1b's onboarding-handoff ruling, FAQ 3's permission answer, and FAQ 12's rewrite. Nothing is gated on it. *(Kept here as the record that it ran and what it was for — onboarding mattered most, because a builder and an onboarding that diverge in shape make the handoff from wall to first launch feel like two products.)*
+- **Weekly review — LOCATED.** App PRD §48, filed jointly with the nightly check-in, which is why it read as missing. *"On by default. The trust engine and the batching valve… 'leave it inconclusive' offered as a first-class, guilt-free option."* The nightly check-in is **off** by default and the app PRD marks that settled. **Still needs a DS-18 verdict before appearing anywhere** — located is not verified.
 - **Day-one gate reachability** — can a new account create a gate at all, by directive or through the `+` sheet? **The §6.1b ruling is conditional on this.** If no, the builder's fourth beat is cut and the wall moves to a timer or reminder.
 
 ### 15.3 Decisions
@@ -623,7 +625,7 @@ Implemented by **SITE-107**.
 1. Contracts publication route — registry, committed build output, or submodule. Not blocking (§6.6).
 2. `dist/` gitignore — deliberate or incidental? Bears on 1.
 3. Terminal action at launch — waitlist, TestFlight, or App Store. All branches built.
-4. Typeface — decided at build item 1 on real display-scale type.
+4. Typeface — decided at build item 1 on real display-scale type. **Still open, and blocked rather than pending.** Neither candidate's files are obtainable: PP Neue Montreal is a commercial per-domain licence, and Satoshi is free but its distributor is denied by the build environment's network policy and it is on no npm registry. So the comparison §14 specifies could not be run, and no verdict was recorded from description. Everything around the decision is built — the scale, the `/type` harness, and `--font-candidate` as the single seam. `docs/typeface-decision.md` is the record.
 5. Cursor spring `0.055` — decided during P1 by feel.
 6. Tier B mobile Peak — decided post-launch by conversion data.
 
@@ -648,7 +650,7 @@ It is also **the only P0 work with no owning issue and no schedule** — the one
 Surfaced by the capture check and the FAQ reads. None is a website problem:
 
 - **The own-words gate coach has no target and was unfiled until the capture report.** The app PRD specifies it in V1.
-- **`SettingsView` renders "export data" and "delete account" as rows with no action closure.** Inert labels that do nothing when tapped. Worse than absent — a user believes the control exists. BAS-125.
+- **`SettingsView` renders "export data" and "delete account" as rows with no action closure.** Inert labels that do nothing when tapped. Worse than absent — a user believes the control exists. `BAS-125` — **identifier unverified; see FAQ 12.**
 - **Occurrence generation returns 200 while producing zero occurrences.** The user is told it worked. A commitment with no occurrences has no resolution cascade, no resolution card, and no adherence record — that reaches considerably further than this website.
 
 ---

@@ -31,7 +31,7 @@ budgets, acceptance criteria, evals, gates, and quality bar.
 All four are stored verbatim as approved. They are amended deliberately, never
 edited in passing during implementation.
 
-Three standing rules:
+Four standing rules:
 
 - Where a lower tier is precise and a higher tier was general, the lower tier
   governs implementation detail — it may refine, never contradict.
@@ -47,6 +47,37 @@ Three standing rules:
   SITE-040's scope still read *"rendering as the protection band with app names and
   window"* — the exact UI the app cannot produce — and it survived the ruling because
   nobody swept. It was caught in the next pass, by grep, not by the amendment.
+
+- **A sweep is stated, and a ruling that moves an issue is swept by reconciliation, not
+  by grep.** The rule above is a *forward* obligation on the ruling being applied, and it
+  assumes the pass that applies it is complete. Nothing checks that assumption. An
+  incomplete sweep leaves no residue — afterwards it is indistinguishable from a complete
+  one, because the tier that was missed simply still says the old thing, which is exactly
+  what a tier that was never in scope would say.
+
+  So: **name every tier you checked, in the commit**, which makes an incomplete pass
+  visible at the time rather than a year later. And note which kind of ruling you are
+  sweeping, because the two kinds fail differently:
+
+  - **A ruling that changes a string** — a banned word, a withdrawn criterion, a corrected
+    number — is swept by grep, and grep is reliable. Where it can also become a CI check,
+    it should, in the same pass (SITE-107 is where those live).
+  - **A ruling that changes an issue's identity** — its scope, title, milestone, priority,
+    or dependencies — **is invisible to grep**, because the stale text contains no phrase
+    the ruling withdrew. It reads as a perfectly ordinary issue. These are swept by
+    **reconciling the decomposition against Linear**, which are meant to mirror each other
+    and therefore can be diffed.
+
+  Worked example, and the reason this clause exists: `SITE-72` and `SITE-74` were
+  re-scoped, and the ruling reached Linear and this file but **not the decomposition**,
+  which kept "Sections 2, 4, 5, 6" and "Metadata, OG card, legal pages" at SP-14/P1 for
+  two days. No grep could have found it — there was no withdrawn string to search for,
+  only an issue quietly describing work that no longer existed. It surfaced because a
+  later sweep happened to read the entry for another reason.
+
+  **The reconciliation runs at each design review gate and before the P0 gate**, over
+  every issue, comparing title, milestone, priority and dependencies. Anything a ruling
+  moved and a document did not is found there rather than by luck.
 
 A material contradiction between artifacts is a STOP condition (§9). Report it.
 Never resolve it in code.
@@ -79,7 +110,7 @@ vocabulary — the 45 action types, object types, enums, and authority tiers —
 this site validates against. Every verb in the provider layer and the authored
 scenarios traces to it. The site **consumes** that vocabulary; it never extends,
 amends, or works around it. A contract change should break this build
-(PRD v7.3 §6.6, §12 DS-15, SITE-004).
+(PRD v7.3 §6.6, §12.3, SITE-004).
 
 > **Resolved — no longer blocking.** This was previously recorded as an unresolved
 > blocker sitting in front of the entire SITE tree, on the assumption that SITE-004
@@ -527,6 +558,41 @@ read P0 = 86, P1 = 17.
 **The longest chain is unchanged at 29.** SITE-109's only edge into the graph is
 SITE-101 → SITE-109 → SITE-061, and SITE-101 has no dependencies — a three-node path into a
 node already reached by a 29-long one.
+
+**Retro-sweep of every ruling, 2026-09-19.** Ruled: sweeping on the ruling being applied and
+auditing whether earlier rulings landed are **different jobs**, and §1 only ever required the
+first. Every ruling issued to date was re-checked against all four tiers plus Linear. **Five
+were stale; one had already been caught.**
+
+1. **`SITE-72` / `SITE-74`** — reached Linear and this file, not the decomposition. Caught and
+   fixed in the previous commit. It is the worked example for §1's new fourth rule.
+2. **`BAS-125` unverified** — reached this file and `SITE-91` only. The PRD's FAQ 12 and §15.5,
+   and the decomposition's `SITE-108` and `SITE-95`, all still named it as the settled owning
+   issue. Four places instructed someone to ship a Block 2 entry that DS-18a holds.
+3. **SP-17's non-goal *"no copy is written before R-2 reports"*** — R-2 has reported in full,
+   and the **same block's entry criteria said so seventeen lines above**. A live contradiction
+   inside one milestone description, in both the decomposition and Linear.
+4. **PRD §15.2 listed R-2 as an open read task** — while the findings from it were already
+   built into §6.1b, FAQ 3 and FAQ 12 of that same document.
+5. **PRD §15.2's *"weekly review — section not located"*** — it is app PRD §48, filed jointly
+   with the nightly check-in, recorded in this file with a quotation. Located is not verified,
+   so its DS-18 requirement stands; the "not located" status does not.
+
+Also swept clean, with nothing found: the §6.3a gate-copy MUST · the 120 KB budget · the DS
+phantom range · "What's underneath" is cut · SP-17's phase and milestone numbering · §10 Join's
+SP-08 dependency · the team key · the longest chain at 29 · the app-name list's 90/180 and
+ships-non-empty properties.
+
+**Every DS-15 citation is struck** (ruled 2026-09-19) — PRD §12.3, `SITE-004`'s `*PRD*` line,
+this file's §2, and Linear `SITE-4`. A citation to a withdrawn gate is worse than none: a
+reader follows it, finds nothing, and cannot tell whether the check is unjustified or the
+definition is missing. **The drift check is unaffected** — §6.6 and §12.3 justify it and it
+needs no DS number.
+
+**§12.4a's reviewer is Kian** (ruled 2026-09-19). Not the implementer, and does not watch the
+build — reports, not the work. Both clauses satisfied as written. If a gate ever needs someone
+who has not been in the conversation at all, that is a real staffing problem, and it is hit at
+`SITE-085` rather than solved in advance.
 
 **Next in sequence is `SITE-4`** (contracts manifest, generated types, drift guard).
 

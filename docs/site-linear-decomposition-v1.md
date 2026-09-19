@@ -173,7 +173,7 @@ linked from the footer. No Apple-supplied UI appears as Baseline's.
 - §5 Day 1 → Day 30 and §6 Method are P1 and belong to SP-14.
 - **"What's underneath" does not exist.** It was cut in v7.3; its surviving rows moved
   into §2 Block 1, §2 Block 2, and §3. Any issue or reference to it is stale.
-- No copy is written before R-2 reports. Held and roadmap content lives in
+- ~~No copy is written before R-2 reports.~~ **R-2 has reported in full** (see this block's Entry criteria above) — the gate has cleared and nothing is held on it. Held and roadmap content lives in
   `docs/site-copy/roadmap-source.md`.
 
 **Milestone ordering note:** SP-17 is numbered after SP-16 because milestone numbering is
@@ -271,7 +271,7 @@ Project SP-01 · P0 · Deps SITE-001
 *Accept* Types generate from the manifest. A deliberately altered manifest fails CI. Every `capability_type` in the manifest has a layout rule; a type without one fails the build.
 *Tests* CI: type generation; one negative test proving the drift guard fires. Unit: layout-rule coverage across all `capability_type` values.
 *Verify* —
-*PRD* v7.3 §6.2, §6.6, §12 DS-15
+*PRD* v7.3 §6.2, §6.6, §12.3
 *Non-goals* No `@baseline/contracts` package import. No cross-repo build of the app — explicitly rejected in §6.6. **Nothing generated may read `artifact_divergences`**, which records stale counts (33 and 72) against current counts (45 and 76) in the same object.
 
 **SITE-005 · Base layout, nav, safe areas, overflow guards**
@@ -875,7 +875,7 @@ Project SP-11 · P0 · Deps SITE-059, SITE-052
 **SITE-108 · DS-18 verdict register**
 Project SP-11 · P0 · Deps SITE-090, SITE-093, SITE-095
 *Scope* The dated record DS-18 requires. Every §2 Block 1 line, every §3 line, and every FAQ answer describing app behavior carries a verdict: the claim, the capability it traces to, the date verified, the verifying issue, and the verdict. **A PRD line is not evidence.** Also carries DS-18a (every Block 2 entry names a real owning issue and states no date) and DS-18b (§2's visible date, and the rule that a change to what is true moves the line between blocks in the same commit).
-*Accept* No claim ships without a verdict row. **A claim whose verdict is false is rewritten, not held** — FAQ 12 is the worked example: export and delete are unbuilt, not unproven, so the answer became a roadmap one and "Export and delete" became a Block 2 entry owned by BAS-125. An entry with no owning issue is a wish and does not ship.
+*Accept* No claim ships without a verdict row. **A claim whose verdict is false is rewritten, not held** — FAQ 12 is the worked example: export and delete are unbuilt, not unproven, so the answer became a roadmap one and "Export and delete" became a Block 2 entry owned by `BAS-125`. An entry with no owning issue is a wish and does not ship — **and `BAS-125` is unverified**: in Linear it resolves to a picker/app-group token-storage issue, not export and delete. **That entry does not ship until the identifier is confirmed app-side**, because DS-18a requires a real owning issue and a wrong one fails it.
 *Tests* CI: a Block 1 or §3 line, or an FAQ answer flagged as describing app behavior, with no verdict row fails the build. A Block 2 entry with no owning issue, or carrying a date, fails.
 *Verify* **The register reviewed in full before the user study.** Q4 depends on §2 being true.
 *PRD* v7.3 §12.1 DS-18 / DS-18a / DS-18b, §0.1
@@ -1101,7 +1101,7 @@ Project SP-17 · P0 · Deps SITE-089
 
 **SITE-091 · §2 Block 2 — What we're building next**
 Project SP-17 · P0 · Deps SITE-089
-*Scope* Five roadmap entries, each a capability name and **one clause**: the interception screen · occurrence generation · conversational resolution · proposals · what Baseline knows. Plus "export and delete", owned by BAS-125 (v7.3 §8 FAQ 12).
+*Scope* Five roadmap entries, each a capability name and **one clause**: the interception screen · occurrence generation · conversational resolution · proposals · what Baseline knows. Plus "export and delete", owned by `BAS-125` (v7.3 §8 FAQ 12) — **identifier unverified, so this entry is held and does not ship until Kian confirms it app-side.** Carry the reference as inert text with the note; do not resolve it by picking a different number.
 *Accept* **Every entry names a real owning issue and states no date** — no quarter, no "soon" (DS-18a). An entry with no issue is a wish and does not ship. Entries are capability names, not features or benefits.
 *Tests* CI: an entry with no owning issue, or matching a date or `soon`, fails the build.
 *Verify* **Screenshot at both widths.**
