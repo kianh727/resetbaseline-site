@@ -322,6 +322,37 @@ Honest, sets the expectation before first launch, and turns a divergence into an
 
 **This ruling is conditional on one read:** that a user can create a gate on day one at all, by directive to the agent or through the `+` sheet. If gates are unreachable for a new account entirely, the fourth beat promises something impossible, protection is cut from the builder, and the wall moves to a timer or reminder. **Tracked in §15.2.**
 
+### 6.1c The workspace transition
+
+**The problem this fixes.** The plan currently appears underneath a hero that does not change. Everything is correct and nothing transforms, so the fold reads as a landing page with a form on it rather than as a tool. This is the single largest gap between the build and its ceiling, and it costs no new generated surface and makes no new claims.
+
+**On submit, the fold reconfigures into a workspace.** Same page, same scroll position, no route change, no modal, no overlay. The page below the fold is untouched and scrolls normally.
+
+| t | What moves |
+|---|---|
+| 0ms | Run pressed. Scroll position locked — **the transition must never move the page.** |
+| 0–240ms | Headline and subhead fade out translating up 24px. Nav wordmark stays — it is the identity anchor and must not move. |
+| 60–300ms | Input translates to the top of the fold and becomes a persistent bar, slightly reduced in scale. It remains editable. |
+| 120ms | Transformation frame renders **complete and empty** in its new full-width position. The t=0 rule holds — the frame is never absent, it simply renders in the new layout. |
+| 240–600ms | Mountain camera eases in roughly 8%. The band region becomes the focal area of the frame. |
+| on arrival | Plan objects land per §11.1. |
+
+**Rules:**
+
+- **Controls enable on data, never on animation.** Tune is live the moment recurrence exists, whether or not the 600ms has elapsed.
+- **The transition never changes scroll position.** This is the one place layout and scroll could fight; they must not.
+- **Reversible.** A reset returns the hero in the same sequence played backward. Dismissing the wall does not reset — it returns to the workspace.
+- **Mobile:** the headline is removed rather than reduced, and the input pins beneath the safe-area inset. Vertical space is the constraint and the headline is what yields.
+- **Reduced motion:** no transition. The workspace layout renders directly, in its final state.
+- **The workspace fills the viewport. It is not a modal and not full-screen chrome** — no escape key, no close button, no scroll lock, no `position: fixed` takeover. The page below remains reachable by scrolling at all times.
+
+**What this deliberately does not do:** add agent turns, conversation, or any additional generated content. Impressiveness comes from presentation — the reconfiguration, the mountain responding, the objects landing — never from the model saying more. More conversation means more generated surface, which walks back into §6.5.
+
+**Two notes added on application, 2026-09-19, because this section arrives after the work it touches:**
+
+- **The band is present when the workspace opens.** §6.3b: a band has no entrance animation and no draw-on. The 240–600ms camera ease moves the *view*; it does not bring the band into existence. What lands on arrival is the marks.
+- **`walled` is still reachable only by an activation attempt.** *"Dismissing the wall returns to the workspace"* is an exit edge, not a second entrance. The state machine's exhaustive test (SITE-012) governs, and a `workspace` state is added to its table by its own issue rather than by hand — the test proving `walled` unreachable by side effect is exactly what a hand-added state puts at risk.
+
 ### 6.2 Plan model — derived, not hand-listed
 
 Handles every `capability_type` the contracts define — exactly five: `commitment · reminder · timer · gate · tracker`. Generated from `contracts-manifest.json` (§6.6) with a layout rule per type. **A type without a layout rule fails the build.**
@@ -637,6 +668,35 @@ Three consequences, binding:
 
 **Ruled, and in effect: the budget gate exists before the builder is built, not after it.** SITE-078 enforces the full performance budgets in CI at P1 — after every builder issue has landed. A ceiling first checked at the end is a criterion satisfiable by the absence of the thing it measures (§0.3), and a dependency that breaks the budget would be discovered at SITE-076 rather than in the PR that added it. **The bundle-size check is therefore in the CI sweep from the first product commit, at 120 kB, failing the build.** It measures the exported chunks each document actually references — every route, not only `/`, because a check that watches one page can be walked around by putting the import on another — and excludes the `noModule` polyfill chunk, which no browser supporting ES modules fetches. SITE-078 still owns the remaining budgets; this is the bundle ceiling arriving early, not SITE-078 moving.
 
+### 11.3 Section handoffs — one property carries across
+
+**Applied 2026-09-19.** Three camera stations move the view. What was never specified is what happens to **content** at each boundary, and without it every section fades in independently and the page reads as stacked blocks rather than one surface.
+
+**The rule: at every section boundary, one continuous property carries across the seam.** Not each element fading on its own schedule — one shared variable that the outgoing and incoming sections both ride.
+
+**Ruled on application (Kian): the carriers resolve toward P0, and the mountain is not the mechanism.**
+
+Three of the four carriers as first drafted rode the mountain, which is **P1**, while §2 and §3 — the sections they join — are **P0**. That makes P0 sections depend on P1 work. Worse, **§2 is the section where the mountain deliberately recedes and carries no band**, so the seam most in need of a carrier had the least mountain to carry it.
+
+**Every seam has a non-mountain carrier at P0. A mountain carrier, where it is better, is a P1 enhancement of a seam that already works without it.**
+
+| Seam | P0 carrier | P1 enhancement |
+|---|---|---|
+| Workspace → §2 status | **The band, thinning.** Its marks fade and the band thins to nothing as §2's first line rises. One linked motion, not two — and the band is builder surface, not scene, so it exists at P0. | The mountain receding in step with the thinning. |
+| §2 → §3 refusals | **Light level, as page luminance.** The surface drops toward near-black and §3's display type comes up as the light leaves. **Type gains exactly what the surface loses** — a background and a type colour on one variable, no WebGL. | The mountain's own light dropping on the same variable. |
+| §3 → pricing / FAQ | **Type scale.** Display collapses to body scale across the seam while luminance returns slightly. **The drop in scale is the transition.** No scene involvement at either phase. | — |
+| FAQ → join | **Luminance returning to its hero value** as the reading surface empties. | The mountain returning at the same time, on the same variable. |
+
+**The P1 enhancements ride the carrier the P0 seam already defines.** They do not introduce a second property, which would break the one-carrier rule below; they give the existing variable something more to drive.
+
+**Constraints:**
+
+- **Native scroll throughout.** Scroll-position-driven, not scroll-jacked. No wheel interception, no Lenis. Unchanged and non-negotiable (§6, SITE-070).
+- **One carrier per seam.** If two properties animate across a boundary, pick one and let the other snap. Two carriers read as busy; one reads as deliberate.
+- **Each seam is legible at any scroll speed**, including an instant jump. A carrier that only works when scrolled slowly is a carrier that doesn't work — and a jump-to-anchor is the case that proves it.
+- **Reduced motion:** carriers do not animate. Sections render at their end states.
+
+
 ---
 
 ## 12. Quality gates
@@ -686,6 +746,45 @@ Thresholds: 5/6 wall · 4/6 tune · 5/6 on each live question.
 ### 12.3 Engineering
 
 v5 §18.2 in full, plus: every user-visible label traces to §6.3 · the drift check fails on divergence · input classification is deterministic and pre-generation · pricing renders both states by config · no section references anything on §10's lists · no Apple-supplied UI appears as Baseline's.
+
+### 12.3a Surface quality — pulled into P0
+
+**Applied 2026-09-19.** Three items previously sat in P1's post chain or nowhere at all. Each is cheap, none depends on the Peak, and together they are most of the distance between a dark page and a designed one.
+
+**Grain — P0.** A fine animated grain overlay across the entire page including UI, at roughly **0.03 strength, 1:1 pixel scale**. This is a CSS or small-canvas overlay, **not** the shader pass in v5 §7.4 — it does not wait for WebGL and **it renders in every tier including D**. It belongs with tokens, not with the P1 post chain. It is the single highest return per line of code on this site: it is what makes a dark surface read as photographed rather than rendered, and its absence is the most visible difference between the build and its reference frames.
+
+**Metadata contrast — P0.** The technical-drawing system is **extreme** scale contrast, and the build is currently delivering mild contrast, which reads as small grey text rather than as a designed layer. Enforce:
+
+- Display type at its specified clamp **ceiling**, not a comfortable middle
+- Metadata at **11px** with **`letter-spacing: 0.06em`** — tracking is not optional, it is what makes the layer read as a layer
+- Hairline rules at **`rgba(242,240,236,0.08)`** and **visible at that value**
+- **Nothing between the two scales.** A 24px label defeats the entire idea.
+
+**Typeface decision recorded — P0.** SITE-003 is supposed to produce a *choice* between PP Neue Montreal and Satoshi, compared at display scale. **A default system sans shipping by omission is a decision nobody made.** The comparison runs and the outcome is written down with a reason.
+
+**This section is retroactive.** It binds SITE-015 and SITE-019, which have shipped, and SITE-002 and SITE-003, which have shipped. Bringing merged work to a specification written after it is the intended behaviour here, not scope creep.
+
+**One note recorded on application.** The metadata primitive `@utility metadata` already carries 11px / 0.06em / `--bone-38` and resolves correctly where it is used; SITE-003 built it. What §12.3a adds is that it must be **used**, that display type must reach its ceiling rather than sit below it, and that hairlines must be visible at 0.08 — none of which a token definition can enforce by existing.
+
+### 12.3b The comparison gate
+
+**Applied 2026-09-19. Blocked on its own inputs — see below.**
+
+**"Is this good?" currently gets answered by whoever has been looking at it longest**, which is the person least able to see it. §12.4a catches *generic*. §6.3b catches *wrong grammar*. **Nothing catches *flat*.**
+
+**Three reference frames live in `docs/site-design/target-frames/`** — the strongest generated stills, labelled **mood only, copy and structure per PRD**. They are a quality target for **light, density, grain and type contrast**. **They are not a content reference, and their copy, fields and layout are all wrong.**
+
+SITE-085, SITE-087 and SITE-088 each compare the build against those frames and answer:
+
+> **Does this hold up next to the target frames on light, density, grain and type contrast?**
+
+A no names which of the four is short and opens an issue.
+
+**This is not asking whether the build matches the images.** A still of a lit scene and a working page are different artifacts, and the build wins on motion, cursor-responsive light and state change that a still cannot carry. It asks whether the *surface quality* is in the same class.
+
+**BLOCKED — `docs/site-design/target-frames/` does not exist, and the gate is not written against it.** Ruled 2026-09-19 (Kian): blocked on Kian, who supplies the frames.
+
+**A gate whose inputs do not exist passes by having nothing to check** — it would iterate an empty directory, find no frame falling short, and report success. That is §0.3 exactly, and it is the reason this section is applied with the gate deliberately unbuilt rather than scaffolded against an absent path. When the frames land, the gate is written **and its first assertion is that the directory is non-empty**, failing by naming the directory rather than the build, because the fault would be in the input.
 
 ### 12.4a The generator tell — SITE-085's actual criterion
 

@@ -6,7 +6,7 @@
  * (DS-10, SITE-EVAL-007). Asserted with **every request after the document
  * aborted**, so a frame that depended on any fetch could not appear.
  *
- * **SITE-019** — typing "by May" surfaces the deadline with **zero network
+ * **SITE-019** — typing "by the end of May" surfaces the deadline with **zero network
  * requests**, verified by counting them rather than by watching (SITE-019
  * accept says "verified in devtools"; this is that, automated).
  *
@@ -18,7 +18,54 @@
  */
 
 import { chromium } from 'playwright-core'
+import { statSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
 import { serve } from './serve-out.mjs'
+
+/*
+ * **The export must be newer than the source it was built from.**
+ *
+ * Found 2026-09-19, by this check passing when it should have failed. It reads
+ * `out/`, not `lib/` — so a logic change that breaks a rendered assertion goes
+ * green locally until somebody rebuilds, and the run that passed was measuring
+ * an artifact produced before the change existed.
+ *
+ * CI is safe by accident: `build` always runs immediately before this step. That
+ * is exactly the kind of safety that holds until the job order is edited, and it
+ * does nothing for anyone running the check by hand — which is when a wrong
+ * green is most expensive, because it is the run someone is using to decide the
+ * change is finished.
+ *
+ * It is the §0.3 family with a twist: the criterion is not satisfiable by the
+ * absence of the thing it measures, it is satisfiable by a **stale copy** of it.
+ */
+function newestMtime(dir) {
+  let newest = 0
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue
+    const full = join(dir, entry.name)
+    newest = Math.max(newest, entry.isDirectory() ? newestMtime(full) : statSync(full).mtimeMs)
+  }
+  return newest
+}
+
+function assertExportIsFresh() {
+  let built
+  try {
+    built = statSync('out/index.html').mtimeMs
+  } catch {
+    console.error('builder: out/index.html does not exist. Run `npm run build` first.')
+    process.exit(1)
+  }
+  const sources = ['app', 'components', 'lib'].reduce((n, d) => Math.max(n, newestMtime(d)), 0)
+  if (sources > built) {
+    console.error(
+      'builder: out/ is older than the source it was built from, so this check would be ' +
+        'measuring a stale export. Run `npm run build` first.',
+    )
+    process.exit(1)
+  }
+}
 
 /** §3.4's five rows. Duplicated here on purpose — see the note below. */
 const EXPECTED_ROWS = ['commitment', 'frequency', 'window', 'deadline', 'protection']
@@ -29,6 +76,9 @@ const EXPECTED_ROWS = ['commitment', 'frequency', 'window', 'deadline', 'protect
  * the renderer used, and agree by construction. Written separately, from
  * §3.4's table, it is a second source and can actually disagree.
  */
+
+
+assertExportIsFresh()
 
 const { origin, close } = await serve('out')
 const browser = await chromium.launch()
@@ -87,7 +137,7 @@ try {
   })
 
   await page.click('input')
-  await page.keyboard.type('finish my thesis by May', { delay: 8 })
+  await page.keyboard.type('finish my thesis by the end of May', { delay: 8 })
   await page.waitForTimeout(250)
 
   const deadline = await page.evaluate(
@@ -101,7 +151,7 @@ try {
     () => document.querySelectorAll('section p')[1]?.textContent?.trim() ?? '',
   )
   check(
-    said === '"finish my thesis by May"',
+    said === '"finish my thesis by the end of May"',
     `YOU SAID showed ${JSON.stringify(said)}, expected the sentence verbatim`,
   )
   await page.close()

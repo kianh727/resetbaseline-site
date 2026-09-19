@@ -79,6 +79,27 @@ Four standing rules:
   every issue, comparing title, milestone, priority and dependencies. Anything a ruling
   moved and a document did not is found there rather than by luck.
 
+**The working tree is the authoritative PRD. A pasted document is a section source,
+never a replacement** (ruled 2026-09-19, Kian).
+
+Full-document pastes are applied **section by section onto the tree**, or refused. **If a
+paste would remove a section that exists on disk, that is a §9 stop** — regardless of what
+the accompanying message says about what changed.
+
+The reason is structural rather than cautious. A paste is written against whatever copy its
+author was holding, and an author working outside this repository **cannot see the working
+tree**. So *"nothing else changed"* is a true statement about the copy it was written from
+and says nothing about the file. The two claims are indistinguishable in the message and
+opposite in effect.
+
+Worked example, 2026-09-19: a v7.3 paste arrived naming four new sections and stating that
+nothing else had changed. It was a faithful description of its own source, which had
+branched earlier that evening — and replacing the file with it would have silently reverted
+**§0.3a, §0.3b, §0.3c, the whole of §6.3b, §6.5's two amendments, the 120 kB decimal ruling,
+the K-8 and DS-1…DS-10 citation corrections, and §12.4a's six band questions**, every one of
+them ruled the same day. The four new sections were applied onto the tree instead and the
+numbering was ruled rather than guessed.
+
 A material contradiction between artifacts is a STOP condition (§9). Report it.
 Never resolve it in code.
 
@@ -1237,6 +1258,82 @@ in place rather than deleted, so the supersession is visible at the point of the
   SITE-070's ban at exactly the paths that animate.
 
 **Bundle 105.0 kB of 120** — decimal now, and the spring has no consumers yet.
+
+**Four PRD sections applied onto the tree, 2026-09-19, never by replacement.** Numbering was
+ruled rather than guessed, and the final numbers are **§6.1c · §11.3 · §12.3a · §12.3b**.
+`§11.1` stays the inlined v5 §8 and `§11.2` stays the budget table — neither is renumbered,
+because both are already committed and referenced. The section handoffs took **§11.3**.
+
+- **§6.1c · the workspace transition.** On submit the fold reconfigures in place — same page,
+  same scroll position, no modal. Two notes added on application, because the section arrives
+  after the work it touches: **the band is present when the workspace opens** (§6.3b — the
+  camera ease moves the view, it does not bring the band into existence), and **`walled` is
+  still reachable only by an activation attempt** — *"dismissing the wall returns to the
+  workspace"* is an exit edge, not a second entrance.
+- **§11.3 · section handoffs, resolved toward P0** (ruled). Three of four carriers as drafted
+  rode the mountain, which is P1, while §2 and §3 are P0 — and **§2 is the seam where the
+  mountain deliberately recedes and carries no band**, so the seam most needing a carrier had
+  the least mountain to carry it. Every seam now has a **non-mountain carrier at P0** (the
+  band thinning; page luminance; type scale), with the mountain as a **P1 enhancement riding
+  the carrier the P0 seam already defines** — not a second property, which would break the
+  one-carrier rule.
+- **§12.3a · surface quality, pulled into P0**, and **retroactive**: grain with tokens rather
+  than the P1 post chain, metadata contrast, the typeface decision recorded. It binds SITE-002,
+  SITE-003, SITE-015 and SITE-019, all merged.
+- **§12.3b · the comparison gate. Applied and deliberately unbuilt.** It needs
+  `docs/site-design/target-frames/`, which does not exist. **A gate whose inputs do not exist
+  passes by having nothing to check** — it would iterate an empty directory and report success,
+  which is §0.3 exactly. Blocked on Kian; when the frames land, the gate's first assertion is
+  that the directory is non-empty, failing by naming the directory rather than the build.
+
+**`SITE-13`'s bare month returns null** (ruled 2026-09-19, Kian). It resolved to the last day
+of the month, and **that is a guess**: *"by May"* means sometime in May, and the 31st is one of
+thirty-one defensible answers presented as the thing the visitor said. **It is the same defect
+as `by February 30` with a plausible output instead of an impossible one — which makes it
+worse, because nothing flags it.** February was caught by a fixture precisely because 28
+February was visibly not what was typed; 31 May is invisible. It also contradicted SITE-013's
+own *"ambiguous phrasing returns null rather than guessing"*, which the end-of-month reading had
+quietly exempted itself from.
+
+**`by the end of May` still resolves**, and that is the distinction the ruling turns on: a
+visitor who writes *"end of"* has named the last day, so the parse reports what they wrote.
+
+**The fixtures were reshaped, not just re-valued.** They read `assert.equal(parsed('by May'),
+'2026-05-31')` — a record of what the code returned, which **would have passed identically
+under any reading somebody picked**. The choice it encoded was invisible, so the next person to
+change it would change a number without learning a decision was being reversed. The rule is now
+one test asserting the triple — **a bare month returns null · an explicit date resolves · an
+impossible date aborts** — deliberately together, because the rule is the distinction between
+them: a suite asserting only the first passes on a parser that returns null for everything.
+
+**A defect in `check-builder.mjs`, found by it passing when it should have failed.** It reads
+`out/`, not `lib/`, so the deadline change went green locally against an export built before
+the change existed. **CI is safe by accident** — `build` runs immediately before it — which is
+the kind of safety that holds until the job order is edited and does nothing for a hand run,
+which is when a wrong green is most expensive. It now **fails if `out/` is older than the
+newest file in `app`, `components` or `lib`**. Proven: touch a source without rebuilding, exit 1.
+It is the §0.3 family with a twist — not satisfiable by the *absence* of the thing it measures,
+but by a **stale copy** of it.
+
+**Lavender is light, never paint, and it is now a CI check.** `scripts/check-lavender.mjs` is in
+the sweep, which is **twelve checks**. §6.3b's clause is written about the band and the rule it
+states is about the token: a viewer cannot learn that lavender means *lit* from a page that also
+uses it to colour things in.
+
+**It existed because the rule was already broken in the most prominent place on the page.** The
+`Run` button was a solid `--color-lavender` fill, and the input's status dot was a filled
+lavender disc **with a lavender glow on it** — the same token used as paint and as light in one
+element. Neither was caught by review, by types, or by the eleven existing checks, because
+nothing was looking. Both are now lit edges: a lavender border and label with the glow, over
+the surface, so enabled and disabled differ by **light** rather than by presence of fill.
+
+The scan matches `background`, `background-color`, `fill` and the `bg-`/`fill-` utilities, and
+**deliberately does not match** `color`, `border-color`, `box-shadow`, `outline` or `stroke` —
+a lit edge and a glow are the sanctioned form, and a check that flagged them would ban the rule
+along with its violation. **One allowlist entry, named explicitly rather than by pattern**:
+`app/tokens/page.dev.tsx`, whose job is to render each token as a filled block and which never
+ships. A pattern would let any future dev route paint with lavender. **Proven three ways** — the
+Tailwind utility exits 1, the CSS property exits 1, and a lit edge exits 0.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as

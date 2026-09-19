@@ -93,15 +93,17 @@ type RuleResult = DeadlineMatch | null | typeof INVALID
 type Rule = (text: string, now: Date) => RuleResult
 
 /*
- * `by|before|until <month>` — the deadline is the end of that month. "by May"
- * does not mean May 1st; it means the visitor has May.
+ * `by|before|until the end of <month>` — **explicit, and the only month phrase
+ * that resolves.** The visitor named the end of the month, so the parse is
+ * reporting what they wrote rather than choosing for them.
  */
-const monthPhrase: Rule = (text, now) => {
-  const m = /\b(?:by|before|until|due)\s+(?:the\s+end\s+of\s+)?([a-z]+)\b/i.exec(text)
+const endOfMonthPhrase: Rule = (text, now) => {
+  const m = /\b(?:by|before|until|due)\s+(?:the\s+)?end\s+of\s+([a-z]+)\b/i.exec(text)
   if (!m?.[1]) return null
   const idx = monthIndex(m[1])
   return idx === null ? null : { date: nextOccurrenceOfMonth(now, idx), phrase: m[0] }
 }
+
 
 /** `in N days|weeks|months`. */
 const relativePhrase: Rule = (text, now) => {
@@ -180,7 +182,30 @@ const explicitDate: Rule = (text, now) => {
  * more specific than "by May" and both patterns match it. "end of" beats the
  * month phrase for the same reason.
  */
-const RULES: readonly Rule[] = [explicitDate, endOfPeriod, relativePhrase, monthPhrase]
+/*
+ * Order matters: the most explicit rule first, so a phrase that names a day is
+ * never claimed by a rule that only sees the month.
+ *
+ * **There is deliberately no bare-month rule** — `by May`, with no day and no
+ * "end of", matches nothing and the parse returns null. Ruled 2026-09-19
+ * (Kian). It previously resolved to the last day of the month, and that is a
+ * guess: *"by May"* means **sometime in May**, and choosing the 31st picks one
+ * of thirty-one defensible answers and presents it as the thing the visitor
+ * said.
+ *
+ * **It is the same defect as `by February 30`, with a plausible output instead
+ * of an impossible one — which makes it worse, because nothing flags it.** The
+ * February case was caught by a fixture precisely because 28 February was
+ * visibly not what was typed. 31 May is invisible: it looks like
+ * understanding, it survives review, and every downstream occurrence count is
+ * built on it. It also contradicted SITE-013's own criterion — *ambiguous
+ * phrasing returns null rather than guessing* — which the end-of-month reading
+ * had quietly exempted itself from.
+ *
+ * The absence is the rule, so it is stated here rather than left as a gap
+ * somebody fills back in.
+ */
+const RULES: readonly Rule[] = [explicitDate, endOfPeriod, endOfMonthPhrase, relativePhrase]
 
 /**
  * @returns the parsed deadline, noon-anchored local, or `null` when the text

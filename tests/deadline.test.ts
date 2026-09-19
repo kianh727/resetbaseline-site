@@ -9,6 +9,19 @@
  * accept is *"ambiguous phrasing returns null rather than guessing"*, and a
  * suite of only positive cases would pass on a parser that guesses at
  * everything.
+ *
+ * **These tests assert the rule, not the output** (reshaped 2026-09-19 on
+ * Kian's ruling). The original month cases read `assert.equal(parsed('by May'),
+ * '2026-05-31')` — which is a record of what the code returned, and **would have
+ * passed identically under end-of-month, start-of-month, or any other reading
+ * somebody picked.** A test shaped that way cannot disagree with the
+ * implementation, so the choice it encodes is invisible: the next person to
+ * change this would change a number without ever learning that a decision was
+ * being reversed.
+ *
+ * Each case below is named for the rule it enforces, and the three that matter
+ * are stated as one triple: **a bare month returns null · an explicit date
+ * resolves · an impossible date aborts.**
  */
 
 import { test } from 'node:test'
@@ -23,28 +36,79 @@ function parsed(text: string, now: Date = NOW): string | null {
   return d === null ? null : toISODate(d)
 }
 
-test('`by <month>` resolves to the end of that month', () => {
-  assert.equal(parsed('finish my thesis by May'), '2026-05-31')
-  assert.equal(parsed('by June'), '2026-06-30')
-  assert.equal(parsed('by February'), '2027-02-28', 'February already passed in 2026')
-  assert.equal(parsed('by feb'), '2027-02-28', 'abbreviations count')
-  assert.equal(parsed('BY DECEMBER'), '2026-12-31', 'case-insensitive')
+/*
+ * The rule, as one triple. Ruled 2026-09-19 (Kian).
+ *
+ * These three cases are deliberately one test rather than three, because the
+ * rule is the *distinction between them* — a suite that asserted only the first
+ * would be satisfied by a parser that returns null for everything, and one that
+ * asserted only the second by a parser that guesses at everything.
+ */
+test('a bare month returns null · an explicit date resolves · an impossible date aborts', () => {
+  assert.equal(
+    parsed('finish my thesis by May'),
+    null,
+    'a bare month is ambiguous — "by May" means sometime in May, and the 31st is a guess',
+  )
+  assert.equal(parsed('by May 15'), '2026-05-15', 'a named day is what the visitor wrote')
+  assert.equal(
+    parsed('by February 30'),
+    null,
+    'an impossible date aborts rather than falling through to a looser rule',
+  )
 })
 
-test('the current month counts as future — "by May" in May is this May', () => {
+test('no bare month resolves, whatever its spelling', () => {
+  // Every shape that previously produced an end-of-month date. If one of these
+  // starts returning a date again, the rule has been partially reintroduced —
+  // which is how it would come back: one case at a time, each defensible.
+  for (const input of [
+    'finish my thesis by May',
+    'by June',
+    'by February',
+    'by feb',
+    'BY DECEMBER',
+    'before March',
+    'until September',
+    'due August',
+  ]) {
+    assert.equal(parsed(input), null, input)
+  }
+})
+
+test('a bare month in the current month is still null, not "this month"', () => {
+  // The old rule had a deliberate carve-out here: "by May" said in May meant
+  // this May rather than next year. That reasoning was sound and is now moot —
+  // the phrase does not resolve at all, so there is no year to pick.
   const inMay = new Date(2026, 4, 3, 12)
-  assert.equal(parsed('by May', inMay), '2026-05-31')
+  assert.equal(parsed('by May', inMay), null)
 })
 
-test('`before` and `until` are the same phrase family as `by`', () => {
-  assert.equal(parsed('before March'), '2026-03-31')
-  assert.equal(parsed('until September'), '2026-09-30')
-  assert.equal(parsed('due August'), '2026-08-31')
+/*
+ * `by the end of <month>` is the explicit form and it does resolve.
+ *
+ * This is the distinction the ruling turns on: the visitor who writes "end of"
+ * has named the last day, so the parse reports what they wrote. The one who
+ * writes "by May" has not, and the parser does not choose for them.
+ */
+test('`by the end of <month>` resolves — the visitor named the end', () => {
+  assert.equal(parsed('by the end of May'), '2026-05-31')
+  assert.equal(parsed('by end of June'), '2026-06-30')
+  assert.equal(parsed('by the end of February'), '2027-02-28', 'February already passed in 2026')
+})
+
+test('the current month counts as future for the explicit form', () => {
+  const inMay = new Date(2026, 4, 3, 12)
+  assert.equal(
+    parsed('by the end of May', inMay),
+    '2026-05-31',
+    'a visitor saying it on the 3rd has most of the month left',
+  )
 })
 
 test('leap years are real days, not approximations', () => {
   const in2027 = new Date(2027, 5, 1, 12)
-  assert.equal(parsed('by February', in2027), '2028-02-29', '2028 is a leap year')
+  assert.equal(parsed('by the end of February', in2027), '2028-02-29', '2028 is a leap year')
 })
 
 test('`in N days|weeks|months`', () => {
@@ -84,7 +148,9 @@ test('explicit dates, ISO and written', () => {
 })
 
 test('an explicit date beats the bare month it contains', () => {
-  assert.equal(parsed('by May 15'), '2026-05-15', 'not 2026-05-31')
+  // Still worth asserting after the ruling: rule order is what makes it true,
+  // and a reordering would now silently return null rather than a wrong date.
+  assert.equal(parsed('by May 15'), '2026-05-15', 'not null, and not 2026-05-31')
 })
 
 test('impossible dates return null rather than rolling over', () => {
@@ -167,7 +233,7 @@ test('DST transitions do not move the calendar day', () => {
 })
 
 test('every parsed date is noon-anchored', () => {
-  for (const text of ['by May', 'in 6 weeks', 'by the end of the year', '2026-05-15']) {
+  for (const text of ['by the end of May', 'in 6 weeks', 'by the end of the year', '2026-05-15']) {
     const d = parseDeadline(text, NOW)
     assert.ok(d !== null)
     assert.equal(d.getHours(), 12, `"${text}" must be noon-anchored or DST can move its day`)
@@ -209,12 +275,12 @@ test('the suite covers at least 60 phrases — SITE-013 accept', () => {
  */
 test('the parser reports the phrase that produced the date', () => {
   const cases: readonly (readonly [string, string])[] = [
-    ['finish my thesis by May', 'by May'],
-    ['finish my thesis by May and stop losing my mornings', 'by May'],
+    ['finish my thesis by the end of May', 'by the end of May'],
+    ['finish my thesis by the end of May and stop losing my mornings', 'by the end of May'],
     ['ship it in 6 weeks', 'in 6 weeks'],
     ['by the end of the quarter', 'by the end of the quarter'],
     ['hand it in on 2026-05-15', '2026-05-15'],
-    ['due August', 'due August'],
+    ['due by the end of August', 'by the end of August'],
   ]
   for (const [text, phrase] of cases) {
     const m = matchDeadline(text, NOW)

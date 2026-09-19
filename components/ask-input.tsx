@@ -50,12 +50,22 @@ export default function AskInput({
 
       <div className="group flex items-center gap-3 border border-edge bg-surface px-4 py-3 transition-colors focus-within:border-lavender">
         {/*
-          * The lavender status dot. Decorative, so it is hidden from assistive
+          * The status dot. Decorative, so it is hidden from assistive
           * technology — it carries no information a screen reader user lacks.
+          *
+          * **Lavender is light, never paint** (§6.3b). Fixed 2026-09-19: this
+          * was `bg-lavender` — a filled lavender disc — with a lavender glow on
+          * focus, which is **the same token used two ways in one element**, and
+          * that is precisely what the grammar exists to stop. A viewer cannot
+          * learn that lavender means *lit* from a page that also uses it to
+          * colour things in.
+          *
+          * It is now an unfilled ring in the hairline colour that **lights** on
+          * focus: the glow is the signal, and the dot is the thing being lit.
           */}
         <span
           aria-hidden="true"
-          className="size-2 shrink-0 rounded-full bg-lavender transition-shadow group-focus-within:shadow-[0_0_12px_2px_var(--color-lavender)]"
+          className="size-2 shrink-0 rounded-full border border-edge transition-shadow group-focus-within:border-lavender group-focus-within:shadow-[0_0_12px_2px_var(--color-lavender)]"
         />
 
         <input
@@ -77,10 +87,26 @@ export default function AskInput({
            * than hidden: the control's existence is what tells a visitor there
            * is something to press once they have typed enough.
            */
-          className="min-h-11 shrink-0 px-4 text-body font-medium text-void transition-colors disabled:cursor-not-allowed"
+          /*
+           * **Lavender is light, never paint** (§6.3b). Fixed 2026-09-19: this
+           * was a solid `--color-lavender` fill with void-coloured text — a
+           * painted region, which is what the grammar forbids whatever the
+           * element is. A filled button is not an exception to the rule; it is
+           * the most prominent violation of it on the page.
+           *
+           * Enabled is now a **lit edge**: a lavender border and lavender label
+           * over the surface, with the same glow the input's focus ring uses.
+           * The affordance is unchanged — the control still reads as the thing
+           * to press — and it now reads as lit rather than as coloured in.
+           *
+           * Disabled keeps the hairline border and `--bone-38`, so the two
+           * states differ by *light*, not by presence of fill.
+           */
+          className="min-h-11 shrink-0 border px-4 text-body font-medium transition-[color,border-color,box-shadow] disabled:cursor-not-allowed"
           style={{
-            backgroundColor: enabled ? 'var(--color-lavender)' : 'var(--color-edge)',
-            color: enabled ? 'var(--color-void)' : 'var(--color-bone-38)',
+            borderColor: enabled ? 'var(--color-lavender)' : 'var(--color-edge)',
+            color: enabled ? 'var(--color-lavender)' : 'var(--color-bone-38)',
+            boxShadow: enabled ? '0 0 12px -2px var(--color-lavender)' : 'none',
           }}
         >
           Run
