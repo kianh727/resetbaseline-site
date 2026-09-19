@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: typecheck · lint · test · build · bundle
+    name: typecheck · lint · test · build · bundle · overflow
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -78,3 +78,13 @@ jobs:
       # the end catches the thirtieth dependency, not the first.
       - name: Core bundle budget
         run: npm run check:bundle
+
+      # SITE-005. Zero horizontal scroll at 320px is a P0 acceptance criterion,
+      # and §9 puts it at every width the site supports. This needs a real
+      # browser because an overflow is a layout outcome, not something visible
+      # in the CSS that caused it.
+      - name: Install Chromium for the overflow check
+        run: npx playwright-core install --with-deps chromium
+
+      - name: Horizontal overflow at 320/375/390/768/1440/1920
+        run: npm run check:overflow

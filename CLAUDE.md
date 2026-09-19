@@ -633,7 +633,51 @@ current absent state: exit 1.
 CI, generate the plan-model types, add the layout-rule-per-`capability_type` coverage check that
 fails the build on an uncovered type, and the negative test proving an altered manifest fails.
 
-**Next in sequence is `SITE-5`** if SITE-4 stays blocked — SP-01's remaining foundation work.
+**`SITE-5` is done in code; its device verification is not, and cannot be from a session.**
+Root layout, nav, safe areas, overflow guards.
+
+- **The nav is the wordmark and an empty terminal-CTA slot.** The non-goal is explicit — no
+  nav interactivity beyond the slot — so the wordmark is text, not a link: there is nowhere
+  else to go yet and a link to `/` from `/` is an affordance that does nothing. The slot
+  stays empty because the terminal action is a three-branch config value decided at launch
+  (§11.4, §15.3 item 3) and building it is SP-08's. SP-01's exit criterion is *"a deployed
+  empty shell"*, and this is what that means.
+- **`viewport-fit=cover` is set, and it is the load-bearing line.** `env(safe-area-inset-*)`
+  resolves to 0 on iOS without it. Omitting it would leave the tokens declared, the nav
+  rendering, nothing looking wrong on a simulator — and the notch handling doing nothing on
+  the only device it exists for.
+- **`overflow-x: clip` is on the root element as well as body.** Body alone is not enough: a
+  child can still extend the initial containing block. `clip` not `hidden`, because `hidden`
+  on the root turns the document into a scroll container and breaks sticky positioning.
+- **Gutter is 16px, 32px from 768px**, and horizontal padding always adds that side's
+  safe-area inset, so one rule covers portrait and landscape-on-a-notched-device.
+
+**A defect in my own check, found by proving it negatively.** The six-width overflow check
+first read `scrollWidth` on the shipped page — and passed a deliberate 1200px-wide probe at
+320px. **`overflow-x: clip` removes the overflow from `scrollWidth`**, so the guard §9
+requires was hiding the defect from the test written to find it: §0.3 in miniature, and the
+third time today that "does this pass against nothing?" caught something real. The check now
+**lifts the clip before measuring** and reports both numbers — unclipped is the layout truth
+and fails the build, as-shipped says whether a scrollbar is actually visible. It names the
+widest offending element, because a report that says only "8px" sends the next person hunting
+the whole page.
+
+**`playwright-core` is a dev dependency.** An overflow is a layout outcome — a long
+unbreakable string, a fixed-width child, a negative margin — and none of those are visible in
+the CSS that caused them, so the check needs a real browser. **Dev dependencies do not count
+against the 120 KB ceiling**, which is runtime JavaScript; the bundle is unchanged at 100.2 KB
+because the nav is a server component. `scripts/serve-out.mjs` is a hand-written static server
+rather than another dependency, because the export references `/_next/...` absolutely and
+`file://` would 404 on every chunk.
+
+**Not done, and not fakeable from here: `SITE-5`'s `Verify` line is *"real iOS Safari, portrait
+and landscape."*** Headless Chromium reports every safe-area inset as 0 because it has no
+notch, so what was verified is that the tokens resolve, the calc holds, and the gutter is
+correct at every width — not that the nav clears a notch. **That verdict needs a device and
+is Kian's to record** (§7: `VIS` verdicts are judged by a human and recorded, never inferred).
+
+**Next in sequence is `SITE-6`** (reduced-motion and render-tier primitives), then `SITE-106`
+(the eval-stub audit). `SITE-4` resumes the moment the manifest lands.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as

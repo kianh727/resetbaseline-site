@@ -133,9 +133,55 @@
   --font-display: var(--font-candidate, var(--font-system));
 }
 
+/*
+ * SITE-005 · Safe areas.
+ *
+ * §9: `env(safe-area-inset-*)` on the wall, the pinned save bar, and the fold.
+ * Declared once here as tokens so every consumer reads the same names rather
+ * than repeating the `env()` call with its own fallback.
+ *
+ * The fallback of `0px` is load-bearing: `env()` with no fallback resolves to
+ * nothing on a browser that does not support it, which invalidates the whole
+ * declaration it sits in rather than contributing zero.
+ *
+ * **These are only non-zero when the viewport is `viewport-fit=cover`**, which
+ * app/layout.tsx sets. Without it iOS reports every inset as 0 and the entire
+ * feature is inert while appearing to be implemented — a thing that looks done
+ * and does nothing.
+ */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /*
+   * The page gutter. 16px at 375px is the §9 leading inset; it opens up on
+   * wider viewports. Side padding always adds the horizontal safe-area inset
+   * on top, so landscape on a notched device never puts text under the notch.
+   */
+  --gutter: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
 html {
   /* Native scroll. No smooth-scroll override, here or anywhere (PRD §7.5, SITE-070). */
   -webkit-text-size-adjust: 100%;
+
+  /*
+   * §9: `overflow-x: clip` on root. Set on both the root element and body —
+   * body alone is not enough, because a child that overflows can still extend
+   * the initial containing block and give the document a horizontal scrollbar.
+   * `clip` rather than `hidden`: `hidden` on the root element turns the whole
+   * document into a scroll container, which breaks `position: sticky` and
+   * scroll anchoring. This is not a scroll override; it is a clip (SITE-070).
+   */
+  overflow-x: clip;
 }
 
 body {
@@ -152,4 +198,16 @@ body {
    * it per column and nothing else in the codebase names a family.
    */
   font-family: var(--font-display);
+}
+
+/*
+ * SITE-005 · The page gutter as a utility.
+ *
+ * Horizontal padding is the gutter plus that side's safe-area inset, so the
+ * rule holds in portrait (inset 0, gutter only) and in landscape on a notched
+ * device (inset non-zero, content clears the notch) without a second rule.
+ */
+@utility page-x {
+  padding-left: calc(var(--gutter) + var(--safe-left));
+  padding-right: calc(var(--gutter) + var(--safe-right));
 }
