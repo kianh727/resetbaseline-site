@@ -652,9 +652,51 @@ signal. **It joins the sweep in the same commit as the manifest**, and its logic
 now by `tests/manifest-staleness.test.mjs` (7 tests). Confirmed failing correctly against the
 current absent state: exit 1.
 
-**Still owed before SITE-4 can finish:** the manifest itself. On arrival — wire the check into
-CI, generate the plan-model types, add the layout-rule-per-`capability_type` coverage check that
-fails the build on an uncovered type, and the negative test proving an altered manifest fails.
+**The manifest arrived, and SITE-4 is still blocked — on a different thing.** The app session
+delivered it in PR **`resetbaseline-site#3`**, one file at the repository root, targeting `main`.
+It matches `docs/contracts-manifest-delivery.md` **exactly**: the three envelope fields, a
+capture time that is not the commit time, a 40-hex `app_commit_sha`
+(`a776dd7e14745ef900ecbf377c641f66bff830e2`), `CONTRACT_MANIFEST` nested verbatim under its own
+key, and `artifact_divergences` left in — which the spec explicitly asked for rather than
+excluded, because the site's generator refusing to read it is the safer place for that rule.
+Every declared count agrees with the array it describes: **45 actions, 76 events**, plus reason
+codes 38, validation errors 21, analytics events 17, gap fills 8. **Nothing is wrong with the
+delivery.**
+
+**What is wrong is an assumption three of our own artifacts make about it.** The manifest is an
+**action and event vocabulary**. It does not contain:
+
+- **`capability_type`** — the string does not appear, and the five are not enumerated anywhere.
+  They exist only *inside* action verb names (`create_commitment`, `create_reminder`, …).
+- **`authority_tier`**, or `auto` / `provisional` / `explicit`.
+- **`belief_tier`**, or the five resolvable outcome values as a set.
+
+So three requirements cannot be met from this file as written:
+
+1. **SITE-004's accept** — *"every `capability_type` in the manifest has a layout rule; a type
+   without one fails the build."* There are none in the manifest, so that check would iterate an
+   empty set and **pass**. **This is §0.3 exactly: a criterion satisfiable by the absence of the
+   thing it measures**, and it would have gone green on the first run.
+2. **PRD §6.2** — *"handles every `capability_type` the contracts define — exactly five …
+   generated from `contracts-manifest.json`"*, and **"derived, not hand-listed."** It cannot be
+   derived from this file. The tempting fix — hand-listing the five in the site — is the one
+   thing §6.2 forbids by name, and it would silently decouple the site from the contract.
+3. **§5 of this file and EVAL-031** — *authority tiers are contract-derived, a pure function of
+   object type.* There are no tiers in the manifest to derive from.
+
+**My spec is where this should have been caught.** It stated the envelope precisely and said
+what the site does with the file — but it never stated, as a checkable precondition, **what the
+file must contain** for the site to do it. The app session delivered `CONTRACT_MANIFEST`
+verbatim, which is exactly what was asked. A spec that fully constrains the container and not
+the contents is the same shape as a check that passes on an empty one.
+
+**Reported, not resolved (§9).** Nothing was merged, nothing was hand-listed, and the manifest
+was **not copied onto this branch** — PR #3 targets `main`, and duplicating the file would
+collide when both land. Three ways out, all Kian's: the app adds the object vocabulary to
+`CONTRACT_MANIFEST` (an app-repo change); the PRD is amended so the site derives the five from
+the action verbs with a CI assertion that the derivation still matches; or §6.2 is amended to
+something the manifest can actually support. **Until one is chosen, SITE-4 stays blocked and the
+layout-rule check must not be written** — writing it now produces a green gate over nothing.
 
 **`SITE-5` is done in code; its device verification is not, and cannot be from a session.**
 Root layout, nav, safe areas, overflow guards.
