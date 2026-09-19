@@ -20,6 +20,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* An answer approximately containing: I tell it what I'm trying to do · it turns that into a plan or system · it structures the actual execution · it can protect the work or adapt over time.
 *Pass* **3 of 4 concepts present.** Baseline terminology not required. Paraphrase fully acceptable.
 *Fail examples* "AI chatbot" · "AI habit tracker" · "goal tracker" · "AI planner" · "cool mountain website" · any answer where the dominant noun is the visual.
+*Stub check* n/a — `FTU`, judged by a human and recorded, never inferred.
 *PRD* §18.3 · *Issues* SITE-061
 
 **SITE-EVAL-002 · Differentiation from a recording tool** · `FTU`
@@ -29,6 +30,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* Some articulation that Baseline produced the structure rather than storing the text.
 *Pass* Participant references the plan, schedule, dates, or protection as something the system made — not something they made.
 *Fail* "It looks nicer" · "It's the same but with AI" · inability to distinguish.
+*Stub check* n/a — `FTU`, judged by a human and recorded, never inferred.
 *PRD* §13, §18.3 · *Issues* SITE-061
 
 ---
@@ -42,6 +44,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* Per §3.1.
 *Pass* **p50 ≤ 2.5s, p95 ≤ 5s.**
 *Fail* p95 > 5s, or any single session exceeding 8s.
+*Stub check* Asserts **50 sessions were recorded** before computing any percentile. An uninstrumented funnel reports zero sessions, and the p95 of nothing is not a slow site — it is no measurement at all.
 *PRD* §2 DS-3, §3.1 · *Issues* SITE-032, SITE-050, SITE-060
 
 **SITE-EVAL-004 · Zero-scroll path to plan** · `VIS`
@@ -51,6 +54,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* Plan visible without any scroll gesture.
 *Pass* All three viewports.
 *Fail* Any viewport requiring scroll to see the first occurrence mark.
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §2 DS-1, §9 · *Issues* SITE-053, SITE-056
 
 **SITE-EVAL-005 · Definition of a meaningful plan** · `AUTO`
@@ -60,6 +64,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* A meaningful plan contains: a commitment with a title, a recurrence rule, **at least 3 dated occurrences**, and either a timer or a gate. A deadline is optional.
 *Pass* Every `plan_generated` event corresponds to a plan meeting that definition.
 *Fail* Any empty, occurrence-less, or commitment-less plan reaching `plan_ready`.
+*Stub check* Asserts **at least one `plan_generated` event exists** before checking that every plan meets the definition. Zero plans satisfy *"every plan is meaningful"* vacuously.
 *PRD* §3.1, §10 · *Issues* SITE-025, SITE-050
 
 ---
@@ -73,6 +78,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* Reference to structure — fields, a schedule, dates, blocks — derived from their sentence.
 *Pass* Participant describes a transformation, not a response.
 *Fail* "It answered me" · "It gave advice" · "It repeated my goal."
+*Stub check* n/a — `FTU`, judged by a human and recorded, never inferred.
 *PRD* §3.4 · *Issues* SITE-015, SITE-016, SITE-061
 
 **SITE-EVAL-007 · Frame renders complete and empty at t=0** · `AUTO`
@@ -82,6 +88,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* Full `YOU SAID` / `BASELINE BUILT` frame present, unfilled rows showing `—`.
 *Pass* Frame present at both snapshots. **Zero elements matching spinner/skeleton/shimmer selectors anywhere in the builder.**
 *Fail* Any loading indicator, any empty container, any layout shift on fill.
+*Stub check* Asserts the frame's **rows are present at 0ms**, not merely that no spinner selector matched. A page that renders nothing contains no spinner either, and would pass the negative half alone.
 *PRD* §2 DS-10, §3.4 · *Issues* SITE-015
 
 **SITE-EVAL-008 · Pre-submit deadline materialization** · `AUTO` `VIS`
@@ -91,6 +98,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* Deadline field fills before submit.
 *Pass* Field populated with zero network requests during typing.
 *Fail* Any fetch during typing, or deadline appearing only post-submit.
+*Stub check* Asserts the **deadline field is populated**, not only that no request was made during typing. An input that parses nothing also issues no requests.
 *PRD* §3.3 · *Issues* SITE-013, SITE-019
 
 ---
@@ -102,6 +110,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Load at 1440px and 375px. Observe idle, focus, filled, and disabled states.
 *Pass* Reviewer confirms: primary action is unambiguous · focus state clearly visible · **does not read as a ChatGPT-style centered text box**.
 *Fail* Centered composition · send-arrow iconography · placeholder implying open-ended conversation.
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §3.2, §14 · *Issues* SITE-008
 
 **SITE-EVAL-010 · Chip breadth constraint** · `AUTO`
@@ -110,6 +119,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Expected* Every displayed set contains at least one of `back`, `thesis`, `lsat`.
 *Pass* Zero violations in 1000 draws.
 *Fail* Any all-habit set.
+*Stub check* Asserts **1000 draws were actually produced** before checking that every set contains a non-habit chip. A rotation that never runs yields zero sets and therefore zero violations.
 *PRD* §3.2, §5 · *Issues* SITE-011
 
 **SITE-EVAL-011 · Chip interaction** · `AUTO` `VIS`
@@ -117,6 +127,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Click a chip. Inspect focus and caret. Then type.
 *Pass* Input focused, caret at end, typed characters append. Rotation permanently stopped.
 *Fail* Caret at start · input unfocused · rotation resumes.
+*Stub check* Asserts the **input's value changed** after the chip click before asserting caret position and focus. An inert chip moves no caret and fails no assertion about where the caret went.
 *PRD* §3.2 · *Issues* SITE-010, SITE-011
 
 **SITE-EVAL-012 · Autotype never submits** · `AUTO`
@@ -124,6 +135,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Load and wait 60s untouched.
 *Pass* Input typed once, then idle. **No submit occurs. No plan appears.**
 *Fail* Any automatic submission or auto-generated plan.
+*Stub check* Asserts autotype **actually typed** before asserting that no submit occurred. A component that does nothing also never submits, and would pass the headline assertion.
 *PRD* §3.2 · *Issues* SITE-009
 
 **SITE-EVAL-013 · Tune discoverability and effect** · `FTU` `AUTO`
@@ -131,6 +143,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* FTU: observe whether the participant tunes unprompted within 60s of plan appearing. AUTO: measure 50 tune operations.
 *Pass* **4 of 6 participants tune unprompted.** Every operation completes in **< 400ms with zero network requests**.
 *Fail* Tune requiring instruction · any network call · any operation > 400ms.
+*Stub check* Asserts **50 tune operations completed** before asserting latency and zero network calls. An inert control performs none, which makes both *< 400ms* and *zero requests* trivially true.
 *PRD* §2 DS-4, §3.6, §4 · *Issues* SITE-037, SITE-061
 
 **SITE-EVAL-014 · Protect implies no browser capability** · `AUTO` `VIS`
@@ -138,6 +151,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Audit all copy in the protect step and gate card against a banned-implication list ("blocked", "now active", "protection on", "enabled").
 *Pass* Zero implications of active enforcement anywhere before the wall.
 *Fail* Any copy or state suggesting protection is running.
+*Stub check* Asserts the protect step and gate card **rendered copy** before scanning it against the banned-implication list. Empty copy contains no banned word.
 *PRD* §2 DS-8, §3.7 · *Issues* SITE-041
 
 **SITE-EVAL-015 · Activate is deliberate** · `VIS`
@@ -145,6 +159,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Observe six sessions to the wall.
 *Pass* Every participant reached the wall by pressing Activate, and can say what they pressed.
 *Fail* Any participant surprised by the wall's appearance.
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §11.1 · *Issues* SITE-042, SITE-061
 
 ---
@@ -156,6 +171,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Submit, then attempt a tune interaction at 200ms after occurrence data exists.
 *Pass* Interaction accepted and processed. Fan-out interruptible with no orphaned state.
 *Fail* Controls disabled until animation finishes.
+*Stub check* Asserts the control **reached its enabled state** before asserting it did so before the animation ended. A control that never enables never enables late.
 *PRD* §3.1, §8.2, §17 K-4 · *Issues* SITE-025
 
 **SITE-EVAL-017 · Settling spring is exclusive** · `AUTO`
@@ -163,6 +179,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Static analysis of every consumer of the spring primitive.
 *Pass* **Only structure-landing components import it.** Lint rule fires on any other import.
 *Fail* Section headers, the wall, chips, or refusals using it.
+*Stub check* Asserts **at least one settling-spring usage exists** before asserting that every usage is structure landing into place. Zero usages satisfies exclusivity vacuously — and the signature would be gone, which is the thing this eval exists to protect.
 *PRD* §8.1 · *Issues* SITE-024
 
 **SITE-EVAL-018 · Refusals read as stopping** · `VIS` `AUTO`
@@ -170,6 +187,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Trigger the `back` scenario. Inspect motion config.
 *Pass* Opacity-only, 300ms, no spring, `--veto` rule, 400ms hold. Reviewer confirms it reads as the system declining.
 *Fail* Any spring or scale on the refusal element.
+*Stub check* Asserts a refusal **actually rendered** before asserting it uses no spring. An unrendered refusal animates nothing.
 *PRD* §8.2, §3.4 · *Issues* SITE-018
 
 **SITE-EVAL-019 · Motion does not read as decorative AI-site animation** · `VIS`
@@ -177,6 +195,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Full-page review at 1440px and 375px.
 *Pass* Reviewer confirms: no fade-and-slide-up on every section · no stagger on non-sequential content · no hover lift · every animation either communicates state change or carries product meaning.
 *Fail* Any decorative motion that survives the question "what does this tell the user?"
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §8.2, §19, §17 K-4 · *Issues* SITE-025, SITE-072
 
 **SITE-EVAL-020 · Reduced motion comprehension** · `VIS` `FTU`
@@ -184,6 +203,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Enable `prefers-reduced-motion`. Complete the full loop at both widths.
 *Pass* **Full loop completable and fully comprehensible with zero animation.** No autotype, no sweep, static grain, camera snaps.
 *Fail* Any state only reachable or only understandable through animation.
+*Stub check* n/a — `VIS` and `FTU`, judged by a human and recorded, never inferred.
 *PRD* §8.3, §18.2 · *Issues* SITE-006, SITE-009, SITE-071
 
 ---
@@ -201,30 +221,35 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Inject 20 malformed fixtures — truncated JSON, extra fields, wrong enums, missing required, wrong types.
 *Pass* All rejected at validation; `plan_generation_fallback` fires with `invalid_schema`; a complete plan still appears.
 *Fail* Any coercion, repair, or partial acceptance.
+*Stub check* Asserts **all 20 malformed fixtures were injected and 20 rejections observed**. A provider that never runs rejects nothing, coerces nothing, and repairs nothing.
 *PRD* §12 · *Issues* SITE-031, SITE-033
 
 **SITE-EVAL-023 · Timeout** · `AUTO` `VIS`
 *Steps* Stub the route to 4001ms.
 *Pass* Request aborts at 4000ms · fallback engages · **no dead spinner** · post-abort response cannot mutate state.
 *Fail* Any wait beyond 4s, or late response overwriting fallback state.
+*Stub check* Asserts the **timeout actually fired and a fallback plan rendered**. A generation path that never starts never exceeds 4000ms, so the bound holds for the wrong reason.
 *PRD* §12, §2 DS-7, DS-10 · *Issues* SITE-032, SITE-033
 
 **SITE-EVAL-024 · Network failure** · `AUTO` `VIS`
 *Steps* Block `/api/plan` at the network layer.
 *Pass* Full loop completes via `StaticProvider`. Visitor sees a complete plan with their own words in `YOU SAID`.
 *Fail* Any error message, any blocked step.
+*Stub check* Asserts the **failure was injected and a complete plan still appeared**. No request means no network error to survive.
 *PRD* §2 DS-7, §12 · *Issues* SITE-029, SITE-033
 
 **SITE-EVAL-025 · Bounded-domain request** · `AUTO` `VIS`
 *Steps* Submit each of five bounded-domain inputs.
 *Pass* Deterministic classifier fires; authored refusal renders; built-instead structure appears. **Model output cannot suppress the refusal.**
 *Fail* Any generated refusal text · any de-escalation from bounded to ordinary.
+*Stub check* Asserts the **bounded classification fired and refusal copy rendered**. An input that is never classified produces no refusal to check, and no escalation to catch.
 *PRD* §3.4, §4 · *Issues* SITE-014, SITE-017, SITE-018, SITE-033
 
 **SITE-EVAL-026 · Rate limit and spend cap** · `AUTO`
 *Steps* Exceed 5/hr/IP, then trip the daily cap, then flip the kill switch.
 *Pass* Each routes to `StaticProvider` with the correct `plan_generation_fallback` reason. Kill switch effective without redeploy.
 *Fail* Any user-visible error, any blocked demo.
+*Stub check* Asserts **both the rate-limit and spend-cap paths were entered**. A provider that is never called hits neither, and every assertion about how they resolve is vacuous.
 *PRD* §12 · *Issues* SITE-034, SITE-033
 
 ---
@@ -234,8 +259,9 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 **SITE-EVAL-027 · Authored scenarios demonstrate distinct behaviors** · `VIS` `AUTO`
 *Risk* Five scenarios that all look like the same habit demo.
 *Steps* Run all five end to end.
-*Pass* Each visibly demonstrates its assigned behavior — `thesis` grounded-only refusal and long horizon · `gym` contention veto and anti-streak · `lsat` timer and explicit gate · `mornings` gate-first · `back` bounded refusal then process. All five validate against contracts. Every action verb is one of the 45 in `contracts-manifest.json`; every rendered outcome is one of the five resolvable values (`complete · partial · missed · cancelled_intentionally · unknown`) — `pending` must not appear, and `rescheduled` must not appear as a recorded outcome (PRD v7.3 §6.3 permits it only as a derived display state).
+*Pass* **Rewritten 2026-09-19 by SITE-106's audit; the previous wording passed on presence-of-render.** Per scenario, the **specific object set that scenario exists to demonstrate** is asserted — `thesis` a grounded-only refusal with a long horizon · `gym` a contention veto and anti-streak · `lsat` a timer plus an `explicit` gate · `mornings` a gate as the first object · `back` a bounded refusal followed by process. **No two scenarios produce the same object-type multiset** — that is what *"indistinguishable in output shape"* means, and it is now asserted rather than eyeballed. All five validate against contracts. Every action verb is one of the 45 in `contracts-manifest.json`; every rendered outcome is one of the five resolvable values (`complete · partial · missed · cancelled_intentionally · unknown`) — `pending` must not appear, and `rescheduled` must not appear as a recorded outcome (PRD v7.3 §6.3 permits it only as a derived display state).
 *Fail* Two scenarios indistinguishable in output shape.
+*Stub check* **Was a named §12.4 exposure and is rewritten here.** *"Each demonstrates its assigned behavior"* passes if the assertion is presence-of-render: five scenarios that each render *something* would satisfy it. It now asserts, per scenario, the **specific object set that scenario exists to demonstrate** — `thesis` a grounded-only refusal with a long horizon, `gym` a contention veto, `lsat` a timer plus an `explicit` gate, `mornings` a gate as the first object, `back` a bounded refusal followed by process — and asserts that **no two scenarios produce the same object-type multiset**, which is what *"indistinguishable in output shape"* actually means. A stub rendering five identical empty plans fails on the first scenario and again on the distinctness check.
 *PRD* §5 · *Issues* SITE-028
 
 **SITE-EVAL-028 · Compelling without an LLM** · `VIS` `FTU`
@@ -243,6 +269,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Disable generation entirely. Run 001 and 006 against the static-only build.
 *Pass* **Comprehension results are statistically indistinguishable from the generated build.** Raw intent preserved verbatim in `YOU SAID`.
 *Fail* Participants noticing the plan doesn't match what they typed.
+*Stub check* n/a — `VIS` and `FTU`, judged by a human and recorded, never inferred.
 *PRD* §5, §12, §2 DS-7 · *Issues* SITE-029
 
 ---
@@ -253,24 +280,28 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* 40+ fixtures: weekday counts, DST both directions, month boundaries, leap year, every closed-set rule.
 *Pass* Weekdays over 14 days = exactly 10. All fixtures exact.
 *Fail* Any off-by-one, any DST drift.
+*Stub check* Asserts the **fixture suite ran to its full declared count** before asserting that every date matches. Zero fixtures pass *"all dates correct"*, and a suite that silently stopped loading fixtures looks identical to one that passed.
 *PRD* §4 · *Issues* SITE-023
 
 **SITE-EVAL-030 · LLM wording does not move dates** · `AUTO`
 *Steps* Feed 20 semantically identical inputs with varied phrasing. Compare resulting occurrence sets.
 *Pass* **Identical dates and counts across all 20.** Only commitment title varies.
 *Fail* Any variance in dates, counts, tiers, or recurrence.
+*Stub check* Asserts **both phrasings produced a plan with a non-zero occurrence count** before comparing them. Two empty results are identical, which would read as perfect determinism.
 *PRD* §4 · *Issues* SITE-023, SITE-030
 
 **SITE-EVAL-031 · Authority tiers are contract-derived** · `AUTO`
 *Steps* Assert tier for every object type across all scenarios.
 *Pass* Tier is a pure function of object type. **Gate always `explicit`.** No model input reaches tier assignment.
 *Fail* Any tier passed through from generation.
+*Stub check* Asserts **every `capability_type` in the manifest produced an object with a tier** before asserting that gate is always `explicit`. No objects means no wrong tiers.
 *PRD* §4 · *Issues* SITE-026, SITE-040
 
 **SITE-EVAL-032 · Tuning is fully local** · `AUTO`
 *Steps* Perform 50 tune operations with network monitoring.
 *Pass* **Zero network requests. Zero LLM calls.** Same input always produces the same occurrence set.
 *Fail* Any request, any nondeterminism.
+*Stub check* Asserts **tune operations occurred and changed the plan** before asserting zero network requests. This is the single most important boundary in SP-06, and an inert control satisfies its headline assertion perfectly.
 *PRD* §4, §3.6 · *Issues* SITE-037
 
 ---
@@ -281,24 +312,28 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Exhaustively attempt: 10-minute idle, full page scroll, section entry, exit-intent gesture, 50 interactions, direct state manipulation.
 *Pass* **`walled` unreachable by every path except an Activate press.**
 *Fail* Any alternate path.
+*Stub check* Asserts the wall **was reached at least once by a genuine activation** before asserting that no other path reaches it. A wall that never opens is unreachable by everything, including activation.
 *PRD* §11.1 · *Issues* SITE-012, SITE-042
 
 **SITE-EVAL-034 · Wall is honest** · `AUTO` `VIS` `FTU`
 *Steps* Press Activate. Inspect all rendered copy and state. Then ask: *"What would you have expected to happen?"*
 *Pass* No "activated" state exists anywhere. Participant understands **why** the site stops — gates need the phone.
 *Fail* Any fake success · participant describing it as "a signup wall" or "they want my email."
+*Stub check* Asserts the wall **rendered its copy** before scanning it for fake-activation language. Unrendered copy implies no capability the browser lacks.
 *PRD* §11.2, §11.3, §2 DS-8 · *Issues* SITE-043, SITE-061
 
 **SITE-EVAL-035 · Plan preserved and dismissible** · `AUTO` `VIS`
 *Steps* Reach the wall, inspect, dismiss, then tune and protect again.
 *Pass* Plan visible behind 40% dim · dismissal returns full interactivity · pinned save bar persists · wall re-reachable only by another Activate.
 *Fail* Plan hidden · trapped state · re-prompt on scroll or exit intent.
+*Stub check* Asserts the plan **was present before dismissal** as well as after. Absent-then-absent passes *"the plan is preserved"*.
 *PRD* §11.3 · *Issues* SITE-043, SITE-047
 
 **SITE-EVAL-036 · Terminal action branches** · `AUTO` `VIS`
 *Steps* Set config to each of `waitlist`, `testflight`, `appstore`.
 *Pass* All three render and submit correctly with no code change. Capture records `terminal_action`.
 *Fail* Any branch unbuilt or hardcoded.
+*Stub check* Asserts **all three branches rendered** across the config values. A config that renders none passes *"each branch is correct"* without producing a branch.
 *PRD* §11.4 · *Issues* SITE-045, SITE-046
 
 ---
@@ -308,20 +343,23 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 **SITE-EVAL-037 · Full event sequence** · `ANLY` `AUTO`
 *Steps* One complete manual loop; assert the event stream.
 *Expected* `hero_view → builder_engaged → goal_input_started → goal_submitted → plan_generated → plan_tuned → protect_started → protect_selected → activation_attempted → wall_reached → email_submitted → share_card_created`, plus `suggestion_selected` where applicable.
-*Pass* Sequence complete and ordered, all properties per §10.
+*Pass* **Rewritten 2026-09-19 by SITE-106's audit; the previous wording passed on an empty stream.** The **expected event count is asserted first** — the twelve named events, plus `suggestion_selected` where the loop used a chip — and only then the ordering and the per-event properties of §10. An empty stream is trivially *"complete and ordered"*, so the count is what makes the rest mean anything.
 *Fail* Missing event, wrong property, out-of-order emission.
+*Stub check* **Was a named §12.4 exposure and is rewritten here.** The sequence assertion passes if no events are expected: an empty stream is trivially *"complete and ordered"*. It now asserts the **exact expected event count first** — the twelve named events, plus `suggestion_selected` where the loop used a chip — and only then their order and properties. A stub emitting nothing fails on the count before ordering is ever considered.
 *PRD* §10 · *Issues* SITE-050
 
 **SITE-EVAL-038 · Branch and fallback events** · `ANLY` `AUTO`
 *Steps* Force each of five generation failures; dismiss the wall.
 *Pass* `plan_generation_fallback` fires with the correct reason each time; `wall_dismissed` fires with `dwell_ms`.
 *Fail* Silent fallback with no event.
+*Stub check* Asserts **each branch and fallback event fired at least once** across the injected failures. An empty stream contains no wrong events and no wrong properties.
 *PRD* §10 · *Issues* SITE-033, SITE-050
 
 **SITE-EVAL-039 · No sensitive free-form text in analytics** · `AUTO`
 *Steps* Submit a goal containing a person's name, a place, and a health term. Capture all analytics payloads.
 *Pass* **No payload contains any substring of the user's input.** Attaching `raw_goal` fails at compile time.
 *Fail* Any free-form text in any event.
+*Stub check* Asserts the **negative fixture genuinely fails to compile** — a file that attaches `raw_goal` to an event must be rejected by `tsc`. A compile-time rule with no failing case rejects nothing, and its absence is indistinguishable from its working.
 *PRD* §10, §18.2 · *Issues* SITE-051
 
 **SITE-EVAL-040 · Peak does not suppress engagement** · `ANLY`
@@ -330,6 +368,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Compare `hero_view → builder_engaged` and `plan_generated → wall_reached` across Tiers A/B and C/D.
 *Pass* Tier A/B engagement **within 5% of, or above,** Tier C/D.
 *Fail* Tier A/B materially lower — **K-1 fires and the Peak gets simplified.**
+*Stub check* Asserts **both cohorts carry a non-zero sample** before comparing engagement rates. Two empty cohorts show no difference, which would read as the Peak costing nothing.
 *PRD* §10.2, §17 K-1 · *Issues* SITE-052
 
 ---
@@ -340,36 +379,42 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Complete goal → plan → tune → protect → activate → wall → share on a real device.
 *Pass* Every step completable. Screenshots captured at each.
 *Fail* Any step requiring rotation, zoom, or desktop.
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §9 · *Issues* SITE-053
 
 **SITE-EVAL-042 · Keyboard behavior** · `VIS`
 *Steps* Focus the input on real iOS Safari. Type. Observe.
 *Pass* Input **and at least three transformation rows** remain visible above the keyboard. Input never scrolls off-screen.
 *Fail* Input obscured · content jumping · viewport not tracked.
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §9 · *Issues* SITE-054
 
 **SITE-EVAL-043 · Chips and tune ergonomics** · `VIS` `AUTO`
 *Steps* One-handed use at 375px. Automated target-size audit.
 *Pass* Chips scroll horizontally with momentum, no wrap. All targets ≥44×44 (day pills ≥40×40). **No hover dependency anywhere.**
 *Fail* Any undersized target · any hover-only affordance.
+*Stub check* Asserts the **targets exist** before measuring them against 44×44. Zero elements are all at least 44px.
 *PRD* §9 · *Issues* SITE-055, SITE-057
 
 **SITE-EVAL-044 · Plan readability in limited height** · `VIS`
 *Steps* 375×667 with keyboard closed and open.
 *Pass* Occurrences collapse to next-5 + "and 5 more"; plan remains understandable; expansion works on tap.
 *Fail* Plan illegible · horizontal scrolling of the plan.
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §9 · *Issues* SITE-056
 
 **SITE-EVAL-045 · Wall on mobile** · `VIS`
 *Steps* Reach the wall at 375px, keyboard open and dismissed.
 *Pass* Bottom sheet, not centered modal · email field and submit visible with keyboard open · plan visible above · safe areas respected.
 *Fail* Centered modal · obscured submit · content under the home indicator.
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §9, §11.3 · *Issues* SITE-044
 
 **SITE-EVAL-046 · Overflow sweep** · `AUTO`
 *Steps* Every builder state at 320/375/390/768/1440/1920.
 *Pass* **Zero horizontal scroll in every state at every width.**
 *Fail* Any overflow.
+*Stub check* Asserts a **non-zero route and state count**, and measures **with `overflow-x: clip` lifted**. The clip §9 requires removes the overflow from `scrollWidth`, so a check reading the shipped page reports clean on a page that overflows by a thousand pixels. Found in SITE-005, where the first version of this check passed a deliberate 1200px probe at 320px wide.
 *PRD* §9, §18.2 · *Issues* SITE-005, SITE-057
 
 ---
@@ -380,24 +425,28 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Complete the full loop using keyboard only.
 *Pass* Every control reachable and operable; visible focus throughout; **wall dismissible by keyboard**; logical tab order.
 *Fail* Any keyboard trap · any unreachable control.
+*Stub check* Asserts a **non-zero count of focusable elements** before asserting that all are reachable and ordered. A page with no controls is perfectly keyboard-operable.
 *PRD* §18.2 · *Issues* SITE-008, SITE-035, SITE-036, SITE-039, SITE-043
 
 **SITE-EVAL-048 · Semantic controls and labels** · `AUTO`
 *Steps* Automated a11y audit across all builder states.
 *Pass* Native or correctly-roled controls · all inputs labeled · state changes announced.
 *Fail* Div-buttons · unlabeled inputs · silent state changes.
+*Stub check* Asserts **controls exist** before asserting each carries a name and role. Zero controls are all correctly labelled.
 *PRD* §18.2 · *Issues* SITE-035, SITE-036, SITE-039
 
 **SITE-EVAL-049 · Contrast and non-color signaling** · `AUTO` `VIS`
 *Steps* Contrast audit on `--bone-38` metadata, `--veto`, and lavender-on-void. Verify selection states.
 *Pass* Body and interactive text meet AA. **No state conveyed by color alone** — selection, veto, and authority tier all carry a non-color signal.
 *Fail* Metadata below AA · color-only selection state.
+*Stub check* Asserts **text and non-text targets were sampled** before asserting contrast ratios. Nothing rendered has no contrast failures.
 *PRD* §14, §18.2 · *Issues* SITE-002, SITE-003, SITE-039
 
 **SITE-EVAL-050 · Reduced motion completeness** · `AUTO` `VIS`
 *Steps* With reduced motion enabled, verify each §8.3 requirement individually.
 *Pass* Sweep stopped · cursor authority off · grain static · camera snaps · no autotype · builder shows final states · Day 1→30 is a toggle.
 *Fail* Any animation surviving the preference.
+*Stub check* Asserts animations **exist when motion is allowed**, then that they are absent under `reduce`. A site with no animation at all passes the reduced case perfectly while failing the product.
 *PRD* §8.3 · *Issues* SITE-006, SITE-009, SITE-071, SITE-073
 
 ---
@@ -408,47 +457,53 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Lighthouse mobile in CI, throttled 4G.
 *Pass* LCP ≤1.8s · CLS ≤0.05 · INP ≤200ms · **core ≤120KB gzip · scene ≤140KB gzip and excluded from first load** · Lighthouse mobile perf ≥90.
 *Fail* Any budget exceeded — build fails.
+*Stub check* Asserts the **built artifacts exist and are non-empty** before comparing them to the budgets. An empty bundle is under every ceiling — this is the §0.3 shape the 120 KB check was written against, and the same trap applies to every budget here.
 *PRD* §16 · *Issues* SITE-076, SITE-078
 
 **SITE-EVAL-052 · Headline is LCP** · `PERF` `AUTO`
 *Steps* Inspect the LCP element with the Peak live.
 *Pass* **LCP is the hero headline. The Peak is never in the LCP path** and initializes after on idle callback.
 *Fail* Canvas or scene asset as LCP.
+*Stub check* Asserts an **LCP element was identified at all** before asserting it is the headline. A blank page reports no LCP candidate.
 *PRD* §16 · *Issues* SITE-007, SITE-076
 
 **SITE-EVAL-053 · Interaction latency** · `PERF` `AUTO`
 *Steps* Measure tune, chip select, protect select, activate over 50 operations each.
 *Pass* Tune < 400ms end to end. All others < 100ms to visible feedback.
 *Fail* Any operation exceeding budget.
+*Stub check* Asserts **interactions actually occurred** before measuring INP. A page nobody can interact with has no interaction latency.
 *PRD* §2 DS-4, §16 · *Issues* SITE-037
 
 **SITE-EVAL-054 · Frame budgets** · `PERF`
 *Steps* Measure on target hardware per tier during scroll and cursor movement.
 *Pass* Tier A ≤8ms · Tier B ≤12ms on a real mid-range Android.
 *Fail* Sustained breach — **K-2 fires and the offending post pass is removed.**
+*Stub check* Asserts **frames were rendered** before asserting frame time. A scene that never initializes never breaches 8ms.
 *PRD* §16, §17 K-2 · *Issues* SITE-077, SITE-079
 
 ---
 
 ## N. Degradation ladder
 
-**SITE-EVAL-055 · Tier A full loop** · `VIS` — Desktop, WebGL2. Full Peak, cursor authority, full post chain. Loop completes; plan legible over the geometry. *PRD* §15 · *Issues* SITE-075
+**SITE-EVAL-055 · Tier A full loop** · `VIS` — Desktop, WebGL2. Full Peak, cursor authority, full post chain. Loop completes; plan legible over the geometry. *PRD* §15 · *Issues* SITE-075 *Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 
-**SITE-EVAL-056 · Tier B full loop** · `VIS` `PERF` — Modern mobile. Half-res upscale, grain and bloom retained, aberration absent, auto-sweep only, plan via `FlatLayout`. Loop completes within frame budget. *PRD* §15 · *Issues* SITE-077
+**SITE-EVAL-056 · Tier B full loop** · `VIS` `PERF` — Modern mobile. Half-res upscale, grain and bloom retained, aberration absent, auto-sweep only, plan via `FlatLayout`. Loop completes within frame budget. *PRD* §15 · *Issues* SITE-077 *Stub check* The `VIS` half is n/a. The `PERF` half asserts **frames were rendered** before asserting frame time — a scene that never initializes never breaches its budget.
 
-**SITE-EVAL-057 · Tier C full loop** · `VIS` — Static peak + CSS gradient. Loop completes; plan renders via `FlatLayout` or `StaticPeakLayout`. *PRD* §15 · *Issues* SITE-069, SITE-058
+**SITE-EVAL-057 · Tier C full loop** · `VIS` — Static peak + CSS gradient. Loop completes; plan renders via `FlatLayout` or `StaticPeakLayout`. *PRD* §15 · *Issues* SITE-069, SITE-058 *Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 
 **SITE-EVAL-058 · Tier D full loop, WebGL disabled** · `AUTO` `VIS`
 *Risk* The demo depends on the atmosphere it was explicitly designed to survive without.
 *Steps* Disable WebGL entirely. Complete the loop at 375px and 1440px.
 *Pass* **Full loop completes. Every builder function works. Plan is coherent and compelling.**
 *Fail* Any degraded function, any broken layout, any missing step.
+*Stub check* Asserts the **loop completed to the wall** with WebGL disabled, not merely that nothing threw. A page that renders nothing also does not crash.
 *PRD* §2 DS-6, §15 · *Issues* SITE-058, SITE-022
 
 **SITE-EVAL-059 · Failure × tier matrix** · `AUTO` `VIS`
 *Steps* Five generation failures × four tiers × two widths = 40 combinations.
 *Pass* **Zero dead states, zero spinners, zero broken layouts.** Minimum twelve manually spot-checked and documented.
 *Fail* Any combination producing an unrecoverable or empty state.
+*Stub check* Asserts **every cell of the failure × tier matrix was exercised** before asserting each resolved. An unrun matrix contains no failures.
 *PRD* §2 DS-6, DS-7, DS-10 · *Issues* SITE-059
 
 ---
@@ -459,6 +514,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Show the fold to three people who know the app icon, without telling them what to look for. Ask what they see.
 *Pass* All three identify the Baseline mark within one second.
 *Fail* Generic mountain · no recognition — **geometry is wrong (SITE-062).**
+*Stub check* n/a — `FTU`, judged by a human and recorded, never inferred.
 *PRD* §7.1 · *Issues* SITE-062
 
 **SITE-EVAL-061 · Peak does not steal from Ask Baseline** · `FTU` `VIS`
@@ -466,24 +522,28 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 *Steps* Run SITE-EVAL-001 against the Peak build and the flat build. Compare.
 *Pass* **Comprehension scores on the Peak build are equal to or better than the flat build.** Participants engage the input first, not the background.
 *Fail* Any comprehension drop, or participants describing the site as "a mountain website" — **K-1 fires.**
+*Stub check* n/a — `FTU` and `VIS`, judged by a human and recorded, never inferred.
 *PRD* §7, §10.2, §17 K-1, §18.3 · *Issues* SITE-062, SITE-068
 
 **SITE-EVAL-062 · Plan legibility over geometry** · `VIS`
 *Steps* Render all five scenarios with `ProjectedPeakLayout` at 1440px.
 *Pass* Every occurrence date, label, and tier remains readable over every facet at every light angle.
 *Fail* Any label lost against the surface — **K-3 fires and readability wins over geometric fidelity.**
+*Stub check* n/a — `VIS`, judged by a human and recorded, never inferred.
 *PRD* §6, §17 K-3 · *Issues* SITE-068, SITE-062
 
 **SITE-EVAL-063 · Adapter swap changes no builder logic** · `AUTO`
 *Steps* Static analysis of the builder module graph under `FlatLayout` and `ProjectedPeakLayout`.
 *Pass* **Identical builder module graph.** Zero parallel plan logic.
 *Fail* Any builder branch on layout type · any duplicated plan model.
+*Stub check* Asserts **both adapters rendered a non-empty plan** before asserting the builder's code paths are identical. Two adapters that render nothing differ in nothing.
 *PRD* §6 · *Issues* SITE-068
 
 **SITE-EVAL-064 · Scroll remains native** · `AUTO` `VIS`
 *Steps* Import-ban check; scroll the full page on real iOS Safari.
 *Pass* No Lenis or locomotive imports · no `preventDefault` on wheel or touchmove · momentum scroll feels native.
 *Fail* Any interception.
+*Stub check* Asserts the page **actually scrolled** before asserting the scroll was native, and pairs it with the import ban's negative test — a page that cannot scroll intercepts nothing, and an import ban with no forbidden import to reject proves nothing.
 *PRD* §7.5 · *Issues* SITE-070
 
 ---
@@ -494,23 +554,28 @@ Each runs the complete demo — goal → transformation → plan → tune → pr
 
 **SITE-EVAL-065 · `gym` — recurring physical goal** · `VIS` `AUTO`
 *Pass* Contention veto fires on a colliding time · **no streak object is ever created** · upstream intervention proposed.
+*Stub check* Asserts the scenario **rendered its objects** before asserting which. An empty plan demonstrates no behaviour, distinctly or otherwise.
 *PRD* §5 · *Issues* SITE-028, SITE-038
 
 **SITE-EVAL-066 · `thesis` — project deadline** · `VIS` `AUTO`
 *Pass* Deadline inferred from "by May" pre-submit · grounded-only refusal to outline unseen content · long-horizon occurrences with correct dates.
+*Stub check* Asserts the scenario **rendered its objects** before asserting which. An empty plan demonstrates no behaviour, distinctly or otherwise.
 *PRD* §5 · *Issues* SITE-013, SITE-028
 
 **SITE-EVAL-067 · `lsat` — studying / procrastination** · `VIS` `AUTO`
 *Pass* Timer created with a real duration · gate at `explicit` · high-frequency recurrence expands correctly.
+*Stub check* Asserts the scenario **rendered its objects** before asserting which. An empty plan demonstrates no behaviour, distinctly or otherwise.
 *PRD* §5 · *Issues* SITE-028, SITE-026
 
 **SITE-EVAL-068 · `mornings` — routine / time-of-day failure** · `VIS` `AUTO`
 *Pass* Gate is the primary object · protection precedes scheduling in the transformation block.
+*Stub check* Asserts the scenario **rendered its objects** before asserting which. An empty plan demonstrates no behaviour, distinctly or otherwise.
 *PRD* §5 · *Issues* SITE-028, SITE-040
 
 **SITE-EVAL-069 · `back` — bounded domain** · `VIS` `AUTO` `FTU`
 *Pass* Authored refusal on the participant's own text · **zero programming or exercise advice generated** · process structure built instead. FTU: participant describes the refusal as trustworthy rather than unhelpful.
 *Fail* Any generated medical or training guidance.
+*Stub check* Asserts the scenario **rendered its objects and its refusal** before asserting which. An empty plan demonstrates no behaviour, and an absent refusal reads as a refusal that correctly did not fire.
 *PRD* §3.4, §4, §5 · *Issues* SITE-014, SITE-017, SITE-018, SITE-028
 
 ---
@@ -577,7 +642,9 @@ Added by PRE-1 Part B against PRD v7.3. **Every eval here must fail against a st
 
 **SITE-EVAL-078 · Every eval fails against a stub — §12.4** · `AUTO`
 *Risk* The standing rule stays a paragraph. An eval suite that has never been run against nothing is a suite of unknown value.
-*Pass* Every automated eval has a recorded stub result showing it **fails** on an empty implementation. The three known exposures — SITE-EVAL-021, SITE-EVAL-027, SITE-EVAL-037 — are rewritten or recorded as verified non-exposures with evidence.
+*Pass* Every eval carries a `*Stub check*` line stating how it fails against a stub that does nothing, enforced by `scripts/check-eval-stubs.mjs` in CI rather than at review. Every **implemented** automated eval additionally has a recorded stub result.
+
+**All three named exposures are rewritten, not recorded as non-exposures.** SITE-EVAL-021 — *"all validate"* passed on zero requests; now asserts 30 responses and ≥8 clarification fields before any property. SITE-EVAL-027 — passed on presence-of-render; now asserts each scenario's specific object set and that no two scenarios share an object-type multiset. SITE-EVAL-037 — passed on an empty stream; now asserts the expected event count before ordering. **The eval definitions are rewritten here; the implementations belong to their owning issues** (SITE-030/031, SITE-028, SITE-050), per SITE-106's non-goal.
 *Fail* Any eval accepted with no stub result · any eval that passes against the stub and is kept as written.
 *Stub check* This eval is the stub check. Its own failure mode is passing when the suite is empty, so it asserts a non-zero eval count.
 *PRD* v7.3 §12.4, §0.3 · *Issues* SITE-106

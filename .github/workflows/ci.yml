@@ -4,7 +4,7 @@ name: CI
 # list, not a number". Adding a check here adds it to the sweep; nothing else
 # does. Later issues extend it — SITE-004 the contracts drift guard, SITE-057
 # the overflow and touch-target audit, SITE-078 the performance budgets,
-# SITE-106 the eval-stub run, SITE-107 the ban-list check.
+# SITE-107 the ban-list check. SITE-106's eval-stub run is already here.
 #
 # The 120 KB core bundle ceiling is already here, pulled forward from
 # SITE-078 by ruling: it costs nothing while the number is 103, and it names
@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: typecheck · lint · test · build · bundle · overflow
+    name: eval-stubs · typecheck · lint · test · build · bundle · overflow
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -47,6 +47,13 @@ jobs:
       # check through a filter: a pipeline reports whether the filter
       # succeeded, so a failing check whose output happens not to match looks
       # exactly like a passing one (CLAUDE.md §7).
+      # SITE-106. §12.4 made operational: every eval states how it fails against
+      # a stub that does nothing, and an eval added without one fails CI rather
+      # than review. Runs before the build because it needs no artifacts and a
+      # missing stub check should be the first thing anyone hears about.
+      - name: Eval stub checks
+        run: npm run check:eval-stubs
+
       - name: Typecheck
         run: npm run typecheck
 

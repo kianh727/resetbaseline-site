@@ -720,8 +720,52 @@ suite uses — SITE-023's DST-safe occurrence math above all.
 **The bundle is unchanged at 100.2 KB.** The hooks are client code but have no consumers yet,
 so nothing imports them into a route.
 
-**Next in sequence is `SITE-106`** (the eval-stub audit), which is the last of SP-01 that is not
-blocked. `SITE-4` resumes the moment the manifest lands.
+**`SITE-106` is done, and it found something about itself.**
+
+**The mechanism.** `scripts/check-eval-stubs.mjs` is in the sweep and runs first, before the
+build, because a missing stub check needs no artifacts and should be the first thing anyone
+hears about. Every eval in `docs/site-evals-v1.md` now carries a `*Stub check*` line saying how
+it fails against a stub that does nothing — **68 were written in this pass; 11 already had
+one.** An eval added without one fails CI rather than review, and **an automated eval may not
+answer `n/a`**: that is the right answer for a `VIS` or `FTU` eval, whose verdict is a human's,
+but an eval with code behind it has a stub to run against and "not applicable" there is the
+question dismissed rather than answered. Both failure modes proven negatively — a new eval with
+no stub check exits 1 naming it; an `AUTO` eval answering `n/a` exits 1 naming it.
+
+**All three named exposures are rewritten, not waved through as non-exposures.**
+
+- **SITE-EVAL-021** — *"all validate"* passed on zero requests. Now asserts 30 responses and ≥8
+  clarification fields **before** any property. (Done in an earlier pass.)
+- **SITE-EVAL-027** — *"each demonstrates its assigned behavior"* passed on presence-of-render:
+  five scenarios each rendering *something* satisfied it. Now asserts each scenario's specific
+  object set, and that **no two scenarios share an object-type multiset** — which is what
+  *"indistinguishable in output shape"* actually means, and was previously eyeballed.
+- **SITE-EVAL-037** — the sequence assertion passed on an empty stream, which is trivially
+  "complete and ordered". Now asserts the **expected event count first**, then ordering and
+  properties.
+
+Per SITE-106's non-goal, the **eval definitions** are rewritten here; the **implementations**
+stay with their owning issues — SITE-030/031, SITE-028, SITE-050.
+
+**The finding, and it needs a ruling.** SITE-106 sits at SP-01 with one dependency, and its
+accept reads *"every eval in the suite has a recorded stub result."* At SP-01 almost no evals
+are implemented, so that criterion is satisfiable by there being nearly nothing to satisfy it —
+**the audit written to catch criteria satisfiable by absence has one, at its own position in the
+graph.** Running it here and calling it done would have been the §0.3 shape one level up.
+
+What was built instead is a **standing gate over the eval definitions**, all 79 of which exist
+today, rather than a one-time audit over implementations that mostly do not. That is the half
+which holds. **The half that does not: actually running each eval against a stub can only
+happen as each eval is implemented, and no mechanism enforces that** — the gate checks the
+document, not the code. It makes the question unskippable; it cannot check that the answer is
+true.
+
+**Recommended, not ruled:** SITE-106 stops being a one-time SP-01 issue and becomes a standing
+gate re-run at each design review and before the P0 gate — the same trigger as §1's fourth-rule
+reconciliation, for the same reason. Awaiting a ruling; the CI gate is in effect either way.
+
+**Next in sequence: SP-01 is complete except `SITE-4`**, which resumes the moment the manifest
+lands. SP-02 (Ask Baseline hero) is the next milestone and depends only on SP-01.
 
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
