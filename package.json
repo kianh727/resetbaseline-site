@@ -20,6 +20,7 @@
     "check:builder": "node scripts/check-builder.mjs",
     "check:lcp": "node scripts/check-lcp.mjs",
     "check:links": "node scripts/check-links.mjs",
+    "check:app-names": "node scripts/check-app-names.mjs",
     "check:eval-stubs": "node scripts/check-eval-stubs.mjs",
     "check:divergences": "node scripts/check-divergences.mjs",
     "check:lavender": "node scripts/check-lavender.mjs",

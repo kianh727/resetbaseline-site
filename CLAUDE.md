@@ -2120,6 +2120,101 @@ that stays the statement rather than becoming a pass when the gate runs for real
 
 **Sweep is seventeen checks, all green. Bundle unchanged at 105.0 kB of 120.0.**
 
+**SP-06, SP-07 and SP-08 are wired. The builder runs end to end: input → plan → tune →
+protect → activate → wall → capture.** `SITE-035`, `SITE-036`, `SITE-037`, `SITE-039`,
+`SITE-040`, `SITE-041`, `SITE-042` and the capture seam are built.
+
+**`walled` is produced by exactly one call in the whole tree** — `send('activation_attempted')`,
+from the Activate control. Nothing in a component sets state directly; `send` is the only
+mutator and it routes through `next()`, which returns `null` for a transition not in the table
+and **drops the event rather than forcing it**. SITE-012's exhaustive test proves the table has
+one route to `walled`, and that proof is worth nothing if a component can bypass the table.
+
+**The plan is deterministic and there is no provider on this path.** §6.5's generated surface is
+three fields; the title and the clarification are blocked on copy and on a route that does not
+exist, and **the window is not blocked at all** — tuning is fully local, so the control *is* the
+selection and the visitor's own choice is a better source than a model's. That leaves the title,
+and **§6.4 already specifies the fallback: *"the build proceeds on the original input."*** So
+the label is the visitor's own sentence. That is the documented path rather than a stand-in, and
+it is the honest one — the site shows what it understood instead of paraphrasing someone back to
+themselves in a sentence a model wrote.
+
+**Four windows, provisional and mine**, because §6.5 names *"one window selection from a closed
+set"* and **no artifact contains that set** — the same shape as the recurrence defect SITE-113
+recorded. The difference is that the recurrence set is the model's and had to be ruled before
+anything could be built, while this one is the visitor's, so it is a provisional interaction call
+rather than a blocked dependency. Four rather than a picker: a free time picker turns the beat
+into data entry, and four is the most a segmented control holds at 375px without the labels
+dropping below 11px. **The evening window is deliberately not late-night** — a site proposing
+midnight-to-2am is making a recommendation about someone's sleep, which §4 refuses to guess at.
+
+**A default window is unavoidable and is not the same shape as a recurrence default.** §6.3c
+forbids falling through to `daily` because a frequency nobody stated multiplies a plan nobody
+agreed to. A window is different: the plan has to render somewhere on the clock to be tunable,
+the control shows which one is selected, and changing it is one tap. **A wrong frequency is
+invisible in the output; a wrong window is the thing the control is pointing at.**
+
+**`lib/plan/capabilities.ts` is a hand-list, it is what §6.2 forbids, and it is recorded rather
+than hidden.** It is the SITE-004 block showing through a **third** time — after SITE-026's tier
+half and SITE-104's Problem lines — and unlike those two it could not be solved by carrying a
+value through, because **the builder is where objects are created and there is nothing upstream
+to carry from.**
+
+What makes it survivable: both constants are annotated with the contract axis types. Today those
+are opaque aliases and the annotation asserts nothing; **when SITE-004 narrows them, the compiler
+checks these two lines against the manifest** and the file stops compiling if the app's
+vocabulary no longer contains them — §6.6's *"a contract change should break this build"*,
+arriving at no cost. It is **unverified until then**, stated rather than dressed up. Two values,
+not five: a test counts them and fails if the file grows toward the closed set, because that is
+the promise the exemption was granted on.
+
+**The hand-list scan fired on `build-plan.ts` and was right by its own rule and wrong in
+substance** — `id: 'commitment'` was a node **id**, the same word-sharing false positive
+`lib/builder/rows.ts` produced. The scan matches quoted literals rather than meaning, which its
+header already states. Ids are now `n-` prefixed, which is a better name anyway: an id identical
+to a capability value reads as though it were one.
+
+**`scripts/check-app-names.mjs` is in the sweep, which is eighteen checks, and §6.3a is a MUST.**
+It **does not scan for the names**, because the chips legitimately carry them — SITE-039's
+non-goal and §6.3a both say the Protect step's chips are the site's own input affordance and the
+visitor picks recognisable names. A scan would ban the rule along with its violation, which is
+the shape the lavender check had to avoid.
+
+Instead it **drives the real flow in a browser** — type, run, select two chips — and asserts the
+assembled object carries a count and no name. A source scan would pass on a component that
+interpolated a chip label at runtime, and the thing §6.3a forbids is what a visitor sees.
+**Counts before properties**: it asserts the chips registered and a gate object rendered before
+asserting no name is in it, because *"no app name in the gate"* is satisfied perfectly by a page
+with no gate. **Proven both ways** — a name leaked into the object exits 1, and removing the gate
+object entirely exits 1 naming the vacuous case.
+
+**The capture seam takes the terminal action as an injected choice, all three branches built**
+(SITE-045). `waitlist` is the **default rather than a decision**, and it is the only branch true
+today: there is no TestFlight build to join and no App Store listing to open, and a branch
+sending someone to a store page that does not exist is DS-8's failure one step removed.
+`NULL_CAPTURE` is **named so nobody reads a green submit as a stored record** — SITE-046 owns the
+write, and a provider posting to an endpoint that does not exist would be inventing a
+destination. **No URL, key or project name appears in the seam**, so nothing here is hardcodeable
+into the production Supabase project: it takes a provider and does not know what a project is.
+
+**The mobile pass found one real defect, by looking.** At 375px the seven day pills wrapped to
+**six plus one orphan**, which reads as a mistake rather than as a two-row control. Measured
+rather than eyeballed: the content box is 343px, seven 44px pills are 308px, and at an 8px gap
+the six gaps need 48px against 35px available. **The gap is 4px on that row and 8px everywhere
+else**, which fits all seven at 375 and still wraps at 320 as SITE-036's accept allows.
+
+**The targets stay 44px, and SITE-036 is wrong about that.** Its scope says 40×40; §9 says 44×44
+with no exceptions. That is a **contradiction rather than a refinement**, so per §1 the PRD wins
+— closing the gap was the alternative to shrinking the target, and it is the one that costs
+nobody a tap.
+
+**The band holds at 375.** Measured: 343×113 at 375px and 1376×113 at 1440px, metadata resolving
+at 11px in both — SITE-22's scaling fix survives the builder wiring rather than being re-broken
+by it.
+
+**Bundle 110.9 kB of 120.0, 9.1 kB remaining.** The builder is now the site's substantial client
+component; every section remains a server component.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

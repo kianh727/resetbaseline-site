@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder · lcp · links · motion
+    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder · lcp · links · app-names · motion
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -139,6 +139,15 @@ jobs:
       # links" passes perfectly on a footer with no links (§0.3).
       - name: Footer reaches every route and anchor
         run: npm run check:links
+
+      # §6.3a, a MUST. Screen Time returns opaque tokens, so a gate object
+      # naming an app depicts a UI state the product cannot produce. This drives
+      # the real flow in a browser rather than scanning for the strings — the
+      # chips legitimately carry names, so a scan would ban the rule along with
+      # its violation. Counts before properties: it asserts a gate rendered
+      # before asserting no name is in it.
+      - name: No depicted object names an app
+        run: npm run check:app-names
 
       - name: Reduced motion in both settings, and locale independence
         run: npm run check:motion

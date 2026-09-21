@@ -30,9 +30,16 @@ import { canRun, clamp, MAX_CHARS } from '@/lib/ask-input'
 export default function AskInput({
   value,
   onChange,
+  onSubmit,
 }: {
   value: string
   onChange: (next: string) => void
+  /**
+   * Pressing Run. Optional because SITE-008 shipped before there was anything
+   * to submit to, and the input's own rules — the thresholds, the cap,
+   * whitespace not counting — are unchanged by its arrival.
+   */
+  onSubmit?: () => void
 }) {
   const inputId = useId()
   const enabled = canRun(value)
@@ -73,6 +80,14 @@ export default function AskInput({
           type="text"
           value={value}
           onChange={(e) => onChange(clamp(e.target.value))}
+          /*
+           * Enter submits. A single-line field where Enter does nothing is a
+           * dead key, and the visitor who types a sentence and presses it is
+           * the common case rather than the edge.
+           */
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && enabled) onSubmit?.()
+          }}
           maxLength={MAX_CHARS}
           placeholder="Ask Baseline"
           autoComplete="off"
@@ -82,6 +97,7 @@ export default function AskInput({
         <button
           type="button"
           disabled={!enabled}
+          onClick={() => onSubmit?.()}
           /*
            * 44px minimum touch target (§9, no exceptions). `disabled` rather
            * than hidden: the control's existence is what tells a visitor there

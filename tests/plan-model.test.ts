@@ -269,11 +269,29 @@ function handListed(source: string): string[] {
  * correctly, which is exactly how a hand-list gets written by someone who
  * needs the set today — the failure this scan exists to catch.
  *
+ * `lib/plan/capabilities.ts` is the second entry and is a **weaker** case than
+ * the first, which is why it is written down rather than waved through. It is a
+ * real hand-list of two values, added because the builder *creates* objects and
+ * so has nothing upstream to carry a capability from — the SITE-026 and
+ * SITE-104 answer of "carry it through" has no source here.
+ *
+ * What justifies it is that both constants are **annotated with the contract
+ * axis types**. Today those are opaque aliases and the annotation asserts
+ * nothing; when SITE-004 narrows them to the generated union, **the compiler
+ * checks these two lines against the manifest** and the file stops compiling if
+ * the app's vocabulary no longer contains them. That is §6.6's *"a contract
+ * change should break this build"*, arriving with the manifest at no cost.
+ *
+ * It is unverified until then, and that is stated rather than dressed up.
+ *
  * `lib/render/layout-rules.ts` is deliberately **not** listed. Its keys are
  * identifiers, not string literals, so the scan does not match them; if that
  * ever changes it should fail and be looked at, not pre-exempted.
  */
-const HAND_LIST_EXEMPT: readonly string[] = ['lib/contracts/generated.ts']
+const HAND_LIST_EXEMPT: readonly string[] = [
+  'lib/contracts/generated.ts',
+  'lib/plan/capabilities.ts',
+]
 
 function sourceFiles(dir: string): string[] {
   const out: string[] = []
@@ -312,14 +330,39 @@ test('one shared word is not a hand-list — negative control', () => {
   assert.deepEqual(handListed("{ key: 'commitment', label: 'commitment' }"), [])
 })
 
-test('the hand-list exemption is one file, and stays one file', () => {
+test('the hand-list exemption is two files, and each is named', () => {
   /*
    * An allowlist is a hole in the scan, and a hole that can grow silently is
-   * the scan being switched off one entry at a time. Adding a second path has
-   * to be a deliberate edit to this assertion with a reason written next to
-   * it, not a line in an array nobody reviews.
+   * the scan being switched off one entry at a time. Adding a path has to be a
+   * deliberate edit to this assertion with a reason written next to it, not a
+   * line in an array nobody reviews — which is what happened for the second
+   * entry: the scan fired on `capabilities.ts`, correctly, and the exemption is
+   * a recorded decision rather than a check being quieted.
    */
-  assert.deepEqual(HAND_LIST_EXEMPT, ['lib/contracts/generated.ts'])
+  assert.deepEqual(HAND_LIST_EXEMPT, [
+    'lib/contracts/generated.ts',
+    'lib/plan/capabilities.ts',
+  ])
+})
+
+test('the capability seam names two values, not the closed set', () => {
+  /*
+   * §6.2 forbids restating the *closed set*. Two of five is a seam; five of
+   * five is the set, and a file that grew to five would be the hand-list the
+   * exemption was granted on the promise of not being. Counted from the file
+   * rather than from the exports, so adding a sixth constant fails here even
+   * if nothing imports it.
+   */
+  const source = readFileSync('lib/plan/capabilities.ts', 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/\/\/[^\n]*/g, ' ')
+  const values = new Set([...source.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]))
+  assert.ok(
+    values.size <= 4,
+    `lib/plan/capabilities.ts names ${values.size} contract values: ` +
+      `${[...values].join(', ')}. Two capabilities and two tiers is the seam; ` +
+      'more is the closed set, which is what §6.2 forbids.',
+  )
 })
 
 test('the exemption is inert until the generated file exists', () => {
