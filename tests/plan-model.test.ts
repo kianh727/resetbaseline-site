@@ -17,7 +17,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 import {
@@ -250,6 +250,31 @@ function handListed(source: string): string[] {
   return hits
 }
 
+/**
+ * The one file the scan does not read, named explicitly rather than by
+ * pattern.
+ *
+ * `lib/contracts/generated.ts` is the **output** of the derivation §6.2
+ * requires. A scan that flagged it would ban the rule along with its
+ * violation — the same shape the lavender check hit, where a check matching
+ * its own sanctioned form catches its own definition. It is written by
+ * `scripts/generate-contract-types.mjs` and nothing else, it says so in its
+ * own header, and `scripts/check-generated-contracts.mjs` regenerates it in
+ * memory from the manifest and fails the build on any difference. So its
+ * contents are not a hand-list in the sense §6.2 forbids: they cannot be
+ * edited and survive.
+ *
+ * **A pattern would be the wrong shape here.** `lib/contracts/**` or
+ * `*generated*` would let any future file claim the exemption by being named
+ * correctly, which is exactly how a hand-list gets written by someone who
+ * needs the set today — the failure this scan exists to catch.
+ *
+ * `lib/render/layout-rules.ts` is deliberately **not** listed. Its keys are
+ * identifiers, not string literals, so the scan does not match them; if that
+ * ever changes it should fail and be looked at, not pre-exempted.
+ */
+const HAND_LIST_EXEMPT: readonly string[] = ['lib/contracts/generated.ts']
+
 function sourceFiles(dir: string): string[] {
   const out: string[] = []
   for (const entry of readdirSync(dir)) {
@@ -263,6 +288,7 @@ function sourceFiles(dir: string): string[] {
 test('no source file hand-lists a contract vocabulary axis', () => {
   const offences: string[] = []
   for (const file of [...sourceFiles('lib'), ...sourceFiles('components'), ...sourceFiles('app')]) {
+    if (HAND_LIST_EXEMPT.includes(file)) continue
     for (const hit of handListed(stripComments(readFileSync(file, 'utf8')))) {
       offences.push(`${file} — ${hit}`)
     }
@@ -284,4 +310,30 @@ test('the hand-list scan catches an enumerated axis — negative control', () =>
 
 test('one shared word is not a hand-list — negative control', () => {
   assert.deepEqual(handListed("{ key: 'commitment', label: 'commitment' }"), [])
+})
+
+test('the hand-list exemption is one file, and stays one file', () => {
+  /*
+   * An allowlist is a hole in the scan, and a hole that can grow silently is
+   * the scan being switched off one entry at a time. Adding a second path has
+   * to be a deliberate edit to this assertion with a reason written next to
+   * it, not a line in an array nobody reviews.
+   */
+  assert.deepEqual(HAND_LIST_EXEMPT, ['lib/contracts/generated.ts'])
+})
+
+test('the exemption is inert until the generated file exists', () => {
+  /*
+   * SITE-004 has not landed. The entry is prep, not cover for anything
+   * currently in the tree: if the file appeared by some other route, the
+   * regeneration guard is what would catch it, and that guard is what this
+   * exemption is justified by.
+   */
+  assert.equal(
+    existsSync('lib/contracts/generated.ts'),
+    existsSync('contracts-manifest.json'),
+    'lib/contracts/generated.ts and contracts-manifest.json land together. One ' +
+      'without the other means either an ungenerated hand-list or types nobody ' +
+      'regenerated.',
+  )
 })

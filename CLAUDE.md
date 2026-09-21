@@ -1785,6 +1785,124 @@ run that left no artifact.** There is no standing check, so nothing would notice
 font, or a hero image displacing the H1. It is small — the measurement already exists in the
 shape SITE-007 used — and it is **scoped, not built** here.
 
+**`SITE-EVAL-052` is built now, and it is the sweep's sixteenth check.**
+`scripts/check-lcp.mjs`. Three things about how it measures, each a catalogued shape avoided
+rather than a preference: the observer is **registered before navigation** via
+`addInitScript` (and `buffered: true` besides), because an observer attached after `load`
+misses the entries it exists to read and reports nothing — which, asserted naively, reads
+exactly like *"nothing displaced the headline"*; **the entry count is asserted before the
+identity**, because a page producing no LCP candidate satisfies *"the LCP element is not the
+Peak"* perfectly, which is the ordering SITE-EVAL-021 and -037 were rewritten into; and it
+**asserts the export is newer than its sources** (§0.3d), since CI's build-immediately-before
+is job ordering rather than a guarantee and protects nothing on a hand run.
+
+Both verification widths, because the element can differ between them. **Proven negatively
+twice, and the two probes are not the same probe**: a 1200×800 block pushed the H1 out of the
+initial viewport and failed at 375px naming the nav wordmark as the winner, while a 200px text
+block outcompeted it on area and failed at 375px naming itself. At 1440px the H1 still won in
+both cases, correctly — the display clamp gives it more area than either probe. A check that
+fired at only one width would have looked like a defect and is the measurement being right.
+
+---
+
+**Prepared for the manifest, before it landed. Everything except the file itself.**
+
+The instruction was to be ready rather than waiting, so that on arrival the only work is the
+verification and dropping the file in. Four scripts and two test suites, all exercised today
+against fixtures.
+
+- **`scripts/contract-axes.mjs` — one reader, three consumers.** The generator, the coverage
+  check and the arrival verification must not be able to disagree about where the vocabulary
+  lives; two lists meant to be identical are two lists that will one day differ silently.
+  **The key spellings are candidates, not one guess**: `docs/contracts-manifest-delivery.md`
+  fixes the envelope and nothing inside it, because those keys are the app's. A miss fails
+  **naming the manifest and listing what was looked for**, so the next reader adapts one array
+  entry instead of hunting — which is the delivery spec's own defect not repeated. It is
+  **deliberately not a recursive search**: a scan finding *a* list of five strings somewhere in
+  the object binds to whichever it reaches first and then reports coverage against the wrong
+  vocabulary.
+- **`scripts/verify-manifest-arrival.mjs` — the 5/3/5/3 stop-or-go**, run by hand at the moment
+  the file lands and never in CI, because it answers a different question from the standing
+  checks: *is this delivery the thing we asked for at all.* It reports **all four axes rather
+  than stopping at the first failure** — four problems surfaced one per run is three wasted
+  round trips with a person in the loop. **The expected counts are §6.3's, written into the
+  axis table and not read from the manifest**: a count read from the file it checks cannot
+  disagree with it (§0.3b). A legitimate vocabulary change makes them wrong, and that is the
+  intended outcome — a contract change should break this build.
+- **`scripts/check-layout-rules.mjs` — SITE-004's accept, as rewritten.** Absent, unreadable,
+  non-array, non-string, empty and duplicated inputs all fail **naming the manifest**, never the
+  layout rules, because the fault is in the input and an error pointing at the rules sends the
+  reader to the wrong file. Coverage is asserted **in both directions** — a rule with no type is
+  as much a failure as a type with no rule. **Accept part 3 runs through the shipped CLI as a
+  subprocess inside `npm test`**, which is already in the sweep: a fixture manifest carrying a
+  sixth unknown type exits 1, an empty vocabulary exits 1 naming the manifest, and **the matched
+  pair exits 0** — the control on the control, without which both assertions are satisfied by a
+  check that fails on everything, which is the failure mode that looks like rigour.
+- **`scripts/generate-contract-types.mjs` and `scripts/check-generated-contracts.mjs`.** The
+  generator emits **both a union and a frozen list per axis** — deliberately both, per the
+  EVAL-033 finding now at §12.4: the union closes the key space at compile time, the list is
+  what a runtime coverage check can iterate, and neither covers the other's case. **A partial
+  vocabulary generates nothing at all**, because a generator emitting the axes that did arrive
+  leaves every downstream check passing against the part of the contract that landed. The drift
+  guard regenerates in memory and fails on any difference; **its two sources are the manifest on
+  disk and the file in git**, neither computed from the other — unlike the rejected *"the
+  derivation still matches the verb list"*, which is §0.3b.
+
+**The fixture vocabulary is synthetic — `alpha`…`epsilon`, `tier_one`… — and that is the
+point.** §6.2 forbids the five real values hand-listed in the site, and a fixture carrying them
+would be that defect one copy removed: a file sitting in the tree looking like a source. Nothing
+under test depends on what the strings say.
+
+**Three checks are written and deliberately out of the sweep** — `check:manifest`,
+`check:layout-rules`, `check:generated-contracts`. All three exit 1 against the current absent
+state, which is correct and is why they wait: wiring a red check in ahead of a pending
+dependency everyone knows about is noise, not signal. **They join in the same commit as the
+manifest.** Their logic is exercised now by `tests/layout-rule-coverage.test.mjs` (17) and
+`tests/contract-axes.test.mjs` (16), both proven negatively — a stub `evaluate()` returning
+`ok` fails 13 of 17, one returning `fail` fails 15 of 17.
+
+**`SITE-020`'s narrowing is written out in `lib/plan/model.ts` itself**, as the two lines plus
+the import, so it is a mechanical edit rather than a decision made under deadline pressure the
+night the file lands. The note states the order explicitly: **verify the delivery before
+narrowing anything.**
+
+**One exemption added to the hand-list scan, and one deliberately not.**
+`lib/contracts/generated.ts` is exempt, **named explicitly rather than by pattern** — a pattern
+like `lib/contracts/**` would let any future file claim the exemption by being named correctly,
+which is exactly how a hand-list gets written by someone who needs the set today. It is
+justified by the regeneration guard: its contents cannot be edited and survive. A test asserts
+the exemption stays one entry, and a second asserts it is **inert until the generated file
+exists** — `lib/contracts/generated.ts` and `contracts-manifest.json` must be present or absent
+together, since one without the other is either an ungenerated hand-list or types nobody
+regenerated. **`lib/render/layout-rules.ts` is not exempt**: its keys will be identifiers rather
+than string literals, so the scan does not match them, and if that ever changes it should fail
+and be looked at rather than pre-exempted.
+
+**`SITE-EVAL-031`, scoped not built, because its source does not exist yet.** *Tier is a pure
+function of object type; gate always `explicit`; no model input reaches tier assignment.* What
+it needs, in order: (1) `AuthorityTier` narrowed to the generated union, so the function's
+codomain is contract-derived rather than `string`; (2) the tier function itself, which is
+**SITE-026's and not written** — the band currently *carries* the node's tier through to
+§6.1a's metadata line, which is honest about the gap, and a derivation written now would be a
+hand-list wearing a function's clothes; (3) the check asserting **every declared
+`capability_type` produced an object with a tier, before asserting gate is `explicit`** — the
+eval's own stub check, and the ordering that stops it passing on zero objects; (4) the negative
+half, that **no generated field reaches tier assignment**, which is a scan rather than a call,
+because the absence of an argument cannot be tested by calling anything. Items 1 and 3 land with
+the manifest. **Item 2 is SITE-026's remaining half and is the actual blocker**, not the
+manifest.
+
+**`§12.4` is amended with the EVAL-033 finding** (ruled 2026-09-19, Kian). *When a guarantee
+rests on a type and a test together, the test is not the guarantee — and the part the type
+carries is the part nobody re-checks. Any property asserted partly by a type is asserted
+explicitly, or it is not asserted.* A stub audit run against the test alone cannot find that
+shape: the test is doing its job, and the half it does not cover looks exactly like a half that
+does not exist.
+
+**Sweep is sixteen checks**, `check:lcp` added between `builder` and `motion`. Bundle
+**105.0 kB of 120.0, 15.0 kB remaining** — unchanged, since everything added is scripts, tests
+and comments.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder · motion
+    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder · lcp · motion
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -124,5 +124,13 @@ jobs:
       # generalised: a behaviour that only exists in an environment CI never
       # enters is a behaviour CI does not test. Asserts BOTH settings, because
       # checking only the reduced case passes on a site that never animates.
+      # SITE-EVAL-052. PRD §6: the headline is the LCP element and the Peak is
+      # never in the LCP path. SITE-007 verified this once, in an ad-hoc run
+      # that left no artifact — so nothing would have noticed a font, a hero
+      # image or the scene displacing the H1. The §12.4 stub audit found it as
+      # the one eval with no implementation and an obvious one.
+      - name: The headline is the LCP element
+        run: npm run check:lcp
+
       - name: Reduced motion in both settings, and locale independence
         run: npm run check:motion

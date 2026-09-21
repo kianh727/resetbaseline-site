@@ -1,0 +1,8 @@
+{
+  "_note": "SITE-004's positive control. Identical to manifest-fixture-valid.json plus a sixth capability_type the layout rules do not cover. Running the coverage check against this pair MUST exit 1 — without it, the coverage assertions are untested claims about an input that has never varied (accept part 3).",
+  "captured_at": "2026-09-19T00:00:00Z",
+  "app_commit_sha": "0000000000000000000000000000000000000000",
+  "manifest": {
+    "capability_type": ["alpha", "beta", "gamma", "delta", "epsilon", "zeta"]
+  }
+}

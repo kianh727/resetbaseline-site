@@ -44,7 +44,29 @@
 
 /* ------------------------------------------------------------------ *
  * The contract axes — SITE-004's seam.
- * ------------------------------------------------------------------ */
+ * ------------------------------------------------------------------ *
+ *
+ * **The narrowing, written out so it is a mechanical edit rather than a
+ * decision made under deadline pressure the night the manifest lands.**
+ *
+ * When `contracts-manifest.json` is committed and `npm run generate:contracts`
+ * has written `lib/contracts/generated.ts`, the two aliases below become:
+ *
+ *     import type { CapabilityType, AuthorityTier } from '@/lib/contracts/generated'
+ *     export type { CapabilityType, AuthorityTier }
+ *
+ * and the two `= string` lines are deleted. Nothing else in this file moves,
+ * and no call site downstream of it moves either — which is the whole point of
+ * the aliases having been opaque rather than the five values having been
+ * written here provisionally.
+ *
+ * The order matters: **verify the delivery before narrowing anything.** Run
+ * `npm run verify:manifest-arrival`, which asserts the four axes are present
+ * at PRD §6.3's counts 5/3/5/3 and the envelope is well-formed. A count that
+ * disagrees is a stop-and-report, not something to adapt around — the envelope
+ * is hand-assembled, and a site built on a bad publish is indistinguishable
+ * from one built on a good publish until the vocabulary moves.
+ */
 
 /**
  * `capability_type`, per PRD §6.3. Exactly five values, contract-derived.

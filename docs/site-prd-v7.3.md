@@ -1003,6 +1003,25 @@ The reason is that SITE-106 sat at SP-01 with one dependency, and its accept rea
 
 This rule exists because the same failure was found in the app's own acceptance criteria the same day it was written. It is not hypothetical.
 
+#### A guarantee split between a type and a test — amended 2026-09-19 (Kian)
+
+**When a guarantee rests on a type and a test together, the test is not the guarantee — and the part the type carries is the part nobody re-checks.** Any property asserted partly by a type is asserted explicitly, or it is not asserted.
+
+The finding is SITE-EVAL-033's, from the §12.4 stub audit, and it is the only one in that audit that inverted on inspection.
+
+`builder-machine.ts`'s transition table is the mechanism behind **Rejection 3** — *a wall triggered by anything other than an activation attempt*. Its test iterates every state × event pair exhaustively and asserts `walled` is produced by exactly one event. Planting a second route to `walled` under an **undeclared** key — `tuning: { scrolled_to_end: 'walled' }` — **left that test green.** For a minute that read as the most important guarantee on the site failing its own stub check.
+
+It was not failing. **Typecheck caught it** (TS2353), because the table's value type is `Partial<Record<BuilderEvent, BuilderState>>` and `scrolled_to_end` is not a `BuilderEvent`. The guarantee is two-part, and **neither part covers the other's case**:
+
+- the exhaustive test iterates the **declared** event list, so an undeclared key is invisible to it;
+- the type closes the **key space**, so a wrongly-routed declared event — `tuning: { tune: 'walled' }` — is invisible to it.
+
+**The table's closure was load-bearing and incidental.** It held because of how the type happened to be written, and was asserted nowhere. Widening it to `Record<string, BuilderState>` leaves the exhaustive test green while the wall becomes reachable by anything — a one-line edit that passes every check in the sweep and defeats a Rejection.
+
+So the closure is now pinned by its own test, proven negatively: widening the key type exits 1, naming the reason.
+
+**The habit.** When writing a check, ask which part of the property the *compiler* is carrying, and assert that part too. A stub audit run against the test alone cannot find this shape — the test is doing its job, and the half it does not cover looks exactly like a half that does not exist.
+
 ---
 
 ## 13. Build order

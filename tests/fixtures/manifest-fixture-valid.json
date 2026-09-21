@@ -1,0 +1,8 @@
+{
+  "_note": "SITE-004 fixture, not a manifest. The capability values are deliberately synthetic so this file cannot become a vocabulary source for the site: PRD §6.2 requires the five real values derived from contracts-manifest.json, and a fixture carrying them would be a hand-list one copy removed. What is under test here is the shape of the coverage check, which does not depend on what the strings say.",
+  "captured_at": "2026-09-19T00:00:00Z",
+  "app_commit_sha": "0000000000000000000000000000000000000000",
+  "manifest": {
+    "capability_type": ["alpha", "beta", "gamma", "delta", "epsilon"]
+  }
+}
