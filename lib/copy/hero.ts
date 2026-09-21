@@ -15,6 +15,25 @@
  * is recorded in CLAUDE.md §12 as open.
  */
 
+import type { Provenance } from './provenance.ts'
+
+/**
+ * **HELD.** The three candidates are Kian's; which one ships is his decision
+ * and it is open (`CLAUDE.md` §12). `CURRENT` selects one so the page renders
+ * and can be reviewed — that is a rendering choice, not the decision, and no
+ * component names a candidate and no test asserts the text, so making the
+ * decision costs one identifier.
+ */
+export const PROVENANCE: Provenance = {
+  status: 'held',
+  owner: 'SITE-109 \u00b7 the choice between the three is Kian\u2019s',
+  source: "Kian's three candidates; no artifact selects one",
+  note:
+    'The rendered candidate is the only one that answers "how is this ' +
+    'different from writing my goal down?" in the headline itself, which is ' +
+    'SITE-EVAL-002\u2019s question. Rendering it is not choosing it.',
+}
+
 export const HEADLINE_CANDIDATES = {
   /** The commitment primitive's Problem line, verbatim (§6.1a). */
   intention: 'An intention with no occasion.',

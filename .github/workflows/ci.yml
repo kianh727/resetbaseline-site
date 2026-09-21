@@ -29,7 +29,7 @@ env:
 
 jobs:
   check:
-    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder · lcp · motion
+    name: eval-stubs · divergences · lavender · predicates · typecheck · lint · test · timezones · build · bundle · overflow · builder · lcp · links · motion
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -131,6 +131,14 @@ jobs:
       # the one eval with no implementation and an obvious one.
       - name: The headline is the LCP element
         run: npm run check:lcp
+
+      # SITE-098. SP-17's exit criterion: all four routes linked from the
+      # footer, no dead link. It reads the exported document and the export's
+      # own filesystem — two sources, neither computed from the other — and
+      # asserts a link count before asserting resolution, because "no dead
+      # links" passes perfectly on a footer with no links (§0.3).
+      - name: Footer reaches every route and anchor
+        run: npm run check:links
 
       - name: Reduced motion in both settings, and locale independence
         run: npm run check:motion

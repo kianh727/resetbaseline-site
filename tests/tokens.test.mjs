@@ -70,6 +70,22 @@ const VETO_ALLOWED = new Set([
   'tests/tokens.test.mjs', // this file, which names the token in order to police it
 ])
 
+/*
+ * The refusal and veto paths, mirroring eslint.config.mjs's globs
+ * `app/**\/refusal/**`, `app/**\/veto/**` and the same two under components/.
+ *
+ * **Expressed as the same rule rather than as a second list.** The exact-path
+ * Set above and eslint's globs were two things meant to agree, maintained
+ * separately — which is the shape that differs silently the first time someone
+ * adds a refusal component and only one of the two mechanisms lets it through.
+ * A directory named `refusal/` or `veto/` is the declaration that a veto colour
+ * belongs there, and both checks now read that declaration instead of a
+ * membership list only one of them has.
+ */
+function inVetoPath(file) {
+  return /(^|\/)(refusal|veto)\//.test(file)
+}
+
 function sourceFiles(dir, acc = []) {
   for (const entry of readdirSync(dir)) {
     if (entry === 'node_modules' || entry === '.next' || entry === 'out' || entry === '.git') continue
@@ -83,7 +99,7 @@ function sourceFiles(dir, acc = []) {
 test('--veto is confined to refusal and veto paths', () => {
   const offenders = sourceFiles('app')
     .concat(sourceFiles('tests'))
-    .filter((f) => !VETO_ALLOWED.has(f))
+    .filter((f) => !VETO_ALLOWED.has(f) && !inVetoPath(f))
     .filter((f) => /veto/i.test(readFileSync(f, 'utf8')))
   assert.deepEqual(
     offenders,

@@ -1903,6 +1903,131 @@ does not exist.
 **105.0 kB of 120.0, 15.0 kB remaining** — unchanged, since everything added is scripts, tests
 and comments.
 
+**`SITE-26` is complete. The other half is ruled, provisional, Kian's, 2026-09-21.**
+**A timer and a tracker get no band and no mountain presence at all.** They render as objects
+in the transformation block and the plan list only, with their §6.1a metadata lines. *"The
+mountain carries recurring windows and protection and nothing else — a timer or tracker
+appearing on it would be the grammar degrading into ambient decoration."*
+
+That closes the gap §6.3b left. The earlier ruling gave the negative half — neither has a
+window, so *"nothing else ever gets a band"* applies by name — and what was missing was where
+they go instead. The answer is **not onto the mountain in some other form**: a thickened
+segment or an off-route node would be a second visual vocabulary competing with a closed one.
+
+- **The test asserts no *composition*, not merely no band.** "No band" is the weaker claim and
+  a future thickened segment would leave `bandsFor` untouched. It also asserts the inverse —
+  that a timer and tracker beside a windowed object do not take the whole plan out with them —
+  and carries a **positive control**, because every other assertion is satisfied by a mountain
+  that draws nothing at all. Proven negatively: a branch giving a timer a band fails three
+  tests by name.
+- **`descriptorFor` keys on the detail's *shape*, never on the capability string.** That is
+  what lets it be written before SITE-004 at all: a version switching on capability would
+  type-check, pass every behavioural test, and be the hand-list §6.2 forbids. A scan asserts
+  it, because the constraint is about what the file does *not* read.
+- **The Problem line is deliberately absent and that is `SITE-104`.** Its map is keyed by
+  `capability_type` and its own test is *"every `capability_type` in `contracts-manifest.json`
+  resolves a Problem line"* — so it is manifest-blocked exactly like the layout rules, and by
+  the same bidirectional coverage. SITE-104 says the lines are **quoted or absent**; a
+  paraphrase would be worse than the gap.
+
+---
+
+**The seven P0 sections §13 builds in parallel after tokens are built. `/` renders the whole
+page for the first time.**
+
+**Copy does not live in JSX, and the reason is a mechanism rather than a preference.** Held
+copy and final copy are indistinguishable once they are strings in a component, so text
+standing in for `SITE-109` ships by default — nobody deletes a sentence that looks finished.
+Every section's copy is one module under `lib/copy/`, and each exports a `PROVENANCE`
+declaring `final` or `held`, its PRD source, and — when held — the issue that owes the text.
+`tests/copy-provenance.test.ts` enforces the shape and, more importantly, **asserts that
+exactly two modules are final and names them**: `refusals.ts` and `wall.ts`. That list is
+written out rather than counted from the tree, because a test reporting whichever modules
+happen to be marked final agrees with the tree by construction (§0.3b) and would go green on
+the exact change it exists to catch. Proven negatively: promoting pricing to final exits 1,
+and a `STATUS_DATE` computed from `new Date()` exits 1.
+
+**Ruled 2026-09-21 (Kian): only §3 and the wall ship as final**, because the PRD already
+verified them. Everything else renders and waits.
+
+- **§3 — What it won't do.** v7.3 §4's four refusals verbatim. Its DS-18 verdict is
+  structural, not a reading of the build: there is no code path whose breakage could make *"no
+  streaks"* false, because there is no streak code. It sits under `components/sections/refusal/`
+  **because that directory name is what both `--veto` guards read** — the path is the
+  declaration, not an allowlist entry added to quiet a check. The accent is a 2px edge, never a
+  fill: a refusal set in a field of alarm colour would be shame framing in pixels, which is the
+  thing the section refuses.
+- **The wall.** v5 §11.2 verbatim, recovered from `9568a9a` — **the fourth citation problem in
+  this tree**, after DS-15, §4's table and v5 §8. **One correction worth recording, because it
+  would have produced invented copy:** the brief said §11's copy included *"free and small"*
+  and a *named-parts line*. **Neither is in v5 §11.** *"The beta is free and small"* is v7.3
+  §3.2 Block 3 and *"the apps you named go quiet"* is §3.2 Block 1 — both §2's, both held under
+  SITE-109. Writing either into the wall would have been a session authoring the site's
+  conversion copy from a half-remembered citation. The wall carries what §11.2 says and nothing
+  else.
+- **The wall is not mounted on `/`, and that is the point.** Its only legal trigger is Activate
+  on a gate, timer or reminder (§11.1), and that affordance is SITE-041 → SITE-040, unbuilt.
+  Mounting it behind a button placed for review would be **a second route into `walled` outside
+  the state machine**, which is Rejection 3 and the one guarantee SITE-012's exhaustive test
+  exists to protect. It is reviewable at the dev-only `/wall` route, which drives the `open`
+  prop directly and **never touches the machine**. The component has no trigger of its own — no
+  timer, no `IntersectionObserver`, no `mouseleave` — so the guarantee stays in one place.
+- **§2, §7, §8, §9, §11 and the legal routes** ship structure with held copy, per the ruling.
+  Block 2 carries five entries; *"export and delete"* is **not** among them, because DS-18a
+  requires a real owning issue and v7.3 §8's identifier resolves in Linear to a different
+  issue. FAQ 10 is filtered out in the copy module rather than at the call site, so a second
+  consumer cannot reintroduce it. **Four FAQ answers render as visibly unwritten** — a question
+  quietly dropped is one nobody notices is missing, and SITE-109 needs to see what it owns.
+- **The FAQ is `<details>`, not a JavaScript disclosure.** SITE-095's accept is all answers in
+  the DOM with the accordion closed; a `hidden` div toggled by state satisfies that only after
+  React hydrates, which on a slow connection is exactly when someone is reading. Verified in
+  the export: no `open` attribute, every answer present.
+- **`/privacy` and `/terms` carry no filler**, which SITE-099 and Rejection 7 both require.
+  They are split by what kind of thing each part is: **what the site records is fact**, field by
+  field from v5 §11.5's capture schema, and it renders; **the policy is legal text**, is not
+  written, is not a session's, and is flagged as required in one honest line. That is the
+  difference between *flagging the content as required*, which the issue asks for, and shipping
+  filler, which it forbids.
+
+**`scripts/check-links.mjs` is in the sweep, which is seventeen checks** — SP-17's exit
+criterion made a check. It reads **the exported document and the export's own filesystem**,
+two sources with neither computed from the other; reading `lib/copy/company.ts` would have
+compared the footer to the list the footer renders from (§0.3b). It asserts a **link count
+before resolution**, because *"no dead links"* passes perfectly on a footer with no links. The
+in-page anchor case is the one that rots silently: renaming a section's `id` breaks the link
+with nothing else changing, and the browser scrolls to the top and reports nothing. Proven
+negatively both ways — a renamed `id` exits 1, a removed footer group exits 1.
+
+**Two defects of mine, both caught by a check rather than by review.**
+
+1. **The full-bleed §3 overflowed by the gutter at all six widths.** `<main>` carries no
+   gutter — every section applies `page-x` itself — so a section omitting it is *already* edge
+   to edge, and the negative margin written to "pull back out" pushed it past the viewport
+   instead. **`overflow-x: clip` meant nothing looked wrong in a browser**; `check-overflow`
+   lifts the clip before measuring and caught it, which is §0.3a working as designed.
+2. **I read two probe exit codes through `tail`.** Both probes printed the right failure, and
+   `$?` was the filter's status, not the check's — the exact §7 failure that section warns
+   about, in the same session that wrote a check about it. Re-run bare: both exit 1.
+
+**The two `--veto` guards now agree on the rule rather than on two lists.** eslint used globs
+(`components/**/refusal/**`) and `tests/tokens.test.mjs` used an exact-path `Set` — two
+mechanisms meant to agree, maintained separately, which differ silently the first time someone
+adds a refusal component and only one of them lets it through. The scan now reads the same
+directory declaration the lint config does.
+
+**Bundle unchanged at 105.0 kB of 120.0** — every section is a server component; only the wall
+is `'use client'` and it is not mounted on `/`.
+
+**§12.4a pre-read — mine, which is not the gate.** §12.4a's staffing constraint is explicit
+that the reviewer must not be the implementer, so this is evidence for Kian, not a verdict.
+Recorded in the report; the two findings worth carrying are the **metadata primitive used as a
+decorative section eyebrow**, which §14 forbids in spirit (*"metadata is always real… never
+decorative"*), and **§3's section head and its four items set at the same type scale**, which
+flattens the hierarchy the section is supposed to spend its boldness on. **Questions 11–16
+cannot be answered from this review set at all** — no plan renders on `/`, so no band appears,
+and a set with no bands cannot fail the band questions. That is §12.4a's own sparse-frame trap
+one level up and it is stated rather than answered.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

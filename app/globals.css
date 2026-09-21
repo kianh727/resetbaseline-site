@@ -301,3 +301,64 @@ body::after {
     animation: none;
   }
 }
+
+/*
+ * SITE-043 · The wall's motion, PRD v5 §11 via §11.1's table: *"Dim 240ms,
+ * content fades up. No scale, no bounce. A boundary, not an event."*
+ *
+ * The two are separate animations because they are separate surfaces — the dim
+ * is a full-viewport sibling and the panel sits above it — and because "content
+ * fades up" is a translate, while the dim only changes opacity. A single
+ * animation on a wrapper would move the dim too, which is a wipe rather than a
+ * dim.
+ *
+ * No scale and no bounce, stated here as well as in the component: an eased
+ * overshoot is what the settling spring is for, and the spring is confined to
+ * structure landing (SITE-024). The system stopping must not look like the
+ * system producing.
+ */
+@keyframes wall-dim {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wall-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Reduced motion removes the movement, not the wall. The boundary must still
+ * arrive — it is the one screen whose absence would change what the site says.
+ */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes wall-rise {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/*
+ * The FAQ disclosure marker. Removed rather than restyled: the default triangle
+ * is a browser glyph nobody chose, and §19 bans an arrow appended to a control.
+ * What signals state is the answer being there or not.
+ */
+summary::-webkit-details-marker {
+  display: none;
+}
