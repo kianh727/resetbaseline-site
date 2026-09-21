@@ -850,6 +850,48 @@ At a typical grotesque cap-height ratio of **0.72** (measured range 0.651–0.73
 
 **It never fought the 0.92 line box.** Whether a face collides at 0.92 is a ratio of its own vertical metrics to the line box and is **scale-invariant** — no ceiling changes it. Nor does the ceiling change the line count, because `max-w-[18ch]` is measured in the font's own units. The two constraints were never in tension; the figure was measured against the wrong axis.
 
+### 11.5 The wall — copy spec
+
+**Amended 2026-09-21 (Kian).** v5 §11.2's boundary copy is superseded by this subsection. §11's list still carries *"The wall (v5 §11)"* for the trigger, the rules and the terminal action; **the copy is here.**
+
+**Why it is here rather than recovered from history again.** The first version of this spec was written into a v7.3 paste that was refused under §1 — the paste came from a divergent base and applying it would have reverted a day of rulings — and it was never re-sent after the refusal. The implementing session then declined to author the copy from a half-remembered citation and built v5 §11.2 verbatim instead, which was the correct call and is the reason this exists as an amendment rather than as invented conversion copy. **A spec that lives only in a message is a spec that is lost the moment the message is refused.**
+
+#### The wall
+
+> **This is where the website ends.**
+>
+> Gates run on your phone. A browser can't hold one.
+>
+> What you just built is saved — the goal, the schedule, the apps you named. Leave an email and it's waiting when your invite lands.
+>
+> The beta is free and small.
+
+#### Name the parts — binds every future revision
+
+The third line's rule outlives its wording. *"Your plan is saved"* asks someone to fear losing **a concept**, and nobody fears losing a concept. *"The goal, the schedule, the apps you named"* is an object with contents — **three things they produced in the last thirty seconds.**
+
+**Any rewrite that collapses the contents back into an abstraction has removed the mechanism, however much better it reads.** This is the one line on the site where concision is the wrong instinct.
+
+*"The apps you named"* is correct here for the same reason it is correct in §3.2 Block 1: **the person named them and Baseline did not read them.** §6.3a stands unchanged — no depicted Baseline UI may name a specific app, and this names none.
+
+#### Scarcity — **"free and small", never "letting people in slowly"**
+
+There is no admissions gate, so *slowly* is **invented scarcity**, and **§0.1 does not stop at capability claims.** A launch-state principle that polices what the product can do and permits a fabricated constraint on who can have it is policing the easy half.
+
+**If a real cohort limit is set later, the line may state the number.** A number that is true is not scarcity language; it is a fact, and it is the only form this line may take beyond the one above.
+
+#### The submitted state
+
+> **You're on the list.**
+>
+> Your plan is saved. When you get in, you'll set the blocking up yourself — Baseline won't do it for you on day one.
+>
+> `[ download your plan ]`
+
+**The handoff line lives in the submitted state because an instruction is for someone who has already said yes.** Before submit it would be a condition attached to an offer nobody has accepted; after submit it is the next thing that happens to them. Its content is §6.1b's — it closes the divergence R-2 found between the builder's four beats and onboarding's three — and it remains conditional on the §15.2 read.
+
+**Note the asymmetry with the rule above, and that it is deliberate.** The wall names the parts because the visitor is being asked to give something up. The submitted state says *"your plan is saved"* because they already have, and repeating the inventory after the decision is reassurance rather than mechanism.
+
 ---
 
 ## 12. Quality gates

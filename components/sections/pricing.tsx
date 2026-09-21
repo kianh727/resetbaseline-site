@@ -12,6 +12,12 @@
  * a timer even if someone wanted one.
  *
  * Copy is held; see `lib/copy/pricing.ts`.
+ *
+ * **No eyebrow above the heading** (ruled 2026-09-21, Kian, from the §12.4a
+ * pre-read). §14's rule is that metadata is always real — dates, occurrence
+ * counts, durations, authority tiers — and a small tracked label reading
+ * "Pricing" above a heading about pricing is decoration wearing the metadata
+ * primitive. The heading is the section.
  */
 
 import { PRICING, PRICING_STATE } from '@/lib/copy/pricing'
@@ -30,10 +36,6 @@ export default function Pricing() {
         paddingBottom: 96,
       }}
     >
-      <p className="metadata" style={{ margin: 0, paddingBottom: 20 }}>
-        Pricing
-      </p>
-
       <h2
         id="pricing-heading"
         className="text-section"

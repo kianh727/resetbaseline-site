@@ -57,8 +57,15 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { WALL_BODY, WALL_HANDOFF, WALL_HEADING } from '@/lib/copy/wall'
-import { EMAIL_LABEL, SUBMITTED_HEADING, SUBMIT_LABEL } from '@/lib/copy/submitted'
+import {
+  DOWNLOAD_LABEL,
+  EMAIL_LABEL,
+  SUBMITTED_HEADING,
+  SUBMITTED_LINES,
+  SUBMIT_LABEL,
+  WALL_HEADING,
+  WALL_LINES,
+} from '@/lib/copy/wall'
 
 export interface WallProps {
   /**
@@ -70,9 +77,20 @@ export interface WallProps {
   readonly onDismiss: () => void
   /** SITE-046's capture write. No network request is made in this file. */
   readonly onSubmit?: (email: string) => void
+  /**
+   * §11.5's `[ download your plan ]`, in the submitted state.
+   *
+   * **Required, not optional, and that is the EVAL-033 lesson applied.** An
+   * optional handler means the control silently disappears when a future call
+   * site forgets it — the submitted state would render, look complete, and be
+   * missing the one affordance on that screen that actually does something.
+   * A required prop makes forgetting it a type error at the call site rather
+   * than a missing button nobody notices.
+   */
+  readonly onDownload: () => void
 }
 
-export default function Wall({ open, onDismiss, onSubmit }: WallProps) {
+export default function Wall({ open, onDismiss, onSubmit, onDownload }: WallProps) {
   const [submitted, setSubmitted] = useState(false)
   const [email, setEmail] = useState('')
   const panel = useRef<HTMLDivElement | null>(null)
@@ -145,25 +163,68 @@ export default function Wall({ open, onDismiss, onSubmit }: WallProps) {
           </h2>
 
           {submitted ? (
-            /*
-             * SITE-105's handoff line, after submit only — never before, and
-             * never in place of the boundary copy. Its verify line: it must
-             * read as an instruction, not an apology.
-             */
-            <p
-              className="text-lead max-w-measure"
-              style={{ margin: 0, paddingTop: 20, color: 'var(--bone-60)' }}
-            >
-              {WALL_HANDOFF}
-            </p>
+            <>
+              {/*
+                * §11.5: the handoff line lives here because an instruction is
+                * for someone who has already said yes. Before submit it is a
+                * condition attached to an offer nobody has accepted.
+                *
+                * Note the asymmetry §11.5 calls deliberate — the wall names the
+                * parts, this says "your plan is saved". Repeating the inventory
+                * after the decision is reassurance rather than mechanism.
+                */}
+              {SUBMITTED_LINES.map((line) => (
+                <p
+                  key={line.slice(0, 24)}
+                  className="text-lead max-w-measure"
+                  style={{ margin: 0, paddingTop: 20, color: 'var(--bone-60)' }}
+                >
+                  {line}
+                </p>
+              ))}
+
+              {/*
+                * The one control on this screen that does what it says. A
+                * browser cannot hold a gate, which is why the wall exists; it
+                * can absolutely write a file, and the plan is already in memory
+                * from a deterministic client-side build, so no request is made.
+                */}
+              <button
+                type="button"
+                onClick={onDownload}
+                className="text-body"
+                style={{
+                  /*
+                   * Block, not the browser's default inline-block. As inline it
+                   * shared a line with the dismiss control at 375px and the two
+                   * collided — caught by looking at the render, not by any
+                   * check, which is the class of defect only a screenshot finds.
+                   */
+                  display: 'block',
+                  minHeight: 44,
+                  marginTop: 28,
+                  padding: '0 20px',
+                  background: 'transparent',
+                  border: '1px solid var(--lavender)',
+                  color: 'var(--lavender-lit)',
+                  boxShadow: '0 0 12px rgba(139, 125, 255, 0.25)',
+                  cursor: 'pointer',
+                }}
+              >
+                {DOWNLOAD_LABEL}
+              </button>
+            </>
           ) : (
             <>
-              <p
-                className="text-lead max-w-measure"
-                style={{ margin: 0, paddingTop: 20, color: 'var(--bone-60)' }}
-              >
-                {WALL_BODY}
-              </p>
+              {WALL_LINES.map((line) => (
+                <p
+                  key={line.slice(0, 24)}
+                  className="text-lead max-w-measure"
+                  style={{ margin: 0, paddingTop: 20, color: 'var(--bone-60)' }}
+                >
+                  {line}
+                </p>
+              ))}
 
               <form
                 onSubmit={(e) => {

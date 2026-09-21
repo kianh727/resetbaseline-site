@@ -98,7 +98,25 @@ export type AuthorityTier = string
  */
 export type PlanDate = Date
 
-/** Noon-anchor a local calendar day. The only sanctioned way to build a `PlanDate`. */
+/**
+ * Noon-anchor a local calendar day. The only sanctioned way to build a `PlanDate`.
+ *
+ * **`month` is 0-indexed, matching `Date` — January is 0 and May is 4.**
+ *
+ * Stated because it is a trap that stayed invisible for six issues. Every
+ * production caller round-trips `getMonth()` back in — `occurrences.ts`,
+ * `bands.ts`, `deadline.ts` and `flat-plan.tsx` all do — so the indexing
+ * cancels out and nothing could be wrong. **The first hand-written literal to
+ * render a month as a name got it wrong immediately**: `planDate(2026, 5, 31)`
+ * reads as 31 May to anybody and is 1 July, because June has thirty days and
+ * `Date` rolls over.
+ *
+ * It is left 0-indexed rather than changed. Changing it would touch every
+ * fixture in `occurrences.test.ts` and silently invert any literal missed in
+ * the sweep, and a half-converted convention is worse than a documented
+ * awkward one. `tests/plan-model.test.ts` pins it so it cannot be "tidied" into
+ * 1-indexing by someone who hits the same surprise and fixes it locally.
+ */
 export function planDate(year: number, month: number, day: number): PlanDate {
   return new Date(year, month, day, 12, 0, 0, 0)
 }

@@ -32,6 +32,29 @@
  *    incompatible at 375px, and a grid that collapses to a stack on mobile is
  *    two compositions. One composition, reading down.
  *
+ * **The hierarchy — ruled 2026-09-21 (Kian), the choice between metadata scale
+ * and absent recorded as mine.**
+ *
+ * The four refusal phrases take **display** scale; the section head drops to
+ * **metadata** scale. The §12.4a pre-read found the section head and its four
+ * items set at the same `text-section` step, which flattens the one screen §4
+ * says to spend the boldness on — a section head at the same scale as its items
+ * spends it evenly.
+ *
+ * **I kept the head rather than removing it, and the distinction is the one the
+ * ruling itself draws.** A label that restates the heading below it is
+ * decoration, which is why "Pricing", "Questions" and "Who's building this"
+ * came out. *"What it won't do"* restates nothing — the four headings beneath it
+ * are *"No streaks."* and its siblings — so it is the section's **name**, and a
+ * name is a real thing for the metadata primitive to carry. Removing it would
+ * leave four `h3`s under no `h2`: the document outline loses a section, the
+ * accessible name goes with it, and §2's information architecture names a
+ * section the page then does not.
+ *
+ * At metadata scale it also lands closer to §14's actual register —
+ * *"enormous display type against very small, very precise metadata"* — with
+ * the four refusals as the only large type on the screen.
+ *
  * **No entrance animation.** §19 bans fade-and-slide-up on every section, and
  * §12.4a tell 6 asks about it directly. The section is the case, not an event.
  *
@@ -72,15 +95,11 @@ export default function Refusals() {
       }}
     >
       <div className="page-x">
-        <h2
-          id="what-it-wont-do-heading"
-          className="text-section"
-          style={{ margin: 0, color: 'var(--bone)', maxWidth: '14ch' }}
-        >
+        <h2 id="what-it-wont-do-heading" className="metadata" style={{ margin: 0 }}>
           What it won&rsquo;t do
         </h2>
 
-        <div style={{ paddingTop: 56 }}>
+        <div style={{ paddingTop: 40 }}>
           {REFUSALS.map((refusal) => (
             <div
               key={refusal.heading}
@@ -92,18 +111,18 @@ export default function Refusals() {
                  */
                 borderLeft: '2px solid var(--veto)',
                 paddingLeft: 20,
-                paddingBottom: 48,
+                paddingBottom: 72,
               }}
             >
               <h3
-                className="text-section"
+                className="text-display"
                 style={{ margin: 0, color: 'var(--bone)' }}
               >
                 {refusal.heading}
               </h3>
               <p
                 className="text-lead max-w-measure"
-                style={{ margin: 0, paddingTop: 12, color: 'var(--bone-60)' }}
+                style={{ margin: 0, paddingTop: 16, color: 'var(--bone-60)' }}
               >
                 {refusal.body}
               </p>

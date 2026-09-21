@@ -337,3 +337,26 @@ test('the exemption is inert until the generated file exists', () => {
       'regenerated.',
   )
 })
+
+test('planDate takes a 0-indexed month, and that is pinned rather than assumed', () => {
+  /*
+   * The convention is `Date`'s: January is 0. Every production caller
+   * round-trips `getMonth()`, so the indexing cancels and no behaviour depends
+   * on it — which is exactly why it could be changed by someone who hit the
+   * surprise once and "fixed" it, breaking every hand-written literal in the
+   * dev review routes and in the download fixtures at the same time.
+   *
+   * Asserted against month names rather than against `getMonth()`, which would
+   * compare the function to its own input (§0.3b).
+   */
+  assert.equal(planDate(2026, 0, 1).getMonth(), 0)
+  assert.equal(planDate(2026, 4, 31).getDate(), 31)
+  assert.equal(
+    planDate(2026, 4, 31).toDateString().slice(4, 7),
+    'May',
+    'planDate month 4 must be May. If this fails the indexing was changed; ' +
+      'every literal in app/**/page.dev.tsx and the download fixtures changes with it.',
+  )
+  /* The rollover that made the trap visible: June has thirty days. */
+  assert.equal(planDate(2026, 5, 31).toDateString().slice(4, 7), 'Jul')
+})

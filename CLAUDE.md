@@ -2028,6 +2028,98 @@ cannot be answered from this review set at all** — no plan renders on `/`, so 
 and a set with no bands cannot fail the band questions. That is §12.4a's own sparse-frame trap
 one level up and it is stated rather than answered.
 
+**The wall's copy is PRD v7.3 §11.5** — amended 2026-09-21 (Kian), a new subsection under §11
+with nothing renumbered. It supersedes v5 §11.2's boundary copy and carries the submitted state
+with it, so `lib/copy/wall.ts` is **one module, one spec, final**; `submitted.ts` is gone.
+
+**Why it exists as an amendment.** The spec was originally inside the v7.3 paste refused under
+§1, and was never re-sent after the refusal. This session then declined to write the wall from a
+half-remembered citation of it and built v5 §11.2 verbatim, flagging that *"free and small"* and
+the named-parts line were §2's rather than §11's. **A spec that lives only in a message is lost
+the moment the message is refused** — that is the reason it is in the PRD now rather than in
+another message.
+
+**Two rules §11.5 states, both binding every future revision:**
+
+- **Name the parts.** *"Your plan is saved"* asks someone to fear losing **a concept**, and
+  nobody fears losing a concept. *"The goal, the schedule, the apps you named"* is an object
+  with contents — three things produced in the last thirty seconds. **Any rewrite that
+  collapses the contents back into an abstraction has removed the mechanism, however much
+  better it reads.** The one line on this site where concision is the wrong instinct.
+- **"Free and small", never "letting people in slowly."** There is no admissions gate, so
+  *slowly* is invented scarcity, and **§0.1 does not stop at capability claims** — a
+  launch-state principle that polices what the product can do while permitting a fabricated
+  constraint on who can have it is policing the easy half. If a real cohort limit is set, the
+  line may state the number.
+
+**§6.3a is untouched by it.** *"The apps you named"* is correct for the same reason as §3.2
+Block 1: the person named them and Baseline did not read them.
+
+**The submitted state carries the handoff line, and §11.5 says why** — an instruction is for
+someone who has already said yes; before submit it is a condition attached to an offer nobody
+has accepted. It also carries `[ download your plan ]`, and **the asymmetry with the wall's
+named-parts line is deliberate and stated in §11.5**: the wall names the parts because the
+visitor is being asked to give something up, the submitted state says *"your plan is saved"*
+because they already have. Do not "fix" the inconsistency.
+
+**`onDownload` is a required prop, which is the EVAL-033 lesson applied rather than restated.**
+An optional handler means the control silently disappears when a call site forgets it — the
+submitted state would render, look complete, and be missing the one affordance on that screen
+that does anything. Making it required turned the omission into a type error, and it **fired
+immediately**: the dev review route failed to compile until it was wired with a real plan.
+
+**`planAsText` is plain text — my call, recorded**, since §11.5 specifies the control and not
+the format. JSON would be the easy choice and hands someone a file they cannot read, which
+makes the control a gesture. It is a **real browser capability and therefore honest** (DS-8):
+the wall exists because a browser cannot hold a gate, and this is the one thing on that screen
+that does what it says, with **zero network** because the plan is already in memory from a
+deterministic client-side build. The test asserts two negatives — **no ordinal and no total**,
+and no locale formatting — because a downloaded file is where *"2 of 12"* gets added by someone
+who never reads a text template as carefully as a component, and it is the one artifact that
+outlives the session that made it.
+
+**A latent trap found by being its first consumer: `planDate`'s month is 0-indexed.**
+`planDate(2026, 5, 31)` reads as 31 May to anybody and **is 1 July**, because it passes the
+month straight to `Date` and June has thirty days. **Nothing was broken** — every production
+caller round-trips `getMonth()` back in (`occurrences.ts`, `bands.ts`, `deadline.ts`,
+`flat-plan.tsx`), so the indexing cancels and no behaviour depended on it. **The first
+hand-written literal to render a month as a *name* got it wrong immediately**, which was mine,
+in the download fixture.
+
+It is **documented and pinned rather than changed**: converting to 1-indexing would touch every
+fixture in `occurrences.test.ts` and silently invert any literal missed in the sweep, and a
+half-converted convention is worse than a documented awkward one. A test asserts month 4 is May
+and that month 5 with day 31 rolls to July, so the next person who hits the same surprise
+cannot quietly "fix" it locally. Proven negatively: switching to `month - 1` exits 1.
+
+**Both §12.4a pre-read findings are ruled and applied (2026-09-21, Kian).**
+
+- **The three decorative eyebrows are gone** — "Pricing", "Questions", "Who's building this".
+  §14's rule that metadata is always real decides it: a label restating its own heading is
+  decoration wearing the metadata primitive. **The §2 dated line stays**, because a date is a
+  real measurement. The FAQ's heading became *"Questions"* rather than *"Answers"*, since
+  removing the eyebrow left the section named after the thing it is not a list of.
+- **§3's hierarchy: the four refusal phrases take display scale; the section head drops to
+  metadata scale. The choice between metadata-scale and absent is mine, and I kept it.** The
+  distinction is the one the ruling itself draws — a label that *restates* the heading below is
+  decoration, and *"What it won't do"* restates nothing, since the headings beneath it are *"No
+  streaks."* and its siblings. It is the section's **name**, and a name is a real thing for the
+  primitive to carry. Removing it would leave four `h3`s under no `h2`: the document outline
+  loses a section, the accessible name goes with it, and §2's information architecture names a
+  section the page then does not. At metadata scale it also lands closer to §14's actual
+  register — *"enormous display type against very small, very precise metadata"* — with the
+  four refusals as the only large type on the screen.
+
+**One defect only a screenshot could find.** At 375px the download button and the dismiss
+control shared a line and collided, because a `<button>` is inline-block by default. No check
+sees that — overflow was clean, the DOM was correct, and both controls were present and
+tappable. Fixed with `display: block`.
+
+**Questions 11–16 remain unanswerable from a review set with no bands**, and per the ruling
+that stays the statement rather than becoming a pass when the gate runs for real.
+
+**Sweep is seventeen checks, all green. Bundle unchanged at 105.0 kB of 120.0.**
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

@@ -8,6 +8,12 @@
  * of them, which is the point: an empty logo strip is a thing somebody fills.
  *
  * Copy is held; see `lib/copy/company.ts`.
+ *
+ * **No eyebrow** (ruled 2026-09-21, Kian). "Who's building this" above a
+ * heading saying the same thing is decoration in the metadata primitive, and
+ * §14 reserves that primitive for real measurements. The footer still carries
+ * the phrase as a navigation label, which is a different job — it names a
+ * destination rather than restating the thing it sits on.
  */
 
 import {
@@ -29,10 +35,6 @@ export default function Company() {
         paddingBottom: 96,
       }}
     >
-      <p className="metadata" style={{ margin: 0, paddingBottom: 20 }}>
-        Who&rsquo;s building this
-      </p>
-
       <h2
         id="company-heading"
         className="text-section"

@@ -21,6 +21,12 @@
  * visible**: a question quietly dropped is one nobody notices is missing, and
  * SITE-109 needs to see what it owns.
  *
+ * **No eyebrow, and the heading is "Questions" rather than "Answers"** (ruled
+ * 2026-09-21, Kian). The eyebrow said "Questions" above a heading saying
+ * "Answers", which is decoration in the metadata primitive §14 reserves for
+ * real measurements. Removing it left "Answers" alone as the name of a section
+ * that is a list of questions, so the heading took the true word.
+ *
  * **No marker rotation, no chevron, no animation.** §19 bans `→` on buttons and
  * §12.4a asks about generator tells; a disclosure that animates open is the
  * one motion on this page that carries no product meaning (K-4).
@@ -40,16 +46,12 @@ export default function Faq() {
         paddingBottom: 96,
       }}
     >
-      <p className="metadata" style={{ margin: 0, paddingBottom: 20 }}>
-        Questions
-      </p>
-
       <h2
         id="faq-heading"
         className="text-section"
         style={{ margin: 0, color: 'var(--bone)', maxWidth: '14ch' }}
       >
-        Answers
+        Questions
       </h2>
 
       <div style={{ paddingTop: 48 }}>

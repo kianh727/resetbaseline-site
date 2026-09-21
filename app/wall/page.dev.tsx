@@ -25,6 +25,41 @@
 import { useState } from 'react'
 
 import Wall from '@/components/wall'
+import { downloadPlan } from '@/lib/plan/download'
+import { planDate, type Plan } from '@/lib/plan/model'
+
+/*
+ * A real plan, so the download control is exercised rather than stubbed. The
+ * capability and tier are opaque strings until SITE-004 (§6.2) and are
+ * deliberately not contract vocabulary here — this route must not become a
+ * place the five real values are written down.
+ */
+const REVIEW_PLAN: Plan = {
+  title: 'Finish the thesis',
+  deadline: planDate(2026, 4, 31),
+  nodes: [
+    {
+      id: 'n-1',
+      capability: 'cap-x',
+      authority: 'tier-x',
+      label: 'Thesis block',
+      detail: {
+        occurrences: [
+          { id: 'o-1', date: planDate(2026, 4, 4), window: { startMinute: 480, endMinute: 570 } },
+          { id: 'o-2', date: planDate(2026, 4, 5), window: { startMinute: 480, endMinute: 570 } },
+          { id: 'o-3', date: planDate(2026, 4, 6), window: { startMinute: 480, endMinute: 570 } },
+        ],
+      },
+    },
+    {
+      id: 'n-2',
+      capability: 'cap-y',
+      authority: 'tier-y',
+      label: 'Protection',
+      detail: { appCount: 3, window: { startMinute: 360, endMinute: 450 } },
+    },
+  ],
+}
 
 export default function WallReview() {
   const [open, setOpen] = useState(true)
@@ -64,7 +99,11 @@ export default function WallReview() {
         Reopen
       </button>
 
-      <Wall open={open} onDismiss={() => setOpen(false)} />
+      <Wall
+        open={open}
+        onDismiss={() => setOpen(false)}
+        onDownload={() => downloadPlan(REVIEW_PLAN)}
+      />
     </main>
   )
 }

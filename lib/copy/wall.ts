@@ -1,62 +1,119 @@
 /*
- * SITE-043 / SITE-105 · The wall.
+ * SITE-043 / SITE-105 · The wall, and its submitted state.
  *
- * **FINAL.** The boundary copy is PRD v5 §11.2 verbatim, carried forward
- * unchanged by v7.3 §11's list — *"**The wall** (v5 §11)"*. Like the motion
- * config SITE-024 needed and the type table SITE-002 and SITE-003 needed, it is
- * a requirement **by explicit carry-forward** and is readable only from git
- * history (`9568a9a:docs/site-prd-v5.md`), because §1 keeps superseded PRDs out
- * of the working tree. That is the fourth time this has bitten; it is reported
- * in `CLAUDE.md` §12 and inlining it is a §10 amendment and Kian's.
+ * **FINAL.** PRD v7.3 §11.5, amended 2026-09-21 (Kian). That subsection
+ * supersedes v5 §11.2's boundary copy and carries the submitted state with it,
+ * which is why both live in this one module: they are one spec.
  *
- * **One correction worth recording, because it could have produced invented
- * copy.** The instruction to build this said §11's copy included *"free and
- * small"* and a *named-parts line*. Neither is in v5 §11. *"The beta is free
- * and small"* is v7.3 §3.2 Block 3 — the §2 status section — and *"the apps you
- * named go quiet"* is §3.2 Block 1. Both belong to §2, which ships **held**
- * under `SITE-109`. Writing either into the wall would have been a session
- * authoring the site's conversion copy from a half-remembered citation, which
- * §5 puts outside anything a session does. The wall carries what v5 §11.2 says
- * and nothing else.
+ * ---
  *
- * **DS-8 binds every line here.** The site never implies a capability a browser
- * can activate, and never fake-activates. *"Gates run on your phone — a browser
- * can't hold one"* is the whole point of the screen: it is a boundary, not an
- * event.
+ * **Two rules from §11.5 that bind every future revision of these lines.**
+ *
+ * **1. Name the parts.** *"Your plan is saved"* asks someone to fear losing **a
+ * concept**, and nobody fears losing a concept. *"The goal, the schedule, the
+ * apps you named"* is an object with contents — three things they produced in
+ * the last thirty seconds. **Any rewrite that collapses the contents back into
+ * an abstraction has removed the mechanism, however much better it reads.**
+ * This is the one line on the site where concision is the wrong instinct.
+ *
+ * **2. "Free and small", never "letting people in slowly."** There is no
+ * admissions gate, so *slowly* is invented scarcity — and **§0.1 does not stop
+ * at capability claims.** A launch-state principle that polices what the
+ * product can do while permitting a fabricated constraint on who can have it is
+ * policing the easy half. If a real cohort limit is ever set, the line may
+ * state the number; a number that is true is a fact rather than scarcity
+ * language, and it is the only other form this line may take.
+ *
+ * **§6.3a stands and is not strained by any of this.** *"The apps you named"*
+ * is correct for the same reason it is correct in §3.2 Block 1: the person
+ * named them and Baseline did not read them. No app is named here.
+ *
+ * **DS-8 binds the second line.** *"Gates run on your phone. A browser can't
+ * hold one."* is the whole screen — a boundary stated, not implied, and never
+ * fake-activated.
+ *
+ * ---
+ *
+ * **How this spec came to be an amendment rather than invented copy**, recorded
+ * because the failure mode is worth keeping. The first version of it was inside
+ * a v7.3 paste refused under §1 — the paste came from a divergent base and
+ * applying it would have reverted a day of rulings — and it was never re-sent.
+ * This session then declined to write the wall from a half-remembered citation
+ * of it and built v5 §11.2 verbatim instead. **A spec that lives only in a
+ * message is lost the moment the message is refused**, which is why it is now
+ * in the PRD.
  */
 
 import type { Provenance } from './provenance.ts'
 
 export const PROVENANCE: Provenance = {
   status: 'final',
-  source: 'PRD v5 §11.2, carried forward by v7.3 §11 · SITE-105 for the handoff line',
+  source: 'PRD v7.3 §11.5, amended 2026-09-21',
   note:
-    'Boundary copy verbatim from v5 §11.2, recovered from git history because ' +
-    '§11 carries it forward by reference to a document §1 removes from the tree.',
+    'Both the boundary copy and the submitted state are one spec at §11.5, ' +
+    'which supersedes v5 §11.2. Two rules bind every revision: name the parts, ' +
+    'and no invented scarcity.',
 }
 
-/** v5 §11.2, verbatim. */
+/* ------------------------------------------------------------------ *
+ * The wall.
+ * ------------------------------------------------------------------ */
+
 export const WALL_HEADING = 'This is where the website ends.'
 
-/** v5 §11.2, verbatim. */
-export const WALL_BODY =
-  "Gates run on your phone — a browser can't hold one. Everything you just " +
-  "built is saved. Add your email and it's waiting when your invite lands."
+/**
+ * Three lines, kept as three. They are separate paragraphs in §11.5 and each
+ * does a different job — the boundary, the inventory, the offer — so joining
+ * them into one block would lose the beat the second line depends on.
+ */
+export const WALL_LINES: readonly string[] = [
+  "Gates run on your phone. A browser can't hold one.",
+
+  /*
+   * The named-parts line. See rule 1 in the header before touching it: the
+   * contents are the mechanism, and shortening this is the specific way it
+   * breaks.
+   */
+  'What you just built is saved — the goal, the schedule, the apps you named. ' +
+    "Leave an email and it's waiting when your invite lands.",
+
+  /* Rule 2. "Free and small", never "letting people in slowly". */
+  'The beta is free and small.',
+]
+
+/* ------------------------------------------------------------------ *
+ * The submitted state.
+ * ------------------------------------------------------------------ */
+
+export const SUBMITTED_HEADING = "You're on the list."
 
 /**
- * SITE-105's handoff line, verbatim from the issue, shown **after submit only**.
- *
- * It closes the divergence R-2 found between the builder's four beats and
- * onboarding's three. Its accept is explicit that it is *"never before, and
- * never in place of the boundary copy"* — it is an instruction, not an apology,
- * and not a second boundary.
+ * SITE-105's handoff line, and §11.5 settles where it goes: **the submitted
+ * state, because an instruction is for someone who has already said yes.**
+ * Before submit it is a condition attached to an offer nobody has accepted.
  *
  * **Conditional on the §15.2 read** (§6.1b): if a new account cannot create a
- * gate at all on day one, the builder's fourth beat is cut, protection leaves
- * the builder, and the wall moves to a timer or reminder. That read has not
- * reported. SITE-105's non-goal says not to build against the alternative until
- * it does, so this is built against the ruling as it stands.
+ * gate at all on day one, the builder's fourth beat is cut and the wall moves
+ * to a timer or reminder. That read has not reported, and SITE-105's non-goal
+ * says not to build against the alternative until it does.
  */
-export const WALL_HANDOFF =
-  "Your plan is saved. When you get in, you'll set the blocking up yourself — " +
-  "Baseline won't do it for you on day one."
+export const SUBMITTED_LINES: readonly string[] = [
+  'Your plan is saved.',
+  "When you get in, you'll set the blocking up yourself — Baseline won't do it " +
+    'for you on day one.',
+]
+
+/**
+ * §11.5's submitted state carries this control.
+ *
+ * **Note the asymmetry with the wall's named-parts line, which §11.5 calls
+ * deliberate.** The wall names the parts because the visitor is being asked to
+ * give something up; the submitted state says *"your plan is saved"* because
+ * they already have, and repeating the inventory after the decision is
+ * reassurance rather than mechanism. Do not "fix" the inconsistency.
+ */
+export const DOWNLOAD_LABEL = 'Download your plan'
+
+export const SUBMIT_LABEL = 'Save my plan'
+
+export const EMAIL_LABEL = 'Email'
