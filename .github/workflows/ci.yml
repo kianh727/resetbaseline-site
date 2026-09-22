@@ -176,6 +176,14 @@ jobs:
       # a site that renders and does nothing. The policy carries per-build
       # hashes computed from the export, and both the server and this check
       # read the shipped _headers rather than recomputing it.
+      # §11.2's budgets, measured under Lighthouse's Slow-4G shape and a 4x CPU
+      # slowdown at 375px. This found INP at 640ms against a 200ms ceiling, and
+      # located it by comparing against a reduced-motion run. Lighthouse itself
+      # is not run here; the three ceilings are what a regression moves and they
+      # are measured directly.
+      - name: LCP, CLS and INP against §11.2
+        run: npm run check:perf
+
       - name: The site works under its production CSP
         run: npm run check:csp
 

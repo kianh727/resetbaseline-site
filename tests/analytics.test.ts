@@ -253,6 +253,10 @@ test('nothing outside the schema hand-lists an event name', async () => {
      * What a duplicate schema looks like is names appearing *outside* a call —
      * in an array, a map, a switch — so those are what is left to count.
      *
+     * `trackOnce(` is listed before `track(` because alternation is ordered
+     * and `\btrack\(` does not match `trackOnce(` — the first version omitted
+     * it and flagged the five one-shot events as a duplicate schema.
+     *
      * `send(` is stripped for a different reason: the builder state machine has
      * its own vocabulary, and `activation_attempted` is a member of **both**
      * namespaces. That collision is meaningful rather than accidental — one
@@ -264,7 +268,7 @@ test('nothing outside the schema hand-lists an event name', async () => {
     const source = readFileSync(file, 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, ' ')
       .replace(/\/\/[^\n]*/g, ' ')
-      .replace(/\b(?:track|send)\(\s*['"`][a-z_]+['"`]/g, 'call(')
+      .replace(/\b(?:trackOnce|track|send)\(\s*['"`][a-z_]+['"`]/g, 'call(')
     const named = (EVENT_NAMES as readonly EventName[]).filter((n) =>
       new RegExp(`['"\`]${n}['"\`]`).test(source),
     )

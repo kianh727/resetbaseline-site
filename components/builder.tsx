@@ -28,7 +28,7 @@
  * than on mount.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import AskInput from '@/components/ask-input'
 import TransformationBlock from '@/components/transformation-block'
@@ -142,6 +142,7 @@ export default function Builder({ sink = NULL_SINK }: { sink?: AnalyticsSink } =
    */
   useEffect(() => {
     trackOnce('hero_view', { reduced_motion: reducedMotion })
+
   }, [trackOnce, reducedMotion])
 
   /**
@@ -222,8 +223,7 @@ export default function Builder({ sink = NULL_SINK }: { sink?: AnalyticsSink } =
   const submit = () => {
     if (text.trim().length === 0) return
 
-    const startedAt = Date.now()
-    submittedAt.current = startedAt
+    submittedAt.current = Date.now()
 
     analytics.track('goal_submitted', {
       // A length, never the text. A length cannot be read back into words.
@@ -232,24 +232,51 @@ export default function Builder({ sink = NULL_SINK }: { sink?: AnalyticsSink } =
       has_deadline: match !== null,
     })
 
-    send('submit')
-    send('build')
-    send('plan_ready')
-
     /*
-     * Measured from the same `buildPlan` the render uses, so the number is the
-     * plan's cost rather than React's. It is deterministic and client-side, so
-     * this is honest: there is no request in it.
+     * **The plan render is a transition, and that is the INP fix that is about
+     * the render rather than the animation.**
+     *
+     * The click's handler was doing all of it synchronously: three state
+     * moves, a plan build, a full render of bands and marks, and the effect
+     * that starts the beat. §11.2's INP ceiling is 200ms and
+     * `check-perf.mjs` measured 640ms on a 4× throttled mobile CPU.
+     *
+     * Marking it a transition lets the browser finish the interaction — the
+     * click is acknowledged, the button's own state settles — and render the
+     * plan on the next frame. **It adds no waiting state**, which DS-10 would
+     * forbid: the transformation block is already complete and empty at t=0
+     * and stays exactly as it was for the extra frame. Nothing appears that
+     * says "loading", because nothing is loading — the plan is deterministic
+     * and client-side, and this is one frame, not a request.
      */
-    const built = buildPlan({ text, window: planWindow, days, appCount: apps.length })
-    if (built !== null) {
-      analytics.track('plan_generated', {
-        node_count: built.nodes.length,
-        occurrence_count: occurrences(built).length,
-        ms_to_plan: Date.now() - startedAt,
-      })
-    }
+    startTransition(() => {
+      send('submit')
+      send('build')
+      send('plan_ready')
+    })
   }
+
+  /*
+   * `plan_generated` fires when the memoized plan first exists.
+   *
+   * **It used to call `buildPlan` again inside `submit`**, which built the
+   * whole plan a second time on the click that also renders it — a duplicate
+   * of the exact work the render was about to memoize, on the one interaction
+   * where the main thread is already fully committed. `check-perf.mjs`
+   * measured the result at 552ms INP against §11.2's 200ms ceiling on a 4×
+   * throttled mobile CPU. The instrumentation was the cost it was reporting.
+   *
+   * Reading the memo instead measures the same plan and builds nothing, which
+   * is also the more honest number: it is the plan the visitor actually got.
+   */
+  useEffect(() => {
+    if (plan === null || submittedAt.current === null) return
+    trackOnce('plan_generated', {
+      node_count: plan.nodes.length,
+      occurrence_count: occurrences(plan).length,
+      ms_to_plan: Date.now() - submittedAt.current,
+    })
+  }, [plan, trackOnce])
 
   return (
     <div className="flex w-full flex-col gap-10">
