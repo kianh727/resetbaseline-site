@@ -35,7 +35,8 @@
     "check:perf": "node scripts/check-perf.mjs",
     "check:degradation": "node scripts/check-degradation.mjs",
     "check:eval-coverage": "node scripts/check-eval-coverage.mjs",
-    "check:interaction": "node scripts/check-interaction.mjs"
+    "check:interaction": "node scripts/check-interaction.mjs",
+    "check:peak": "node scripts/check-peak.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

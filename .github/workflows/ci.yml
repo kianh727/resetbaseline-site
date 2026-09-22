@@ -205,6 +205,14 @@ jobs:
       - name: Tuning is local, and the loop is operable
         run: npm run check:interaction
 
+      # v5 §7, P1. Tier A renders the scene, C and D do not (SITE-058, §15),
+      # reduced motion draws once and stops, the builder still works with the
+      # canvas over the fold, and with WebGL disabled there is no canvas and the
+      # loop still completes (DS-6). The scene's 140 kB budget and its exclusion
+      # from first load are asserted in check:bundle.
+      - name: The Peak costs nothing when it is absent
+        run: npm run check:peak
+
       - name: Every degradation path renders something honest
         run: npm run check:degradation
 

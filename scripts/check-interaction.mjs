@@ -97,10 +97,45 @@ try {
       fail(`only ${performed} of ${TUNE_OPERATIONS} tune operations ran`)
     }
 
-    if (requests.length > 0) {
+    /*
+     * **Compared against a control that does no tuning**, rather than against
+     * zero.
+     *
+     * The first version asserted zero requests outright and fired on the Peak's
+     * own chunk — which the page fetches after the LCP window whether or not
+     * anybody tunes. Excluding it by name would have been a hole: any future
+     * request could be added next to it. Excluding it by *cause* is the claim
+     * SITE-EVAL-032 actually makes, and a control run measures cause directly.
+     *
+     * So: the same page, open for the same span, with no tuning at all. Any URL
+     * the tuning run requested that the idle run did not is a request tuning
+     * caused, and that set must be empty.
+     */
+    const control = await browser.newPage({ viewport: { width: 375, height: 800 } })
+    const controlRequests = []
+    control.on('request', (r) => controlRequests.push(r.url()))
+    await control.goto(origin, { waitUntil: 'networkidle' })
+    await control.fill('input[type="text"]', GOAL)
+    await control.getByRole('button', { name: /run/i }).first().click()
+    await control.waitForTimeout(3000)
+    await control.close()
+
+    const idle = new Set(controlRequests.map((u) => u.replace(/^https?:\/\/[^/]+/, '')))
+    const caused = requests
+      .map((u) => u.replace(/^https?:\/\/[^/]+/, ''))
+      .filter((path) => !idle.has(path))
+
+    if (caused.length > 0) {
       fail(
-        `SITE-EVAL-032: ${requests.length} network request(s) during ${performed} tune ` +
-          `operations — first was ${requests[0]}. Tuning is fully local.`,
+        `SITE-EVAL-032: ${caused.length} network request(s) caused by ${performed} tune ` +
+          `operations — first was ${caused[0]}. Tuning is fully local.`,
+      )
+    }
+    if (controlRequests.length === 0) {
+      fail(
+        'the control run recorded no requests at all, so the comparison above ' +
+          'cannot distinguish "caused by tuning" from "caused by anything" — it ' +
+          'would pass on a page that fetches nothing ever.',
       )
     }
 
@@ -326,7 +361,8 @@ if (failures > 0) {
 }
 
 process.stdout.write(
-  `interaction ok — ${TUNE_OPERATIONS} tune operations with zero network requests and a ` +
+  `interaction ok — ${TUNE_OPERATIONS} tune operations causing no request a control ` +
+    'run did not also make, and a ' +
     'stable occurrence set, a tune accepted mid-animation, every target ≥44×44 at 375px, ' +
     'the loop completed by keyboard, and every control named.\n',
 )
