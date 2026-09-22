@@ -7,6 +7,8 @@
  * supposed to reach it. Testing only the intended path would confirm that
  * activation reaches the wall while saying nothing about whether anything else
  * does, which is the half that matters.
+ *
+ * @implements SITE-EVAL-033
  */
 
 import { test } from 'node:test'

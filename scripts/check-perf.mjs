@@ -25,6 +25,8 @@
  * values for the same reason.
  *
  * **§0.3d: the export is asserted newer than its sources.**
+ *
+ * @implements SITE-EVAL-053
  */
 
 import { existsSync, readdirSync, statSync } from 'node:fs'

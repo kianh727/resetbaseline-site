@@ -8,6 +8,9 @@
  * everywhere. An empty stream is trivially "complete and ordered", which is the
  * exposure SITE-EVAL-037 was rewritten out of; a sink that collected nothing
  * fails the first assertion in every test below rather than passing them all.
+ *
+ * @implements SITE-EVAL-037
+ * @implements SITE-EVAL-038
  */
 
 import assert from 'node:assert/strict'

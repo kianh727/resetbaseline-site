@@ -64,7 +64,25 @@ export default function Company() {
         <p className="text-body" style={{ margin: 0, paddingTop: 24 }}>
           <a
             href={`mailto:${COMPANY_EMAIL}`}
-            style={{ color: 'var(--bone)', textDecoration: 'underline', textUnderlineOffset: 4 }}
+            /*
+             * **Not an inline link, so §9's 44px floor applies.** It sits alone
+             * in its own paragraph rather than inside a sentence, which is what
+             * WCAG 2.5.8's inline carve-out covers — and what
+             * `check-interaction.mjs` tests for structurally. A standalone
+             * contact link 19px tall is a target, and it was under the floor.
+             *
+             * `inline-flex` with `align-items: center` rather than vertical
+             * padding, so the underline stays on the text's own baseline
+             * instead of sinking 12px below it.
+             */
+            style={{
+              color: 'var(--bone)',
+              textDecoration: 'underline',
+              textUnderlineOffset: 4,
+              display: 'inline-flex',
+              alignItems: 'center',
+              minHeight: 44,
+            }}
           >
             {COMPANY_EMAIL}
           </a>

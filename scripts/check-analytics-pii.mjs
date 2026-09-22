@@ -14,6 +14,8 @@
  * a health term goes through the real client, and every emitted payload is
  * checked for any substring of it. The type covers code the compiler saw; the
  * scan covers a payload that arrived through a cast (§12.4).
+ *
+ * @implements SITE-EVAL-039
  */
 
 import { execFileSync } from 'node:child_process'

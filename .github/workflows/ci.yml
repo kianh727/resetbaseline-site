@@ -189,6 +189,22 @@ jobs:
       # extended to twice the viewport in the plan state -- the band's bleed was
       # clipped by the root safety net rather than by its own container, and
       # check:overflow could not see it because it measures the idle page.
+      # The machine-readable link between an eval and its implementation, which
+      # SITE-106's audit found did not exist -- ten eval IDs appeared across the
+      # tree and every one was prose in a comment. The convention is one line,
+      # `@implements SITE-EVAL-NNN`, and this asserts every AUTO eval is either
+      # implemented or listed in PENDING with a reason. A marker naming a
+      # withdrawn ID fails, and so does an eval that is both implemented and
+      # still pending -- the same expiry mechanism the SITE-004 exemption uses.
+      - name: Every AUTO eval is implemented or pending with a reason
+        run: npm run check:eval-coverage
+
+      # SITE-EVAL-013/016/032/043/047/048. Fifty tune operations with every
+      # request recorded, a tune accepted mid-animation, the 44x44 floor at
+      # 375px with a plan, the full loop by keyboard, and every control named.
+      - name: Tuning is local, and the loop is operable
+        run: npm run check:interaction
+
       - name: Every degradation path renders something honest
         run: npm run check:degradation
 

@@ -24,6 +24,8 @@
  * plan actually rendered before asserting anything about how.
  *
  * §0.3d: the export is asserted newer than its sources.
+ *
+ * @implements SITE-EVAL-059
  */
 
 import { existsSync, readdirSync, statSync } from 'node:fs'

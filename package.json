@@ -33,7 +33,9 @@
     "build:headers": "node scripts/build-headers.ts",
     "check:csp": "node scripts/check-csp.mjs",
     "check:perf": "node scripts/check-perf.mjs",
-    "check:degradation": "node scripts/check-degradation.mjs"
+    "check:degradation": "node scripts/check-degradation.mjs",
+    "check:eval-coverage": "node scripts/check-eval-coverage.mjs",
+    "check:interaction": "node scripts/check-interaction.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

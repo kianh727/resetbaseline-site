@@ -23,6 +23,8 @@ const compat = new FlatCompat({ baseDirectory: __dirname })
  * The list is deliberately narrow and names the issues that own each entry.
  * SITE-025 lands occurrence marks; SITE-026 lands the plan objects. Nothing
  * else lands structure today.
+ *
+ * @implements SITE-EVAL-064
  */
 const SETTLE_ALLOWLIST = [
   'lib/motion/settle.ts', // the primitive itself

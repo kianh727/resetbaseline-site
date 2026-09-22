@@ -10,6 +10,8 @@
  * The curve is asserted on `settleProgress()` directly rather than by observing
  * an animation. A test that could only watch a browser play it would be
  * asserting the browser; the overshoot is a property of these numbers.
+ *
+ * @implements SITE-EVAL-017
  */
 
 import { test } from 'node:test'

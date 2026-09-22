@@ -8,6 +8,8 @@
  * cannot fail, and it would stay green through any divergence because there is
  * nothing to diverge. What can actually go wrong is someone writing a *second*
  * classifier for the server route, so that is what the test looks for.
+ *
+ * @implements SITE-EVAL-025
  */
 
 import { test } from 'node:test'

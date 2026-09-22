@@ -7,6 +7,11 @@
  * is no flag to forget and no environment in which these tests behave
  * differently. That is the point of the seam rather than a property of the
  * suite.
+ *
+ * @implements SITE-EVAL-022
+ * @implements SITE-EVAL-023
+ * @implements SITE-EVAL-024
+ * @implements SITE-EVAL-026
  */
 
 import assert from 'node:assert/strict'

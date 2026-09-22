@@ -7,6 +7,8 @@
  * the property the interface exists for: **swapping adapters changes zero
  * builder code** (PRD §6, SITE-EVAL-063), which holds only while the seam runs
  * one way and the model stays ignorant of it.
+ *
+ * @implements SITE-EVAL-063
  */
 
 import { test } from 'node:test'

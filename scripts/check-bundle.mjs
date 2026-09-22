@@ -33,6 +33,8 @@
  * is the module set. Excluded files are printed rather than dropped silently.
  *
  * Run after `npm run build`. Exits 1 over budget, with the breakdown.
+ *
+ * @implements SITE-EVAL-051
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs'
