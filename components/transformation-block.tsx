@@ -49,7 +49,22 @@ export default function TransformationBlock({
             <div
               key={spec.key}
               data-row={spec.key}
-              className={`grid grid-cols-[7rem_1fr_auto] items-baseline gap-3 py-2.5 ${
+              /*
+               * **Every track is `minmax(0, …)`, and that is what stops the row
+               * overflowing at a large default text size.**
+               *
+               * A bare `7rem` and a bare `auto` are both floors: a grid track
+               * cannot shrink below its content, so at a 200% root font size
+               * the label column alone takes 224px of a 343px content box and
+               * the qualifier pushes the row past the viewport. Measured at
+               * 375px: 382px against 375.
+               *
+               * A reader who has set a larger default font size is not an edge
+               * case, and it is the one degradation axis invisible to every
+               * other check here, because it changes nothing about the markup.
+               * `minmax(0, …)` lets each track shrink and the text wrap.
+               */
+              className={`grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,auto)] items-baseline gap-3 py-2.5 ${
                 i === 0 ? '' : 'border-t border-edge'
               }`}
             >

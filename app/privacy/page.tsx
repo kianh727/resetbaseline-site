@@ -15,6 +15,7 @@
 
 import type { Metadata } from 'next'
 
+import { metadataForRoute } from '@/lib/seo/metadata'
 import SiteFooter from '@/components/site-footer'
 import {
   COLLECTED,
@@ -25,9 +26,7 @@ import {
   PRIVACY_WHY,
 } from '@/lib/copy/legal'
 
-export const metadata: Metadata = {
-  title: 'Privacy — Baseline',
-}
+export const metadata: Metadata = metadataForRoute('/privacy/')
 
 export default function Privacy() {
   return (

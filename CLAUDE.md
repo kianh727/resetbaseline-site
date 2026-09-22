@@ -2293,6 +2293,181 @@ manifest with no generated types is the ordinary shape of a bad publish and pass
 both guards pass (18/18, exit 0); with guard one re-keyed to the manifest, the same state exits 1.
 Manifest removed again; sweep of eighteen checks run bare, every exit code 0.
 
+**Ship mode was corrected 2026-09-22 (Kian): it was for the app's alpha scope, not for this
+site.** The site is early and most of P0 was buildable without further input, so a twelve-item
+queue ran continuously: the generation provider, `/api/plan`, the share card, metadata and
+icons, analytics, deploy readiness, the §11.2 budgets, the failure sweep, the eval harness, the
+Peak, the two gated P1 sections, and then the decomposition. **Merge authority was granted** for
+this site's own PRs when green; **`resetbaseline-site#3` still waits for the regenerated
+manifest and is never merged.**
+
+**`/api/plan` is a Cloudflare Pages Function, not a Next route — recorded as my resolution of a
+real contradiction.** `next.config.ts` sets `output: 'export'` per SITE-001, so no Next server
+exists at runtime, while §4 requires a site-local route with zero dependency on the Baseline
+backend. A Pages Function satisfies both; the alternatives are abandoning the static export or
+standing up the server that clause exists to avoid. The handler is framework-agnostic in
+`lib/api/plan.ts` and `functions/api/plan.ts` is a thin adapter, so everything decidable is
+reachable by `node --test`. `docs/deploy-cloudflare-pages.md` carries the exact steps, the
+values and the secrets; **the Pages project itself is Kian's and no deploy was fabricated.**
+
+**SITE-030's *"action vocabulary restricted to the 45 types"* no longer applies**, and that is
+why generation is **not** manifest-blocked. It predates §6.5's narrowing to three fields: a
+title, a window id and a question are not verbs, so the model emits none and there is no
+vocabulary to restrict. A prompt listing 45 verbs would invite the model to use one.
+
+**The window is selected by id from a closed set, never as minutes.** Two integers let the model
+return 6:05–7:25 — a window nobody designed, inside the shape the validator accepts, wrong in a
+way that renders perfectly. An id is a member or it is discarded, which is §0.3c applied to a
+closed set rather than to a date.
+
+**The transport is injected, and that is what keeps CI off the network.** A provider calling
+`fetch` directly could only be tested behind a skip flag, and a suite that skips its own subject
+reports a pass for a path nobody ran. There is no live path to skip. `ANTHROPIC_API_KEY` is
+named only; a provider constructed without one throws at construction rather than failing every
+request as a network error, which would fall back silently and look like a working site.
+
+**The analytics property tables are mine, and the citation is broken.** The decomposition cites
+*"§10"*; v7.3 §10 is "Bans", and the analytics section it means is **v5 §10, which §11 does not
+carry forward** — so the tables are carried forward by nothing and are in the tree nowhere, the
+DS-1…DS-10 shape again. The **names and ordering** come from SITE-EVAL-037 and -038, which are
+precise. **Reported, not resolved.** The sink is a seam with `NULL_SINK` as the default, named so
+a green build is not read as a site that measures.
+
+**SITE-051's guard is a type, and it was weaker than I claimed while its own check hid that.**
+No event property accepts `string`: a value is a number, a boolean, or a member of a closed set,
+and an arbitrary `string` is assignable to none of those. But the negative fixture's five
+attempts were being rejected by TypeScript's **excess-property check**, which applies only to a
+fresh object literal — so building the payload in a variable first compiled cleanly, and the
+check passed because its threshold was a literal `5` against a fixture making six attempts.
+`track`'s parameter is intersected with `Record<string, StructuralValue>` now, and the threshold
+is derived from the fixture. **That is §12.4's amendment hitting its own author**: a guarantee
+resting on a type and a test, where the half the type actually carried was not the half I
+thought.
+
+**§11.2's budgets are measured, and INP went from 640ms to 40ms.** Under Lighthouse's Slow-4G
+shape at 375px: **LCP 920ms of 1800 · CLS 0.000 of 0.05 · INP 40ms of 200.** The 640ms was
+located by comparing against a reduced-motion run at 168ms. Four attempts, each measured:
+memoising the spring curve 640 → 448; memoising the keyframe array, no effect; per-element style
+plus `getAnimations`, **616 — worse**, because each read forces a style flush; one CSS
+`@keyframes` rule with the stagger as a variable, 616 → 360; **the plan render as a transition,
+360 → 40.** Cutting keyframe samples was the cheap way out and is wrong — SITE-024 records that
+the overshoot **is** the signature — so the curve is unchanged at full resolution and only the
+delivery moved. This **refines** SITE-024: that issue rejected a CSS `linear()` *easing* on
+browser-support grounds, and a `@keyframes` block with percentage stops is not `linear()`.
+
+**The CPU throttle is calibrated to the host, and the reason is the timezone finding again.** A
+fixed 4× multiplies whatever the machine already is: the same commit read 40ms locally and 688ms
+on CI. An absolute budget measured through a relative throttle is measuring the runner. The host
+is benchmarked first and the multiplier chosen to land it on a fixed reference, which is what
+Lighthouse does; a host already slower than the target gets 1× and the output says so.
+
+**Ten checks joined the sweep, which is twenty-five**: `metadata` · `pii` · `interaction` ·
+`peak` · `degradation` · `perf` · `csp` · `eval-coverage`, plus the scene budget inside
+`bundle`. **Bundle 114.6 kB of 120.0; the scene is 4.1 kB of 140.0, in one chunk, referenced by
+none of the five documents.**
+
+**The production CSP would have shipped a site that renders and does nothing.** Next's App Router
+export emits its hydration payload as **37 inline `<script>` elements**, so `script-src 'self'`
+blocked every one and the builder was unreachable at both widths. **Every other browser check
+loads the export over a permissive local server, so all of them were measuring a more permissive
+site than the one that ships** — none of them could have found it. The fix is per-build hashes
+computed from the export after the build, since a static export has nowhere to put a nonce;
+`'unsafe-inline'` is refused by the check, so that road is closed deliberately.
+
+**SITE-059's five failure modes do not vary the client loop at all, and that is the result.**
+There is no provider on the builder's path, so a generation failure cannot reach it — DS-7 and
+DS-10 satisfied by construction. The sweep varies what can change the rendered result: four
+tiers × two widths, offline, JavaScript disabled, 200% text, and 320px with a plan. **Fifteen
+combinations, and it found two real defects.** The document extended to **twice the viewport** in
+the plan state — the bands bleed off both edges by design and the root's `overflow-x: clip` hid
+the consequence, which is §0.3a with the guard §9 requires doing the hiding; `check-overflow`
+never saw it because it measures the idle page and a band only exists once a plan does. And the
+transformation block overflowed at a 200% root font size, because a bare `7rem` and a bare `auto`
+are both floors a grid track cannot shrink below.
+
+**The eval harness exists now, and SITE-106's open half was wider than it recorded.** There was
+no machine-readable link between an eval and its implementation at all — ten eval IDs across the
+tree, every one prose in a comment. The convention is `@implements SITE-EVAL-NNN` in the file
+that implements it, deliberately not a separate registry. `check:eval-coverage` asserts the
+document parses into a non-trivial set, every marker names an eval that **exists**, every `AUTO`
+eval is implemented or in `PENDING` **with a stated reason**, and nothing is in both — so landing
+an implementation fails the check until its entry goes. A marker on a `VIS` or `FTU` eval fails
+by name (§7). **Coverage went from about 11 to 34 of 56, with 22 pending.** It caught a
+mis-attribution of mine on its first run.
+
+**The Peak is built, hand-rolled, and costs nothing when absent.** v5 §7, recovered from
+`9568a9a` — **the fifth citation of that shape**, after DS-15, §4's table, v5 §8 and v5 §14;
+inlining it is a §10 amendment and Kian's. No library: three.js tree-shaken would spend the
+entire 140 kB scene budget on a framework for 364 triangles and one draw call. **Two shader bugs,
+both found by looking at what it drew, and both produced the one thing §7.3 forbids — lavender as
+paint**: the normal was interpolated in object space while the view direction was in view space,
+and the open heightfield's back-facing triangles gave full rim on every fragment. **§7.1's
+binding constraint — the silhouette must read as the Baseline icon — cannot be checked, because
+the mark does not exist in this repository.** Stated in `geometry.ts` rather than skipped.
+
+**A P1-ordering note, recorded rather than assumed.** §3 says no P1 work begins until the P0 gate
+passes, and that gate is a six-participant study that has not run. Kian directed the Peak
+explicitly as *"P1 but buildable now"*, and **K-1's test is not met** — every remaining P0 item
+is blocked on an input only he can provide, so Peak work displaces nothing. It is strictly
+additive; `FlatLayout` remains the reference implementation.
+
+**§6 Method and §5 Day 1 → 30 are built, gated and reviewable.** `lib/sections/gates.ts` holds a
+boolean and a **condition that may not be a date** — §15.1 gates on evidence, and a gate that
+opens on a quarter opens whether or not the thing happened. Neither is on `/`; both render at a
+dev-only review route that **never consults the gates**, because a route that checked one and
+rendered anyway would be a second way for a gated section to reach a page.
+
+**SITE-114 is a set, not a state — recorded as my call.** The issue exists because hand-adding a
+state to SITE-012's table multiplies the pair space its exhaustive test walks, and that test is
+what proves `walled` unreachable by side effect. §6.1c keeps every existing beat inside the
+workspace, so a `workspace` state would duplicate `submitted` or add a second axis. **What §6.1c
+genuinely adds is `reset`**, which did not exist — and it is deliberately absent from `walled`,
+since a reset reachable from behind the wall would be a second way to leave it.
+
+**Four scans of mine fired on legitimate code and were narrowed rather than allowlisted** — the
+shape `check-lavender` was itself written around. The duplicate-schema scan flagged the
+instrumentation for naming thirteen events in thirteen `track` calls; the server/client boundary
+scan flagged a comment saying the file does the right thing; `tests/tokens.test.mjs` fired on a
+test naming the refusal token in order to assert the card never uses it; the status-date test
+fired on `status.ts` documenting why it does not use `new Date()`. Each reads import specifiers,
+strips call sites, strips comments, or asserts **palette membership** instead of banning one hex
+— which enumerates what it accepts (§0.3e). **The one real exemption is `lib/share/card.ts` in
+`check-lavender`**, named explicitly, because in SVG `fill` is how you draw anything at all: a
+1px lit line and a 3px mark are both `fill`. The rule is enforced *better* there by a geometry
+assertion no text scan can express.
+
+**Three failures of mine worth recording as habits rather than incidents.**
+
+- **CI was red for three runs while my local sweep was green**, because `npm run build` now
+  rasterises the share card through `playwright-core` and the Chromium install ran *after* the
+  build. Green on any machine with a browser cached, red on a fresh runner. The §0.3d
+  job-ordering hazard, in the workflow rather than in a check.
+- **I committed once claiming *"every exit code 0"* while `check:perf` was failing** with CLS
+  0.095 — a regression my own transition had just introduced by animating `max-height`, which
+  reflows every sibling. The claim should not have been made; the next commit corrected the
+  record and the fix took CLS back to 0.000.
+- **A check of mine was flaky and that is worse than no check.** SITE-EVAL-013's 400ms tune
+  ceiling read 455ms under the load of the full sweep and passed on a rerun, because it timed
+  Playwright's round trip rather than the interaction. It reads the Event Timing API now — the
+  same source INP comes from, so the two numbers are commensurable.
+
+**`SITE-016` is satisfied by construction, and that is a report rather than a check.** Its accept
+reads *"with generation stubbed to 3.5s, deadline and domain are visible within 100ms of
+submit"* — and **there is no provider on the client path at all**: the plan is deterministic and
+client-side, and the deadline materialises *mid-typing*, before submit. So the delay the
+criterion guards against cannot occur, and a check asserting it would pass against the absence of
+the thing it measures (§0.3). What *is* asserted, by `check-builder.mjs` with every post-document
+request aborted, is the stronger claim underneath it: the frame renders complete and empty at t=0
+and the deadline surfaces with **zero network requests**. `SITE-016`'s citation is *"§3.1"*, which
+in v7.3 is *"Why this and not a day"* — **the sixth instance of the superseded-numbering problem**,
+after DS-15, §4's table, v5 §8, v5 §14 and v5 §7.
+
+**Still blocked, and each on an input only Kian has:** the regenerated manifest (`SITE-4`), the
+typeface files, the target frames, `SITE-5` and `SITE-22`'s `VIS` verdicts, `SITE-028` and
+`SITE-109`…`SITE-112`'s copy, the Cloudflare Pages project, and Lighthouse's ≥90 line, which is
+**not run** — the three ceilings it blends are measured directly and the script says so rather
+than implying it passed.
+
 **Ship mode, not audit mode** (2026-09-22, Kian). Everything remaining on the implementation
 side waits on an input: the manifest, the typeface files, the target frames, `SITE-5` and
 `SITE-22`'s verdicts, and `SITE-110`/`111`/`112`'s copy. **No new audits or catalogue work**

@@ -33,6 +33,8 @@
  * is the module set. Excluded files are printed rather than dropped silently.
  *
  * Run after `npm run build`. Exits 1 over budget, with the breakdown.
+ *
+ * @implements SITE-EVAL-051
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs'
@@ -175,5 +177,67 @@ if (over.length > 0) {
   )
   process.exit(1)
 }
+
+/* ── §11.2's scene budget ────────────────────────────────────────────────── */
+
+/*
+ * **140 kB gzip, lazy, and excluded.** Two clauses, and the second is the one
+ * that could pass silently: a scene chunk under budget but *referenced by the
+ * document* is not excluded from first load at all, and the core budget above
+ * would then be measuring it too. So this asserts both, and asserts the chunk
+ * **exists** first — "the scene is under budget" is satisfied perfectly by
+ * there being no scene.
+ *
+ * Identified by what the shader source contains rather than by filename, since
+ * the chunk hash changes every build and a name pattern would bind to whichever
+ * chunk happened to match.
+ */
+const SCENE_BUDGET_BYTES = 140_000
+const SCENE_FINGERPRINT = 'a_position'
+
+const sceneChunks = readdirSync(join(OUT, '_next/static/chunks'))
+  .filter((f) => f.endsWith('.js'))
+  .map((f) => join(OUT, '_next/static/chunks', f))
+  .filter((f) => readFileSync(f, 'utf8').includes(SCENE_FINGERPRINT))
+
+if (sceneChunks.length === 0) {
+  console.error(
+    'bundle: no scene chunk found. The Peak is mounted, so either it stopped ' +
+      'being code-split — in which case it is inside the core budget above and ' +
+      'that number is wrong — or the fingerprint stopped matching.',
+  )
+  process.exit(1)
+}
+
+const sceneBytes = sceneChunks.reduce((sum, f) => sum + gzipSync(readFileSync(f)).length, 0)
+
+/* `documents` is already a function in this file; this is the list it returns. */
+const exportedDocuments = documents(OUT)
+
+for (const chunk of sceneChunks) {
+  const name = chunk.split('/').pop()
+  for (const doc of exportedDocuments) {
+    if (readFileSync(doc, 'utf8').includes(name)) {
+      console.error(
+        `bundle: ${doc} references the scene chunk ${name}. §11.2 excludes the ` +
+          'scene from first load, and a referenced chunk is fetched with the ' +
+          'document however it was imported.',
+      )
+      process.exit(1)
+    }
+  }
+}
+
+if (sceneBytes > SCENE_BUDGET_BYTES) {
+  console.error(
+    `bundle: the scene is ${kb(sceneBytes)} against §11.2's ${kb(SCENE_BUDGET_BYTES)}.`,
+  )
+  process.exit(1)
+}
+
+console.log(
+  `scene: ${kb(sceneBytes)} of ${kb(SCENE_BUDGET_BYTES)}, in ${sceneChunks.length} chunk(s), ` +
+    `referenced by none of ${exportedDocuments.length} documents.`,
+)
 
 console.log(`bundle: every route within budget.`)

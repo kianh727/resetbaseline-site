@@ -1,5 +1,7 @@
 /*
  * SITE-102 · Fixtures across all seven classes, plus the no-network assertion.
+ *
+ * @implements SITE-EVAL-075
  */
 
 import { test } from 'node:test'

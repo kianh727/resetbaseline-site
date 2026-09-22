@@ -76,6 +76,14 @@ export default function AskInput({
         />
 
         <input
+          /*
+           * **`min-h-11` is 44px — §9's floor, which carries no exceptions.**
+           * The `Run` button next to it had it from the start; the field itself
+           * did not, and rendered 26px tall. `check-interaction.mjs` measured
+           * it. A wrapper with padding makes the *row* tappable and leaves the
+           * control that takes focus below the floor, which is the version of
+           * this defect that looks fine in a screenshot.
+           */
           id={inputId}
           type="text"
           value={value}
@@ -91,7 +99,15 @@ export default function AskInput({
           maxLength={MAX_CHARS}
           placeholder="Ask Baseline"
           autoComplete="off"
-          className="min-w-0 flex-1 bg-transparent text-body text-bone outline-none placeholder:text-bone-38"
+          /*
+           * **`min-h-11` is 44px — §9's floor, which carries no exceptions.**
+           * The `Run` button beside it had that floor from the start; the field
+           * itself did not, and rendered 26px tall. `check-interaction.mjs`
+           * measured it. The wrapper's padding made the *row* tappable and left
+           * the control that actually takes focus below the floor, which is the
+           * version of this defect that looks fine in a screenshot.
+           */
+          className="min-h-11 min-w-0 flex-1 bg-transparent text-body text-bone outline-none placeholder:text-bone-38"
         />
 
         <button

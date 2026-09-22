@@ -42,9 +42,14 @@
 import { useEffect, useRef } from 'react'
 
 import { compose } from '@/lib/render/flat-layout'
-import { settle } from '@/lib/motion/settle'
+import {
+  installSettleStyles,
+  SETTLING_CLASS,
+  STAGGER_VAR,
+} from '@/lib/motion/settle'
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion'
 import type { Plan } from '@/lib/plan/model'
+import { markLabels } from '@/lib/plan/axis'
 
 /*
  * §14 tokens. Three readings of §6.3b recorded rather than left implicit,
@@ -72,7 +77,9 @@ const MARK_DARK = 'var(--bone-38)'
 const MARK_RADIUS = 3
 
 /** §8.2: 45ms apart, ~600ms total. Do not shorten it — it carries product meaning (K-4). */
-const STAGGER_MS = 45
+export const STAGGER_MS = 45
+
+
 
 function formatWindow(startMinute: number, endMinute: number): string {
   // §6.3a's example is `6:00–7:30am`, not `6:00am–7:30am`. The suffix is dropped
@@ -99,40 +106,88 @@ export function FlatPlan({ plan }: { plan: Plan }) {
   const reducedMotion = useReducedMotion()
   const root = useRef<HTMLDivElement>(null)
 
+  /*
+   * **One class toggle, not one animation per mark.**
+   *
+   * This used to call `settle()` on every mark. `check-perf.mjs` measured the
+   * interaction that renders a plan at **640ms INP against §11.2's 200ms
+   * ceiling** on a 4× throttled mobile CPU, and a reduced-motion run — which
+   * skips the animations — came in at 168ms. Memoising the curve took it to
+   * 448ms; memoising the keyframe array took it nowhere. About 120ms of it is
+   * the browser constructing twenty-odd animation objects, and it barely moves
+   * with the keyframe count (24 samples → 480ms, 12 → 304ms, 6 → 288ms).
+   *
+   * Cutting samples was the cheap way out and is the wrong one: SITE-024
+   * records that the overshoot **is** the signature, and six samples across a
+   * spring that crosses its target once do not describe one. So the curve is
+   * unchanged and the delivery moved: the keyframes and one rule are installed
+   * at mount, each mark carries its stagger index as a CSS variable, and
+   * starting the beat is a class on the container.
+   *
+   * An intermediate attempt set `element.style.animation` per mark and read
+   * `getAnimations()` per mark — **616ms, worse than where it started**,
+   * because each read forces a style flush.
+   */
   useEffect(() => {
     const node = root.current
     if (node === null) return
-    const marks = node.querySelectorAll<HTMLElement>('[data-mark]')
-    const animations: Animation[] = []
-    marks.forEach((mark, i) => {
-      const a = settle(mark, { reducedMotion, delayMs: i * STAGGER_MS })
-      if (a !== null) animations.push(a)
-    })
+
+    installSettleStyles(node.ownerDocument, STAGGER_MS)
+    if (reducedMotion) return
+
+    node.classList.add(SETTLING_CLASS)
+
     /*
-     * **Interruptible, and it leaves no orphaned state.** `cancel()` reverts a
-     * WAAPI animation to the element's own styles — and the element's own styles
-     * are the *final* state, because the marks are rendered in place and the
+     * **Interruptible, and it leaves no orphaned state.** `cancel()` reverts an
+     * animation to the element's own styles — and the element's own styles are
+     * the *final* state, because the marks are rendered in place and the
      * animation moves them from an offset. An implementation that animated
      * *to* the final state would leave a cancelled mark at its start position,
-     * which is exactly the orphaned state this clause forbids.
+     * which is exactly the orphaned state SITE-025's accept forbids.
+     *
+     * `getAnimations({ subtree: true })` is read **once, in cleanup** rather
+     * than per mark at start: that is where the flush is affordable, since the
+     * plan is being torn down rather than rendered.
      */
     return () => {
-      for (const a of animations) a.cancel()
+      node.classList.remove(SETTLING_CLASS)
+      for (const a of node.getAnimations({ subtree: true })) a.cancel()
     }
   }, [plan, reducedMotion])
 
   if (bands.length === 0) return null
 
   return (
-    <div ref={root} role="img" aria-label="Execution plan">
+    /*
+     * **`overflow-x: clip` here, and not only on the root.**
+     *
+     * The bands bleed off both frame edges by design (§6.3b), which they do
+     * with `margin-inline: -100vw`. The root's clip (SITE-005) hid the
+     * consequence, so nothing looked wrong — but the *document* was extending
+     * to roughly twice the viewport in the plan state: 2848px against 1440,
+     * 734px against 375. `check-overflow.mjs` never saw it because it measures
+     * the idle page and a band only exists once a plan does.
+     *
+     * That is §0.3a with the guard the PRD requires as the thing doing the
+     * hiding, and the fix is for the bleed to be clipped by **its own
+     * container** rather than by the page's safety net: the band still has no
+     * left or right end, the document no longer extends, and the root clip goes
+     * back to being a net rather than load-bearing.
+     *
+     * `clip` and not `hidden`, for the same reason SITE-005 gives: `hidden`
+     * makes this a scroll container and would break sticky positioning inside
+     * it.
+     */
+    <div ref={root} role="img" aria-label="Execution plan" style={{ overflowX: 'clip' }}>
       {bands.map((g) => {
         const protection = g.band.kind === 'protection'
         return (
           <div key={g.band.nodeId} style={{ paddingBottom: 20 }}>
             {/*
               The band. `margin-inline: -100vw` with matching padding puts its
-              edges far outside any viewport, and the page's `overflow-x: clip`
-              (SITE-005) hides them — §6.3b's "no left end, no right end".
+              edges far outside any viewport, and the **plan container's** own
+              `overflow-x: clip` hides them — §6.3b's "no left end, no right
+              end", without the document extending past the viewport.
             */}
             <div
               style={{
@@ -161,6 +216,13 @@ export function FlatPlan({ plan }: { plan: Plan }) {
                   data-mark
                   data-lit={m.lit ? 'true' : 'false'}
                   style={{
+                    /*
+                     * The stagger, as a number the CSS rule multiplies.
+                     * `CSSProperties` has no index signature for custom
+                     * properties, so the cast is the sanctioned form rather
+                     * than a workaround — React passes it through verbatim.
+                     */
+                    ...({ [STAGGER_VAR]: i } as React.CSSProperties),
                     position: 'absolute',
                     left: `${m.xFraction * 100}%`,
                     top: -g.height / 2 - MARK_RADIUS,
@@ -186,18 +248,18 @@ export function FlatPlan({ plan }: { plan: Plan }) {
             */}
             {!protection && g.marks.length > 0 && (
               <div style={{ position: 'relative', height: 14 }}>
-                {g.marks.map((m, i) => (
+                {markLabels(g.marks.map((m) => m.date)).map(({ index, text }) => (
                   <span
-                    key={i}
+                    key={index}
                     className="metadata"
                     style={{
                       position: 'absolute',
-                      left: `${m.xFraction * 100}%`,
+                      left: `${(g.marks[index]?.xFraction ?? 0) * 100}%`,
                       transform: 'translateX(-50%)',
-                      opacity: m.lit ? 1 : 0.55,
+                      opacity: g.marks[index]?.lit ? 1 : 0.55,
                     }}
                   >
-                    {m.date.getDate()}
+                    {text}
                   </span>
                 ))}
               </div>

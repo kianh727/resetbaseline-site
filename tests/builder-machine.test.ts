@@ -7,18 +7,22 @@
  * supposed to reach it. Testing only the intended path would confirm that
  * activation reaches the wall while saying nothing about whether anything else
  * does, which is the half that matters.
+ *
+ * @implements SITE-EVAL-033
  */
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import {
-  next,
-  can,
-  STATES,
   EVENTS,
-  WALL_EVENT,
   INITIAL_STATE,
+  STATES,
+  WALL_EVENT,
+  WORKSPACE_STATES,
+  can,
+  isWorkspace,
+  next,
   type BuilderState,
 } from '../lib/builder-machine.ts'
 
@@ -156,6 +160,67 @@ test('the event union is closed — the half typecheck was carrying by itself', 
       source,
       new RegExp(`'${event}'`),
       `${event} is iterated by the exhaustive test but does not appear in the machine`,
+    )
+  }
+})
+
+/* ── §6.1c · the workspace and the reset ─────────────────────────────────── */
+
+test('the workspace predicate enumerates its members', () => {
+  /*
+   * §0.3e. `!== 'idle'` would be correct today and wrong the instant a state
+   * is added that is neither a hero nor a workspace — which is exactly how
+   * `isBounded` shipped a latent bug for two answers and broke on the third.
+   */
+  assert.ok(WORKSPACE_STATES.length > 0)
+  for (const state of STATES) {
+    assert.equal(
+      isWorkspace(state),
+      WORKSPACE_STATES.includes(state),
+      `${state} disagrees with the declared set`,
+    )
+  }
+
+  // The hero states, named positively rather than as "the rest".
+  assert.equal(isWorkspace('idle'), false)
+  assert.equal(isWorkspace('engaged'), false)
+  assert.equal(isWorkspace('submitted'), true, 'the workspace opens on submit (§6.1c)')
+  assert.equal(isWorkspace('walled'), true, 'the wall is over the workspace, not instead of it')
+
+  const source = readFileSync('lib/builder-machine.ts', 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/\/\/[^\n]*/g, ' ')
+  assert.doesNotMatch(
+    source,
+    /state\s*!==\s*'idle'/,
+    'the workspace must not be defined as "not idle" (§0.3e)',
+  )
+})
+
+test('reset returns to idle from every workspace state except behind the wall', () => {
+  /*
+   * §6.1c: *"Reversible. A reset returns the hero…"* and *"Dismissing the wall
+   * does not reset — it returns to the workspace."* A reset reachable from
+   * behind the wall would be a second way to leave it, and the wall's exits are
+   * exactly one edge by design.
+   */
+  for (const state of WORKSPACE_STATES) {
+    if (state === 'walled') continue
+    assert.equal(next(state, 'reset'), 'idle', `reset from ${state} must return the hero`)
+  }
+
+  assert.equal(next('walled', 'reset'), null, 'reset is not an exit from the wall')
+  assert.equal(next('walled', 'dismiss_wall'), 'tuning', 'positive control: the wall does open')
+})
+
+test('reset is not a route into anything', () => {
+  // It lands on `idle` or nowhere. A reset that advanced state would be a
+  // transition wearing an undo's name.
+  for (const state of STATES) {
+    const landed = next(state, 'reset')
+    assert.ok(
+      landed === null || landed === 'idle',
+      `reset from ${state} produced ${landed}`,
     )
   }
 })

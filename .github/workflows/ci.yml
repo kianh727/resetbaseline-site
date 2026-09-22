@@ -58,6 +58,14 @@ jobs:
       # records stale counts against current counts in the same object. The ban
       # was prose until the manifest was about to enter the repo; this is the
       # construction behind it.
+      # SITE-107. §14's PRE-2, automated: §19's banned terms and the committed
+      # app-name list against every authored string, site-wide rather than
+      # gate-scoped (§6.3a is a MUST), plus staleness of the list itself. The
+      # list ships non-empty -- an empty one fails nothing, which would be §0.3
+      # turned on the check written to catch it.
+      - name: Banned terms, app names, and list staleness
+        run: npm run check:bans
+
       - name: Divergences ban
         run: npm run check:divergences
 
@@ -78,6 +86,16 @@ jobs:
 
       - name: Date-sensitive suites in real DST zones
         run: npm run check:timezones
+
+      # Chromium comes BEFORE the build, not after, and that is load-bearing
+      # rather than tidy: `npm run build` rasterises the share card and the icon
+      # set through playwright-core, so a build step ahead of the install fails
+      # on a fresh runner while passing on any machine with a browser already
+      # cached. It did exactly that here -- green locally, red in CI, three runs
+      # in a row -- which is the job-ordering hazard §0.3d warns about, in the
+      # workflow rather than in a check.
+      - name: Install Chromium — the build rasterises the OG card with it
+        run: npx playwright-core install --with-deps chromium
 
       - name: Build
         run: npm run build
@@ -106,9 +124,6 @@ jobs:
       # and §9 puts it at every width the site supports. This needs a real
       # browser because an overflow is a layout outcome, not something visible
       # in the CSS that caused it.
-      - name: Install Chromium for the overflow check
-        run: npx playwright-core install --with-deps chromium
-
       - name: Horizontal overflow at 320/375/390/768/1440/1920
         run: npm run check:overflow
 
@@ -148,6 +163,79 @@ jobs:
       # before asserting no name is in it.
       - name: No depicted object names an app
         run: npm run check:app-names
+
+      # SITE-100. Reads the exported documents and the export's own filesystem —
+      # two sources, neither computed from the other, since reading the route
+      # list that generated the tags would agree by construction (§0.3b). Counts
+      # before properties, and it asserts the sitemap in both directions: a
+      # sitemap advertising a route that does not exist sends crawlers to a 404,
+      # and a route missing from it is a page nobody finds.
+      - name: Every route has metadata, an OG card and icons that resolve
+        run: npm run check:metadata
+
+      # SITE-051 / SITE-EVAL-039. Compiles a fixture that MUST fail and fails
+      # the build if it succeeds -- a compile-time rule with no failing case
+      # rejects nothing, and its absence is indistinguishable from its working.
+      # The rejection count is derived from the fixture, not a literal: an
+      # earlier threshold of five against six attempts hid the one attempt the
+      # guard did not catch. Also scans real payloads for any substring of a
+      # goal containing a name, a place and a health term.
+      - name: No free-form user text can reach an analytics event
+        run: npm run check:pii
+
+      # The deployment's real headers, run against the real page. Every other
+      # browser check in this sweep loads the export over a permissive local
+      # server, so all of them were measuring a more permissive site than the
+      # one that ships. This found that Next's export emits its hydration
+      # payload as inline scripts, which script-src 'self' blocks outright --
+      # a site that renders and does nothing. The policy carries per-build
+      # hashes computed from the export, and both the server and this check
+      # read the shipped _headers rather than recomputing it.
+      # §11.2's budgets, measured under Lighthouse's Slow-4G shape and a 4x CPU
+      # slowdown at 375px. This found INP at 640ms against a 200ms ceiling, and
+      # located it by comparing against a reduced-motion run. Lighthouse itself
+      # is not run here; the three ceilings are what a regression moves and they
+      # are measured directly.
+      # SITE-059's failure sweep, plus §11's degradation paths. Fifteen
+      # combinations: four tiers x two widths, offline, JavaScript disabled,
+      # 200% text, and 320px with a plan. Zero dead states, zero spinners, zero
+      # broken layouts, each asserted separately because a page that failed to
+      # render satisfies all three vacuously. It found that the document
+      # extended to twice the viewport in the plan state -- the band's bleed was
+      # clipped by the root safety net rather than by its own container, and
+      # check:overflow could not see it because it measures the idle page.
+      # The machine-readable link between an eval and its implementation, which
+      # SITE-106's audit found did not exist -- ten eval IDs appeared across the
+      # tree and every one was prose in a comment. The convention is one line,
+      # `@implements SITE-EVAL-NNN`, and this asserts every AUTO eval is either
+      # implemented or listed in PENDING with a reason. A marker naming a
+      # withdrawn ID fails, and so does an eval that is both implemented and
+      # still pending -- the same expiry mechanism the SITE-004 exemption uses.
+      - name: Every AUTO eval is implemented or pending with a reason
+        run: npm run check:eval-coverage
+
+      # SITE-EVAL-013/016/032/043/047/048. Fifty tune operations with every
+      # request recorded, a tune accepted mid-animation, the 44x44 floor at
+      # 375px with a plan, the full loop by keyboard, and every control named.
+      - name: Tuning is local, and the loop is operable
+        run: npm run check:interaction
+
+      # v5 §7, P1. Tier A renders the scene, C and D do not (SITE-058, §15),
+      # reduced motion draws once and stops, the builder still works with the
+      # canvas over the fold, and with WebGL disabled there is no canvas and the
+      # loop still completes (DS-6). The scene's 140 kB budget and its exclusion
+      # from first load are asserted in check:bundle.
+      - name: The Peak costs nothing when it is absent
+        run: npm run check:peak
+
+      - name: Every degradation path renders something honest
+        run: npm run check:degradation
+
+      - name: LCP, CLS and INP against §11.2
+        run: npm run check:perf
+
+      - name: The site works under its production CSP
+        run: npm run check:csp
 
       - name: Reduced motion in both settings, and locale independence
         run: npm run check:motion

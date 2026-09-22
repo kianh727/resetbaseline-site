@@ -28,6 +28,8 @@
  * §12.4: a check that finds no routes and reports success is measuring the
  * container, so it asserts a non-zero route count before it asserts anything
  * about overflow.
+ *
+ * @implements SITE-EVAL-046
  */
 
 import { readdirSync, statSync } from 'node:fs'

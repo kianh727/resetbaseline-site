@@ -34,6 +34,8 @@
  * degrade into the first time the selector changed.
  *
  * It also asserts the export is newer than its sources (§0.3d).
+ *
+ * @implements SITE-EVAL-074
  */
 
 import { chromium } from 'playwright-core'

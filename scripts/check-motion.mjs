@@ -39,6 +39,8 @@
  * stack, so the overflow check measures the runner's fonts. A matrix cannot fix
  * the second, because the candidate faces are not obtainable; it lands with the
  * typeface decision instead.
+ *
+ * @implements SITE-EVAL-050
  */
 
 import { chromium } from 'playwright-core'

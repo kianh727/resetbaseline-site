@@ -28,7 +28,7 @@
  * than on mount.
  */
 
-import { useCallback, useMemo, useState } from 'react'
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import AskInput from '@/components/ask-input'
 import TransformationBlock from '@/components/transformation-block'
@@ -44,6 +44,13 @@ import { downloadPlan } from '@/lib/plan/download'
 import { DEFAULT_WINDOW_ID, WINDOW_OPTIONS } from '@/lib/copy/builder-controls'
 import { ACTIVATE_LABEL, RUN_AGAIN_LABEL } from '@/lib/copy/builder-controls'
 import type { RowValues } from '@/lib/builder/rows'
+import { createAnalytics, NULL_SINK, type AnalyticsSink } from '@/lib/analytics/client'
+import type { EventName, EventPayloads, EventProperties } from '@/lib/analytics/events'
+import { classifyInput } from '@/lib/parse/input-class'
+import { occurrences } from '@/lib/plan/model'
+import { useRenderTier } from '@/lib/hooks/use-render-tier'
+import { isWorkspace } from '@/lib/builder-machine'
+import { useReducedMotion } from '@/lib/hooks/use-reduced-motion'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -67,12 +74,80 @@ function formatWindow(startMinute: number, endMinute: number): string {
 
 const FALLBACK_WINDOW = WINDOW_OPTIONS[0]!
 
-export default function Builder() {
+/**
+ * SITE-050 · Where the fifteen events fire.
+ *
+ * **Each fires at the moment the thing it names happens**, not at the render
+ * that follows it: `goal_input_started` on the first keystroke and not on every
+ * one, `wall_reached` when the machine enters `walled` and not when the wall
+ * paints. An event fired from a render effect counts renders, which is a
+ * different measurement wearing the same name.
+ *
+ * **Nothing the visitor typed reaches a payload**, and that is not a discipline
+ * applied here — `Analytics.track` admits no free-form string at all, so there
+ * is no argument this component could pass one through (SITE-051).
+ *
+ * **The sink is injected and defaults to `NULL_SINK`.** The PRD names no
+ * provider, so this measures nothing until Kian chooses one; the seam is what
+ * makes that a one-argument change rather than an instrumentation pass.
+ */
+export default function Builder({
+  sink = NULL_SINK,
+  headline,
+}: { sink?: AnalyticsSink; headline?: React.ReactNode } = {}) {
   const [text, setText] = useState('')
   const [state, setState] = useState(INITIAL_STATE)
   const [windowId, setWindowId] = useState(DEFAULT_WINDOW_ID)
   const [days, setDays] = useState<readonly Weekday[] | null>(null)
   const [apps, setApps] = useState<readonly string[]>([])
+
+  /*
+   * The tier is read once and attached to every event (§10.2). Reading it per
+   * event would attribute a session that changed tier mid-way to whichever tier
+   * it happened to be in at each moment, and SITE-EVAL-040's K-1 comparison
+   * would be measuring something other than the cohort.
+   */
+  const tier = useRenderTier()
+  const reducedMotion = useReducedMotion()
+  const analytics = useMemo(() => createAnalytics(sink, tier), [sink, tier])
+
+  /*
+   * Refs, not state: these gate one-shot events and must not cause a render.
+   * `submittedAt` is what `wall_reached` measures against, and it is a ref for
+   * the same reason — a timestamp in state re-renders the builder at the moment
+   * the visitor is typing.
+   */
+  const fired = useRef<Set<string>>(new Set())
+  const submittedAt = useRef<number | null>(null)
+  const walledAt = useRef<number | null>(null)
+
+  /**
+   * Fire at most once per session — `hero_view`, `builder_engaged` and
+   * `goal_input_started` are all "the first time", not "every time".
+   *
+   * **Keyed on the event name itself** rather than on a separate string. An
+   * arbitrary key is a second name for the same thing, and it drifts from the
+   * event the first time somebody renames one and not the other.
+   */
+  const trackOnce = useCallback(
+    <K extends EventName>(name: K, properties: Omit<EventPayloads[K], 'tier'> & EventProperties) => {
+      if (fired.current.has(name)) return
+      fired.current.add(name)
+      analytics.track(name, properties)
+    },
+    [analytics],
+  )
+
+  /*
+   * `hero_view` is the one event that legitimately fires from an effect: it
+   * names a view, and mount is when the view happens. The `once` guard makes a
+   * remount — a fast refresh, a tier upgrade re-running the memo — count one
+   * view rather than two, which is the failure this event has by default.
+   */
+  useEffect(() => {
+    trackOnce('hero_view', { reduced_motion: reducedMotion })
+
+  }, [trackOnce, reducedMotion])
 
   /**
    * The only way state moves. `next()` returns `null` for a transition that is
@@ -80,9 +155,30 @@ export default function Builder() {
    * a component that could not make a transition happen must not get one by
    * writing the state itself.
    */
-  const send = useCallback((event: BuilderEvent) => {
-    setState((current) => next(current, event) ?? current)
-  }, [])
+  const send = useCallback(
+    (event: BuilderEvent) => {
+      setState((current) => {
+        const moved = next(current, event)
+        if (moved === null) return current
+
+        /*
+         * `wall_reached` fires on the **transition**, which is the only place
+         * it can be correct: the wall is reachable by exactly one event
+         * (SITE-012), so firing it here means the event and the guarantee have
+         * the same single source. Fired from the wall's own mount it would
+         * count paints, and a remount would count two.
+         */
+        if (moved === 'walled' && current !== 'walled') {
+          walledAt.current = Date.now()
+          analytics.track('wall_reached', {
+            ms_since_submit: submittedAt.current === null ? 0 : Date.now() - submittedAt.current,
+          })
+        }
+        return moved
+      })
+    },
+    [analytics],
+  )
 
   const option = WINDOW_OPTIONS.find((o) => o.id === windowId) ?? FALLBACK_WINDOW
   const planWindow = { startMinute: option.startMinute, endMinute: option.endMinute }
@@ -130,18 +226,172 @@ export default function Builder() {
 
   const submit = () => {
     if (text.trim().length === 0) return
-    send('submit')
-    send('build')
-    send('plan_ready')
+
+    submittedAt.current = Date.now()
+
+    analytics.track('goal_submitted', {
+      // A length, never the text. A length cannot be read back into words.
+      length: text.trim().length,
+      input_class: classifyInput(text.trim()),
+      has_deadline: match !== null,
+    })
+
+    /*
+     * **The plan render is a transition, and that is the INP fix that is about
+     * the render rather than the animation.**
+     *
+     * The click's handler was doing all of it synchronously: three state
+     * moves, a plan build, a full render of bands and marks, and the effect
+     * that starts the beat. §11.2's INP ceiling is 200ms and
+     * `check-perf.mjs` measured 640ms on a 4× throttled mobile CPU.
+     *
+     * Marking it a transition lets the browser finish the interaction — the
+     * click is acknowledged, the button's own state settles — and render the
+     * plan on the next frame. **It adds no waiting state**, which DS-10 would
+     * forbid: the transformation block is already complete and empty at t=0
+     * and stays exactly as it was for the extra frame. Nothing appears that
+     * says "loading", because nothing is loading — the plan is deterministic
+     * and client-side, and this is one frame, not a request.
+     */
+    startTransition(() => {
+      send('submit')
+      send('build')
+      send('plan_ready')
+    })
   }
 
+  /*
+   * `plan_generated` fires when the memoized plan first exists.
+   *
+   * **It used to call `buildPlan` again inside `submit`**, which built the
+   * whole plan a second time on the click that also renders it — a duplicate
+   * of the exact work the render was about to memoize, on the one interaction
+   * where the main thread is already fully committed. `check-perf.mjs`
+   * measured the result at 552ms INP against §11.2's 200ms ceiling on a 4×
+   * throttled mobile CPU. The instrumentation was the cost it was reporting.
+   *
+   * Reading the memo instead measures the same plan and builds nothing, which
+   * is also the more honest number: it is the plan the visitor actually got.
+   */
+  useEffect(() => {
+    if (plan === null || submittedAt.current === null) return
+    trackOnce('plan_generated', {
+      node_count: plan.nodes.length,
+      occurrence_count: occurrences(plan).length,
+      ms_to_plan: Date.now() - submittedAt.current,
+    })
+  }, [plan, trackOnce])
+
+  const workspace = isWorkspace(state)
+
   return (
-    <div className="flex w-full flex-col gap-10">
+    /*
+     * SITE-115 · §6.1c · the workspace transition.
+     *
+     * **The fold reconfigures in place.** Same page, same scroll position, no
+     * route change, no modal, no overlay — and the page below the fold is
+     * untouched and scrolls normally. That last clause is why this is a plain
+     * flow element with no `position: fixed` anywhere: §6.1c is explicit that
+     * the workspace *"is not a modal and not full-screen chrome — no escape
+     * key, no close button, no scroll lock"*, and every one of those is absent
+     * by construction rather than by having been left out.
+     *
+     * **The transition never changes scroll position.** There is no
+     * `scrollIntoView`, no `scrollTo`, and no element that leaves the flow — so
+     * the one place §6.1c says layout and scroll could fight has nothing to
+     * fight with. A test asserts `scrollY` is unchanged across the submit.
+     *
+     * **Controls enable on data, never on animation** (§6.1c, EVAL-016). The
+     * transition is CSS on the container; nothing below is gated on it, and the
+     * plan renders from the same memo it always did.
+     *
+     * **Reduced motion: no transition, the workspace layout renders directly.**
+     * Handled by the duration collapsing to zero rather than by a second code
+     * path, so there is one layout and one set of final values.
+     */
+    <div
+      data-workspace={workspace ? 'true' : 'false'}
+      className="relative flex w-full flex-col gap-10"
+      style={
+        headline === undefined
+          ? undefined
+          : {
+              /*
+               * The headline's reserved space. It does not change between hero
+               * and workspace, so nothing reflows; what moves is the block
+               * below it, by transform.
+               */
+              paddingTop: 'var(--headline-space)',
+            }
+      }
+    >
+      {headline !== undefined && (
+        /*
+         * §6.1c: headline out over 0–240ms, translating up 24px. **On mobile
+         * it is removed rather than reduced** — vertical space is the
+         * constraint and the headline is what yields — which `max-height: 0`
+         * does at every width once it has faded, so the input takes the top of
+         * the fold on a phone without a second rule.
+         */
+        <div
+          aria-hidden={workspace ? 'true' : undefined}
+          style={{
+            /*
+             * **Out of flow, not collapsed.** The first version animated
+             * `max-height` to 0, which reflows every sibling below it — that is
+             * layout shift by definition, and `check-perf.mjs` measured CLS at
+             * **0.095 against §11.2's 0.05**. §6.1c asks for the headline to
+             * fade out translating up and for the input to take the top of the
+             * fold; neither requires the document to reflow, and `transform`
+             * and `position` are the two things that move an element without
+             * moving anything else.
+             *
+             * So the headline is absolutely positioned from the start and the
+             * container reserves its height. It fades and translates on submit,
+             * the input rises into the space by transform, and nothing below
+             * moves at all.
+             */
+            position: 'absolute',
+            insetInline: 0,
+            top: 0,
+            opacity: workspace ? 0 : 1,
+            transform: workspace ? 'translateY(-24px)' : 'none',
+            pointerEvents: workspace ? 'none' : undefined,
+            transition: reducedMotion
+              ? 'none'
+              : 'opacity 240ms ease-out, transform 240ms ease-out',
+          }}
+        >
+          {headline}
+        </div>
+      )}
+
+      {/*
+        * §6.1c: the input translates to the top of the fold and becomes a
+        * persistent bar, and **everything below it comes with it**.
+        *
+        * Translating the input alone left the headline's reserved space sitting
+        * as a hole between the input and the transformation block — no reflow,
+        * which was the point, but a visible gap where the fold was supposed to
+        * have reconfigured. Moving the whole block by one transform closes it
+        * and still shifts nothing: a transform moves an element without moving
+        * anything else, which is the entire reason this is not a height
+        * animation.
+        */}
+      <div
+        className="flex flex-col gap-10"
+        style={{
+          transform: workspace ? 'translateY(calc(-1 * var(--headline-space)))' : 'none',
+          transition: reducedMotion ? 'none' : 'transform 240ms 60ms ease-out',
+        }}
+      >
       <AskInput
         value={text}
         onChange={(v) => {
+          if (v.trim().length > 0) trackOnce('goal_input_started', {})
           setText(v)
           send('engage')
+          trackOnce('builder_engaged', {})
         }}
         onSubmit={submit}
       />
@@ -157,6 +407,7 @@ export default function Builder() {
             <TimeControl
               value={option}
               onChange={(o) => {
+                analytics.track('plan_tuned', { control: 'window' })
                 setWindowId(o.id)
                 send('tune')
               }}
@@ -164,6 +415,7 @@ export default function Builder() {
             <DaysControl
               value={activeDays}
               onChange={(d) => {
+                analytics.track('plan_tuned', { control: 'days' })
                 setDays(d.length === 0 ? [] : WEEKDAYS.filter((w) => d.includes(w)))
                 send('tune')
               }}
@@ -171,6 +423,9 @@ export default function Builder() {
             <ProtectControl
               value={apps}
               onChange={(a) => {
+                trackOnce('protect_started', {})
+                /* A count, never a name (§6.3a) — and the type cannot carry one. */
+                analytics.track('protect_selected', { app_count: a.length })
                 setApps(a)
                 send('protect')
               }}
@@ -189,7 +444,10 @@ export default function Builder() {
           {apps.length === 0 ? null : (
             <button
               type="button"
-              onClick={() => send('activation_attempted')}
+              onClick={() => {
+                analytics.track('activation_attempted', {})
+                send('activation_attempted')
+              }}
               className="text-body"
               style={{
                 alignSelf: 'flex-start',
@@ -208,11 +466,30 @@ export default function Builder() {
         </>
       )}
 
+      </div>
+
       <Wall
         open={state === 'walled'}
-        onDismiss={() => send('dismiss_wall')}
+        onDismiss={() => {
+          analytics.track('wall_dismissed', {
+            dwell_ms: walledAt.current === null ? 0 : Date.now() - walledAt.current,
+          })
+          send('dismiss_wall')
+        }}
+        onSubmit={() => analytics.track('email_submitted', {})}
         onDownload={() => {
-          if (plan !== null) downloadPlan(plan)
+          if (plan !== null) {
+            /*
+             * The download **is** the share artifact today: the card is a
+             * server-side render and the wall's control hands over a plain-text
+             * plan (§11.5). Firing `share_card_created` here rather than at
+             * some future share button is the honest reading — the event names
+             * the moment a visitor takes the plan away with them, and that is
+             * this one.
+             */
+            analytics.track('share_card_created', {})
+            downloadPlan(plan)
+          }
         }}
       />
     </div>

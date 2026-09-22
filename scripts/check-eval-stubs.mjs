@@ -18,6 +18,8 @@
  *
  * §12.4 applied to this script: its own failure mode is passing when it finds
  * no evals, so it asserts a plausible floor before it asserts anything else.
+ *
+ * @implements SITE-EVAL-078
  */
 
 import { readFileSync } from 'node:fs'

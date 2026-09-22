@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build-assets.ts && next build && node scripts/build-headers.ts",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -26,7 +26,18 @@
     "check:lavender": "node scripts/check-lavender.mjs",
     "check:predicates": "node scripts/check-predicates.mjs",
     "check:timezones": "node scripts/check-timezones.mjs",
-    "check:motion": "node scripts/check-motion.mjs"
+    "check:motion": "node scripts/check-motion.mjs",
+    "build:assets": "node scripts/build-assets.ts",
+    "check:metadata": "node scripts/check-metadata.mjs",
+    "check:pii": "node scripts/check-analytics-pii.mjs",
+    "build:headers": "node scripts/build-headers.ts",
+    "check:csp": "node scripts/check-csp.mjs",
+    "check:perf": "node scripts/check-perf.mjs",
+    "check:degradation": "node scripts/check-degradation.mjs",
+    "check:eval-coverage": "node scripts/check-eval-coverage.mjs",
+    "check:interaction": "node scripts/check-interaction.mjs",
+    "check:peak": "node scripts/check-peak.mjs",
+    "check:bans": "node scripts/check-bans.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

@@ -37,6 +37,8 @@
  * **Both verification widths**, because the LCP element can differ between
  * them: the headline sets on two lines at 1440px and more at 375px, and a
  * different element can win at one width and not the other.
+ *
+ * @implements SITE-EVAL-052
  */
 
 import { chromium } from 'playwright-core'

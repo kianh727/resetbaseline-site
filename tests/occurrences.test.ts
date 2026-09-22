@@ -17,6 +17,8 @@
  * asserted instead is the property that must hold in **every** zone: stepping
  * the calendar N times lands on the Nth calendar day, and the count over a span
  * does not change because an offset did.
+ *
+ * @implements SITE-EVAL-029
  */
 
 import { test } from 'node:test'

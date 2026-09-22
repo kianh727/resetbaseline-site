@@ -19,17 +19,34 @@
 
 import Builder from '@/components/builder'
 import { HEADLINE } from '@/lib/copy/hero'
+import PeakScene from '@/components/peak/peak-scene'
 
 export default function Hero() {
   return (
-    <section className="page-x flex min-h-[70svh] flex-col justify-center gap-8 py-12">
+    /*
+     * `relative`, so the Peak's absolutely-positioned canvas has a containing
+     * block. It sits at `z-index: -1` behind the fold's content and carries no
+     * meaning the flat layout does not — if it never appears, nothing the
+     * visitor needed is missing (§3, DS-6).
+     */
+    <section className="page-x relative flex min-h-[70svh] flex-col justify-center gap-8 py-12">
+      <PeakScene />
       {/*
+        * **The headline is handed to `Builder` rather than rendered here**, and
+        * that is SITE-115's shape rather than a convenience: §6.1c's transition
+        * fades it out on submit, so whatever renders it has to know the
+        * machine's state. Lifting the state up instead would put the one
+        * mutator (`send`) behind a prop, and SITE-012's guarantee is that
+        * `walled` is produced by exactly one call in the tree.
+        *
         * `text-balance` keeps a short headline from breaking to a single
         * trailing word. No italic or coloured accent on any one word (§19).
         */}
-      <h1 className="max-w-[18ch] text-balance text-display text-bone">{HEADLINE}</h1>
-
-      <Builder />
+      <Builder
+        headline={
+          <h1 className="max-w-[18ch] text-balance text-display text-bone">{HEADLINE}</h1>
+        }
+      />
     </section>
   )
 }

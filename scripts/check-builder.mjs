@@ -15,6 +15,9 @@
  * "no shimmer" are both vacuously true on a blank page — the row count is
  * checked first, and it is checked against the declared row set rather than
  * against whatever rendered.
+ *
+ * @implements SITE-EVAL-007
+ * @implements SITE-EVAL-008
  */
 
 import { chromium } from 'playwright-core'
