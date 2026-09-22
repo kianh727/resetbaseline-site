@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/build-assets.ts && next build",
+    "build": "node scripts/build-assets.ts && next build && node scripts/build-headers.ts",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -29,7 +29,9 @@
     "check:motion": "node scripts/check-motion.mjs",
     "build:assets": "node scripts/build-assets.ts",
     "check:metadata": "node scripts/check-metadata.mjs",
-    "check:pii": "node scripts/check-analytics-pii.mjs"
+    "check:pii": "node scripts/check-analytics-pii.mjs",
+    "build:headers": "node scripts/build-headers.ts",
+    "check:csp": "node scripts/check-csp.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

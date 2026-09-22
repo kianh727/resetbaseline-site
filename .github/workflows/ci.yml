@@ -168,5 +168,16 @@ jobs:
       - name: No free-form user text can reach an analytics event
         run: npm run check:pii
 
+      # The deployment's real headers, run against the real page. Every other
+      # browser check in this sweep loads the export over a permissive local
+      # server, so all of them were measuring a more permissive site than the
+      # one that ships. This found that Next's export emits its hydration
+      # payload as inline scripts, which script-src 'self' blocks outright --
+      # a site that renders and does nothing. The policy carries per-build
+      # hashes computed from the export, and both the server and this check
+      # read the shipped _headers rather than recomputing it.
+      - name: The site works under its production CSP
+        run: npm run check:csp
+
       - name: Reduced motion in both settings, and locale independence
         run: npm run check:motion
