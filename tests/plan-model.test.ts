@@ -289,7 +289,22 @@ function handListed(source: string): string[] {
  * ever changes it should fail and be looked at, not pre-exempted.
  */
 const HAND_LIST_EXEMPT: readonly string[] = [
+  /* Generated output. Regenerated and diffed by check-generated-contracts.mjs. */
   'lib/contracts/generated.ts',
+
+  /*
+   * **SITE-004.** A bounded exception, accepted 2026-09-22 (Kian) **as an
+   * exception and not as a precedent** — the builder creates objects and has
+   * nothing upstream to carry a capability from, which is the one position the
+   * carry-it-through answer cannot reach.
+   *
+   * **This entry is deleted in the same commit that narrows the aliases.** It
+   * is not a permanent second home for contract values: once
+   * `contracts-manifest.json` lands and `CapabilityType` narrows to the
+   * generated union, `capabilities.ts` is checked by the compiler against the
+   * manifest and needs no exemption at all. The test below fails if the
+   * manifest arrives and this line survives it.
+   */
   'lib/plan/capabilities.ts',
 ]
 
@@ -343,6 +358,50 @@ test('the hand-list exemption is two files, and each is named', () => {
     'lib/contracts/generated.ts',
     'lib/plan/capabilities.ts',
   ])
+})
+
+test('the capabilities exemption is deleted the moment SITE-004 lands', () => {
+  /*
+   * **The mechanism that stops a bounded exception becoming a permanent one.**
+   *
+   * A temporary allowlist entry has no expiry of its own: the reason it exists
+   * stops being true silently, and afterwards a permanent hole is
+   * indistinguishable from one somebody means to remove. Nothing in the tree
+   * would have said otherwise — the exemption would simply keep working.
+   *
+   * So the expiry is asserted against the thing that ends it. While
+   * `contracts-manifest.json` is absent, SITE-004 is open and the entry must be
+   * present; the moment the manifest lands, `CapabilityType` narrows, the
+   * compiler checks those two values against the manifest, and the exemption is
+   * not merely unnecessary but wrong — it would hide a real hand-list added
+   * later to the same file.
+   *
+   * Its two sources are the exemption list and the filesystem. Neither is
+   * derived from the other (§0.3b), and the assertion inverts rather than
+   * relaxing — there is no state in which it passes by having nothing to check.
+   */
+  const site004Open = !existsSync('contracts-manifest.json')
+  const exempt = HAND_LIST_EXEMPT.includes('lib/plan/capabilities.ts')
+
+  if (site004Open) {
+    assert.equal(
+      exempt,
+      true,
+      'lib/plan/capabilities.ts must stay exempt while SITE-004 is open — the ' +
+        'builder has nothing upstream to carry a capability from, and removing ' +
+        'the exemption without the manifest would only move the hand-list.',
+    )
+  } else {
+    assert.equal(
+      exempt,
+      false,
+      'contracts-manifest.json has landed, so CapabilityType narrows to the ' +
+        'generated union and the compiler now checks lib/plan/capabilities.ts ' +
+        'against the manifest. Delete its exemption in this commit: the ' +
+        'exception was bounded by SITE-004 and SITE-004 is closed. Leaving it ' +
+        'would hide the next hand-list added to that file.',
+    )
+  }
 })
 
 test('the capability seam names two values, not the closed set', () => {

@@ -391,7 +391,7 @@ Subjective design quality is not pretended to be automatable. `VIS` and `FTU` ev
 
 **SITE-EVAL-043 · Chips and tune ergonomics** · `VIS` `AUTO`
 *Steps* One-handed use at 375px. Automated target-size audit.
-*Pass* Chips scroll horizontally with momentum, no wrap. All targets ≥44×44 (day pills ≥40×40). **No hover dependency anywhere.**
+*Pass* Chips scroll horizontally with momentum, no wrap. **All targets ≥44×44, day pills included** (amended 2026-09-22, Kian — the day-pill carve-out at 40×40 was a typo against §9, which carries no exceptions). **No hover dependency anywhere.**
 *Fail* Any undersized target · any hover-only affordance.
 *Stub check* Asserts the **targets exist** before measuring them against 44×44. Zero elements are all at least 44px.
 *PRD* §9 · *Issues* SITE-055, SITE-057

@@ -116,11 +116,11 @@ export function DaysControl({
         * 24px and all seven fit. At 320px the row still wraps, as the accept
         * allows.
         *
-        * **The targets stay 44px.** SITE-036's scope says 40×40, and §9 says
-        * 44×44 with no exceptions — that is a contradiction rather than a
-        * refinement, so per CLAUDE.md §1 the PRD wins and the issue is wrong.
-        * Closing the gap was the alternative to shrinking the target, and it is
-        * the one that does not cost anyone a tap.
+        * **The targets are 44px, and SITE-036 now says so** — amended
+        * 2026-09-22 (Kian) from 40×40. §9 is the accessibility floor and
+        * matches Apple's own minimum, so the 40 was a typo against it rather
+        * than a refinement of it. Closing the gap was the alternative to
+        * shrinking the target, and it is the one that costs nobody a tap.
         */}
       <div role="group" aria-label={DAYS_CONTROL_LABEL} style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {WEEKDAYS.map((day) => {

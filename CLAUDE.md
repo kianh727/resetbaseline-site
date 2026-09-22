@@ -2215,6 +2215,60 @@ by it.
 **Bundle 110.9 kB of 120.0, 9.1 kB remaining.** The builder is now the site's substantial client
 component; every section remains a server component.
 
+**Two rulings, 2026-09-22 (Kian), and both are about not letting a temporary thing settle.**
+
+**1. `lib/plan/capabilities.ts` is accepted as a bounded exception, not as a precedent** — and
+it is now **explicit rather than tolerated**. It sits in the hand-list scan's exemption list
+beside `generated.ts` with SITE-004 named as the reason, and with the clause that matters:
+**the entry is deleted in the same commit that narrows the aliases.**
+
+**A temporary allowlist entry has no expiry of its own**, which is the whole problem. The
+reason it exists stops being true silently, and afterwards a permanent hole is
+indistinguishable from one somebody means to remove — nothing in the tree would say otherwise,
+because the exemption would simply keep working. So the expiry is asserted **against the thing
+that ends it**: while `contracts-manifest.json` is absent the entry must be present, and the
+moment the manifest lands the assertion **inverts** and demands its removal. Its two sources
+are the exemption list and the filesystem, neither derived from the other, and there is no
+state in which it passes by having nothing to check.
+
+Once the manifest lands the exemption is not merely unnecessary but **wrong**: `CapabilityType`
+narrows, the compiler checks those two values against the manifest, and a surviving exemption
+would hide the next hand-list added to that file. Proven by dropping a stub manifest into the
+tree — the assertion fails naming SITE-004 as closed.
+
+**2. §9's 44×44 wins, and `SITE-036` is amended to say so.** Its scope said 40×40; §9 is the
+accessibility floor, carries no exceptions, and matches Apple's own minimum — so **the 40 was a
+typo against the PRD rather than a refinement of it**, which is what §1's "an issue that
+conflicts with the PRD is wrong" covers. The issue now says 44.
+
+**The 4px gap is recorded in the issue as the consequence**, so it is not tidied back to 8px by
+someone who reads it as an inconsistency. At 375px the content box is 343px and seven 44px
+pills are 308px, leaving 35px for six gaps — which an 8px gap overruns, orphaning one pill on a
+second row. The days row alone uses 4px; every other control uses 8px; at 320px it still wraps,
+which the accept allows.
+
+**Swept, and the grep earned its place.** The decomposition (SITE-036's scope plus a dated
+amendment note), the code comment in `components/builder/controls.tsx` that had recorded it as
+an unresolved contradiction, this file — **and `SITE-EVAL-043`, which I would have missed.** Its
+pass line read *"All targets ≥44×44 (day pills ≥40×40)"*: the evals tier carrying the same
+carve-out, in the one place that would have **certified the defect as passing**. An eval
+granting an exception the PRD does not is worse than an issue doing it, because the issue only
+misinstructs the implementer while the eval signs off the result.
+
+This is §1's string-ruling case working exactly as described — a withdrawn number is findable by
+grep, and grep is reliable. **The reason it was found is that the sweep was run rather than
+asserted.** My first note in this file claimed the evals needed no change; that was written
+before the grep and was wrong.
+
+The PRD itself needed no change — §9 already says 44×44 with no exceptions, which is what made
+every other tier wrong. A grep for `40×40` now returns only the two amendment notes that quote
+the withdrawn number in order to record it.
+
+**Ship mode, not audit mode** (2026-09-22, Kian). Everything remaining on the implementation
+side waits on an input: the manifest, the typeface files, the target frames, `SITE-5` and
+`SITE-22`'s verdicts, and `SITE-110`/`111`/`112`'s copy. **No new audits or catalogue work**
+until one lands, and nothing is scheduled or armed.
+
 **Linear — populated 2026-09-18.** This section is load-bearing for a fresh session
 and goes stale the moment either statement changes. **Update it in the same commit as
 the change it describes.**

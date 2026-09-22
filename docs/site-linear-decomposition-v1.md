@@ -632,8 +632,11 @@ Project SP-06 · P0 · Deps SITE-025
 
 **SITE-036 · Days-of-week control**
 Project SP-06 · P0 · Deps SITE-025
-*Scope* Seven pills, 40×40 minimum, wrapping to two rows below 375px.
+*Scope* Seven pills, **44×44 minimum** (amended 2026-09-22, Kian — was 40×40), wrapping to two rows below 375px.
 *Accept* Keyboard-operable; no hover dependency.
+*Amended 2026-09-22 (Kian).* **The 40×40 was a typo against §9, not a refinement of it.** §9 is the accessibility floor — 44×44 minimum touch targets, no exceptions — and it matches Apple's own minimum, so a smaller number in an issue contradicts the PRD rather than making it precise. Per §1 the issue was wrong; it now says 44.
+
+**The consequence is the gap, and it is recorded here so it is not "tidied" back.** At 375px the content box is 343px and seven 44px pills are 308px, leaving 35px for six gaps — which an 8px gap overruns, wrapping one pill alone onto a second row. **The days row uses a 4px gap** (every other control uses 8px) so all seven fit at 375px; at 320px it still wraps, which this issue's accept allows. Closing the gap was the alternative to shrinking the target, and it is the one that costs nobody a tap.
 *Tests* Unit: state binding.
 *Verify* **Screenshot at 320px and 375px.**
 *PRD* §3.6, §9
