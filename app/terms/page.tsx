@@ -9,12 +9,11 @@
 
 import type { Metadata } from 'next'
 
+import { metadataForRoute } from '@/lib/seo/metadata'
 import SiteFooter from '@/components/site-footer'
 import { PENDING_NOTICE, TERMS_HEADING, TERMS_INTRO } from '@/lib/copy/legal'
 
-export const metadata: Metadata = {
-  title: 'Terms — Baseline',
-}
+export const metadata: Metadata = metadataForRoute('/terms/')
 
 export default function Terms() {
   return (

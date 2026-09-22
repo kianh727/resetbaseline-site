@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build-assets.ts && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -26,7 +26,9 @@
     "check:lavender": "node scripts/check-lavender.mjs",
     "check:predicates": "node scripts/check-predicates.mjs",
     "check:timezones": "node scripts/check-timezones.mjs",
-    "check:motion": "node scripts/check-motion.mjs"
+    "check:motion": "node scripts/check-motion.mjs",
+    "build:assets": "node scripts/build-assets.ts",
+    "check:metadata": "node scripts/check-metadata.mjs"
   },
   "dependencies": {
     "next": "15.5.25",

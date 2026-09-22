@@ -44,7 +44,27 @@ const SOURCE_DIRS = ['app', 'components', 'lib']
  * future dev route to paint with lavender, and the point is that each exception
  * is a decision somebody made about the site's one signature colour.
  */
-const ALLOWED = new Set(['app/tokens/page.dev.tsx'])
+/*
+ * **Two entries, each named explicitly rather than by pattern.** A glob like
+ * `app/**\/tokens/**` would let any future file claim the exemption by being
+ * named correctly, which is how a hole gets opened by someone who needs it
+ * today.
+ *
+ * - `app/tokens/page.dev.tsx` renders every token as a filled block and never
+ *   ships.
+ * - `lib/share/card.ts` emits **SVG**, where `fill` is how you draw anything at
+ *   all: a 1px lit line and a 3px mark are both `fill`. This scan's rule is
+ *   about lavender covering an *area*, and SVG does not distinguish the two, so
+ *   the scan would ban the sanctioned form along with its violation — the shape
+ *   it was itself written to avoid for `color`, `border-color` and `box-shadow`.
+ *
+ *   **The rule is not unenforced there, it is enforced better.**
+ *   `tests/share-card.test.ts` asserts every lavender rect in the rendered SVG
+ *   is at most 1px high or 3px wide — a geometry check, which is what "only as
+ *   a lit line and on active marks" actually means, and which a text scan
+ *   cannot express. A lavender band fill in that file exits 1 there; proven.
+ */
+const ALLOWED = new Set(['app/tokens/page.dev.tsx', 'lib/share/card.ts'])
 
 const LAVENDER = String.raw`(?:--(?:color-)?lavender(?:-lit)?|lavender(?:-lit)?)`
 

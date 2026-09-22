@@ -1,17 +1,20 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import SiteNav from '@/components/site-nav'
+import { metadataForRoute } from '@/lib/seo/metadata'
 
 /*
- * Placeholder-free by construction: SITE-001's scope is the pipeline, not content.
- * Real metadata and the OG card are SITE-100. The hero headline is SITE-007.
- *
  * SITE-005 adds the nav, the safe-area handling and the overflow guards.
+ *
+ * **SITE-100's metadata is derived, not written here.** The root layout carries
+ * `/`'s entry, and `/privacy` and `/terms` override it with their own. Every
+ * one comes from the single list in `lib/copy/metadata.ts`, so the OpenGraph
+ * and Twitter cards cannot describe a different page from the `<title>` — three
+ * hand-written copies of one description drift, and the OG one drifts first
+ * because nobody looks at it except when sharing.
  */
 
-export const metadata: Metadata = {
-  title: 'Baseline',
-}
+export const metadata: Metadata = metadataForRoute('/')
 
 export const viewport: Viewport = {
   width: 'device-width',

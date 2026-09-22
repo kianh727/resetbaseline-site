@@ -149,5 +149,14 @@ jobs:
       - name: No depicted object names an app
         run: npm run check:app-names
 
+      # SITE-100. Reads the exported documents and the export's own filesystem —
+      # two sources, neither computed from the other, since reading the route
+      # list that generated the tags would agree by construction (§0.3b). Counts
+      # before properties, and it asserts the sitemap in both directions: a
+      # sitemap advertising a route that does not exist sends crawlers to a 404,
+      # and a route missing from it is a page nobody finds.
+      - name: Every route has metadata, an OG card and icons that resolve
+        run: npm run check:metadata
+
       - name: Reduced motion in both settings, and locale independence
         run: npm run check:motion
