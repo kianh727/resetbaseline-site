@@ -40,12 +40,43 @@ const OUT = 'out'
 /** §11.2, verbatim. Written here and nowhere else in this file. */
 const BUDGETS = { lcpMs: 1800, cls: 0.05, inpMs: 200 }
 
-/** Lighthouse's Slow 4G, and its mobile CPU multiplier. */
+/** Lighthouse's Slow 4G. The network shape is absolute; the CPU is not. */
 const THROTTLE = {
   downloadKbps: 1600,
   uploadKbps: 750,
   latencyMs: 150,
-  cpuSlowdown: 4,
+}
+
+/*
+ * **The CPU multiplier is calibrated to the host, not fixed at 4x.**
+ *
+ * A fixed 4x means something different on every machine: it multiplies whatever
+ * the host already is. This check read INP at 40ms on a developer machine and
+ * 688ms on a shared CI runner from the same commit -- and the 688 was not a
+ * regression, it was a slower machine with the same multiplier applied on top.
+ * An absolute budget measured through a relative throttle is measuring the
+ * runner, which is the timezone finding in a different costume: the environment
+ * quietly changed what the number meant.
+ *
+ * So the host is benchmarked first and the multiplier chosen to land it on a
+ * fixed reference speed -- which is what Lighthouse itself does, and why it
+ * warns when the host is too slow to simulate a mobile device at all. The
+ * budget is then compared against roughly the same simulated device wherever it
+ * runs.
+ *
+ * `TARGET_MS` is the benchmark's intended duration on the device §11.2 means by
+ * "mobile". A host already slower than that gets 1x, because slowing it further
+ * would measure a device nobody has.
+ */
+const CPU_BENCHMARK_TARGET_MS = 260
+const CPU_MULTIPLIER_MAX = 6
+
+/** A fixed, allocation-free integer loop. Deliberately dull and deterministic. */
+const CPU_BENCHMARK = () => {
+  const started = performance.now()
+  let acc = 0
+  for (let i = 0; i < 6_000_000; i++) acc = (acc + i * 7) % 1_000_003
+  return { ms: performance.now() - started, acc }
 }
 
 let failures = 0
@@ -108,6 +139,7 @@ const COLLECT = () => {
 const { origin, close } = await serve(OUT)
 const browser = await chromium.launch()
 const results = {}
+let calibration = { hostMs: 0, cpuSlowdown: 0 }
 
 try {
   const context = await browser.newContext({
@@ -118,13 +150,39 @@ try {
   await page.addInitScript(COLLECT)
 
   const cdp = await context.newCDPSession(page)
+
+  /*
+   * Calibrate before throttling anything, on a blank page, so the benchmark
+   * measures the host rather than the host plus this site.
+   */
+  await page.goto('about:blank')
+  const hostMs = (await page.evaluate(CPU_BENCHMARK)).ms
+  const cpuSlowdown = Math.min(
+    CPU_MULTIPLIER_MAX,
+    Math.max(1, Math.round((CPU_BENCHMARK_TARGET_MS / hostMs) * 10) / 10),
+  )
+  calibration = { hostMs, cpuSlowdown }
+
+  if (cpuSlowdown === 1) {
+    /*
+     * Reported rather than failed. A host this slow cannot simulate the target
+     * device, so the numbers below are the host's own — still a regression
+     * signal, but not comparable to the budget. Saying so beats a silent pass.
+     */
+    process.stdout.write(
+      `perf: the host ran the benchmark in ${hostMs.toFixed(0)}ms against a ` +
+        `${CPU_BENCHMARK_TARGET_MS}ms target, so no CPU throttle was applied — ` +
+        'it is already at or below the simulated device.\n',
+    )
+  }
+
   await cdp.send('Network.emulateNetworkConditions', {
     offline: false,
     downloadThroughput: (THROTTLE.downloadKbps * 1000) / 8,
     uploadThroughput: (THROTTLE.uploadKbps * 1000) / 8,
     latency: THROTTLE.latencyMs,
   })
-  await cdp.send('Emulation.setCPUThrottlingRate', { rate: THROTTLE.cpuSlowdown })
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: cpuSlowdown })
 
   await page.goto(origin, { waitUntil: 'load' })
   await page.waitForTimeout(1500)
@@ -185,7 +243,8 @@ try {
 
 process.stdout.write(
   `perf, 375px, Slow 4G (${THROTTLE.downloadKbps}kbps, ${THROTTLE.latencyMs}ms RTT), ` +
-    `${THROTTLE.cpuSlowdown}x CPU:\n` +
+    `${calibration.cpuSlowdown}x CPU calibrated from a ${calibration.hostMs.toFixed(0)}ms ` +
+    `host benchmark against a ${CPU_BENCHMARK_TARGET_MS}ms target:\n` +
     `  LCP  ${results.lcp?.toFixed(0)}ms   of ${BUDGETS.lcpMs}ms   (${results.lcpEntries} entries)\n` +
     `  CLS  ${results.cls?.toFixed(3)}      of ${BUDGETS.cls}      (${results.clsEntries} shifts)\n` +
     `  INP  ${results.inp?.toFixed(0)}ms     of ${BUDGETS.inpMs}ms    (${results.inpEntries} events, worst: ${results.inpName})\n` +
