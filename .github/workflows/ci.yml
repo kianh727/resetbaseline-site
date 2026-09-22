@@ -58,6 +58,14 @@ jobs:
       # records stale counts against current counts in the same object. The ban
       # was prose until the manifest was about to enter the repo; this is the
       # construction behind it.
+      # SITE-107. §14's PRE-2, automated: §19's banned terms and the committed
+      # app-name list against every authored string, site-wide rather than
+      # gate-scoped (§6.3a is a MUST), plus staleness of the list itself. The
+      # list ships non-empty -- an empty one fails nothing, which would be §0.3
+      # turned on the check written to catch it.
+      - name: Banned terms, app names, and list staleness
+        run: npm run check:bans
+
       - name: Divergences ban
         run: npm run check:divergences
 
