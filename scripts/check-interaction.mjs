@@ -350,6 +350,67 @@ try {
 
     await page.close()
   }
+  /* ── §6.1c · the workspace transition never moves the page ────────────── */
+
+  {
+    /*
+     * **The one rule §6.1c calls out twice**: *"Scroll position locked — the
+     * transition must never move the page"*, and *"this is the one place layout
+     * and scroll could fight; they must not."*
+     *
+     * Measured from a scrolled position, because at `scrollY === 0` a
+     * transition that scrolled to the top would be indistinguishable from one
+     * that did nothing — which is §0.3 with the scroll as the missing thing.
+     */
+    const page = await browser.newPage({ viewport: { width: 375, height: 700 } })
+    await page.goto(origin, { waitUntil: 'networkidle' })
+
+    await page.evaluate(() => window.scrollTo(0, 120))
+    await page.waitForTimeout(100)
+    const before = await page.evaluate(() => window.scrollY)
+    if (before < 40) {
+      fail(`could only scroll to ${before}px — the page is too short to measure this`)
+    }
+
+    await page.fill('input[type="text"]', GOAL)
+    await page.getByRole('button', { name: /run/i }).first().click()
+    await page.waitForTimeout(900)
+
+    const after = await page.evaluate(() => window.scrollY)
+    if (Math.abs(after - before) > 2) {
+      fail(
+        `§6.1c: the workspace transition moved the page from ${before}px to ${after}px. ` +
+          'Scroll position is locked across it.',
+      )
+    }
+
+    /* And the page below the fold is still reachable — it is not a modal. */
+    const reachable = await page.evaluate(() => {
+      const before = window.scrollY
+      window.scrollTo(0, before + 400)
+      const moved = window.scrollY > before
+      return { moved, bodyOverflow: getComputedStyle(document.body).overflow }
+    })
+    if (!reachable.moved) {
+      fail('§6.1c: the page below the fold is not scrollable once the workspace opens')
+    }
+    if (/hidden/.test(reachable.bodyOverflow)) {
+      fail(`§6.1c: body overflow is "${reachable.bodyOverflow}" — that is a scroll lock`)
+    }
+
+    /* No fixed-position takeover, no close button, no escape handler. */
+    const chrome = await page.evaluate(() => {
+      const fixed = [...document.querySelectorAll('body *')].filter(
+        (el) => getComputedStyle(el).position === 'fixed',
+      )
+      return fixed.map((el) => el.tagName + '.' + (typeof el.className === 'string' ? el.className : '')).slice(0, 3)
+    })
+    for (const element of chrome) {
+      fail(`§6.1c: ${element} is position: fixed — the workspace is not full-screen chrome`)
+    }
+
+    await page.close()
+  }
 } finally {
   await browser.close()
   await close()

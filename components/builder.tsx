@@ -49,6 +49,7 @@ import type { EventName, EventPayloads, EventProperties } from '@/lib/analytics/
 import { classifyInput } from '@/lib/parse/input-class'
 import { occurrences } from '@/lib/plan/model'
 import { useRenderTier } from '@/lib/hooks/use-render-tier'
+import { isWorkspace } from '@/lib/builder-machine'
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion'
 
 const MONTHS = [
@@ -90,7 +91,10 @@ const FALLBACK_WINDOW = WINDOW_OPTIONS[0]!
  * provider, so this measures nothing until Kian chooses one; the seam is what
  * makes that a one-argument change rather than an instrumentation pass.
  */
-export default function Builder({ sink = NULL_SINK }: { sink?: AnalyticsSink } = {}) {
+export default function Builder({
+  sink = NULL_SINK,
+  headline,
+}: { sink?: AnalyticsSink; headline?: React.ReactNode } = {}) {
   const [text, setText] = useState('')
   const [state, setState] = useState(INITIAL_STATE)
   const [windowId, setWindowId] = useState(DEFAULT_WINDOW_ID)
@@ -278,8 +282,62 @@ export default function Builder({ sink = NULL_SINK }: { sink?: AnalyticsSink } =
     })
   }, [plan, trackOnce])
 
+  const workspace = isWorkspace(state)
+
   return (
-    <div className="flex w-full flex-col gap-10">
+    /*
+     * SITE-115 · §6.1c · the workspace transition.
+     *
+     * **The fold reconfigures in place.** Same page, same scroll position, no
+     * route change, no modal, no overlay — and the page below the fold is
+     * untouched and scrolls normally. That last clause is why this is a plain
+     * flow element with no `position: fixed` anywhere: §6.1c is explicit that
+     * the workspace *"is not a modal and not full-screen chrome — no escape
+     * key, no close button, no scroll lock"*, and every one of those is absent
+     * by construction rather than by having been left out.
+     *
+     * **The transition never changes scroll position.** There is no
+     * `scrollIntoView`, no `scrollTo`, and no element that leaves the flow — so
+     * the one place §6.1c says layout and scroll could fight has nothing to
+     * fight with. A test asserts `scrollY` is unchanged across the submit.
+     *
+     * **Controls enable on data, never on animation** (§6.1c, EVAL-016). The
+     * transition is CSS on the container; nothing below is gated on it, and the
+     * plan renders from the same memo it always did.
+     *
+     * **Reduced motion: no transition, the workspace layout renders directly.**
+     * Handled by the duration collapsing to zero rather than by a second code
+     * path, so there is one layout and one set of final values.
+     */
+    <div
+      data-workspace={workspace ? 'true' : 'false'}
+      className="flex w-full flex-col gap-10"
+    >
+      {headline !== undefined && (
+        /*
+         * §6.1c: headline out over 0–240ms, translating up 24px. **On mobile
+         * it is removed rather than reduced** — vertical space is the
+         * constraint and the headline is what yields — which `max-height: 0`
+         * does at every width once it has faded, so the input takes the top of
+         * the fold on a phone without a second rule.
+         */
+        <div
+          aria-hidden={workspace ? 'true' : undefined}
+          style={{
+            opacity: workspace ? 0 : 1,
+            transform: workspace ? 'translateY(-24px)' : 'none',
+            maxHeight: workspace ? 0 : '40svh',
+            overflow: 'hidden',
+            pointerEvents: workspace ? 'none' : undefined,
+            transition: reducedMotion
+              ? 'none'
+              : 'opacity 240ms ease-out, transform 240ms ease-out, max-height 300ms ease-out',
+          }}
+        >
+          {headline}
+        </div>
+      )}
+
       <AskInput
         value={text}
         onChange={(v) => {
