@@ -1,6 +1,6 @@
 {
-  "captured_at": "2026-09-19T09:40:52Z",
-  "app_commit_sha": "a776dd7e14745ef900ecbf377c641f66bff830e2",
+  "captured_at": "2026-09-22T17:56:56Z",
+  "app_commit_sha": "fb37a26dcc1a62fd72efb01475e184e385b1027c",
   "manifest": {
     "action_schema_version": 1,
     "event_schema_version": 1,
@@ -10,7 +10,11 @@
       "reason_codes": 38,
       "validation_errors": 21,
       "analytics_events": 17,
-      "gap_fills": 8
+      "gap_fills": 8,
+      "capability_type": 5,
+      "authority_tier": 3,
+      "outcome": 5,
+      "belief_tier": 3
     },
     "action_types": [
       "create_goal",
@@ -260,6 +264,30 @@
         "namedAt": "contracts §23–29 table (`propose_intervention`); schema `intervention.bottleneck_type`",
         "requiredBy": "propose_intervention — derived verbatim from PRD §39, not invented"
       }
+    ],
+    "capability_type": [
+      "commitment",
+      "reminder",
+      "timer",
+      "gate",
+      "tracker"
+    ],
+    "authority_tier": [
+      "auto",
+      "provisional",
+      "explicit"
+    ],
+    "outcome": [
+      "complete",
+      "partial",
+      "missed",
+      "cancelled_intentionally",
+      "unknown"
+    ],
+    "belief_tier": [
+      "hypothesis",
+      "pattern",
+      "observed_fact"
     ],
     "artifact_divergences": [
       {
