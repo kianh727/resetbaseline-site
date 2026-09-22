@@ -1,0 +1,8 @@
+{
+  "_note": "SITE-004 accept part 1. An empty vocabulary is what would have made the original criterion pass on nothing (§0.3). It must fail naming the manifest, not the layout rules.",
+  "captured_at": "2026-09-19T00:00:00Z",
+  "app_commit_sha": "0000000000000000000000000000000000000000",
+  "manifest": {
+    "capability_type": []
+  }
+}

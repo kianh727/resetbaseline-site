@@ -1,0 +1,364 @@
+@import "tailwindcss";
+
+/*
+ * SITE-002 · Design tokens.
+ *
+ * The nine tokens of PRD §14, carried forward unchanged by v7.3 §11.
+ * Values are exact and are asserted by tests/tokens.test.mjs — if a value
+ * here and a value there disagree, the test fails rather than the site
+ * quietly shipping a colour nobody approved.
+ *
+ * Each token is declared twice, deliberately, because SITE-002's scope asks
+ * for both forms:
+ *   - `@theme` under Tailwind's `--color-*` namespace, which is what
+ *     generates `bg-void`, `text-bone-60` and the rest.
+ *   - `:root` under the bare names §14 uses, so a stylesheet or an inline
+ *     style can reference `var(--void)` as the PRD writes it.
+ *
+ * The type scale is SITE-003, below. No component styling here.
+ */
+
+@theme {
+  --color-void: #0a0a0a;
+  --color-surface: #0e0c18;
+  --color-lavender: #8b7dff;
+  --color-lavender-lit: #c9c0ff;
+  --color-bone: #f2f0ec;
+  --color-bone-60: rgba(242, 240, 236, 0.6);
+  --color-bone-38: rgba(242, 240, 236, 0.38);
+  --color-edge: rgba(242, 240, 236, 0.08);
+
+  /* Refusal and veto states only. Enforced by eslint.config.mjs and by
+   * tests/tokens.test.mjs, which scans every source file rather than
+   * trusting the lint rule to have covered the file type. */
+  --color-veto: #c4614f;
+}
+
+/*
+ * SITE-003 · Type scale.
+ *
+ * PRD §14 (v5, carried forward unchanged by v7.3 §11): "enormous display type
+ * against very small, very precise metadata, hairline rules, real
+ * measurements. Density against scale, not scale alone."
+ *
+ * Section-head carries its clamp verbatim from §11.4's table. Display's slope
+ * is §11.4's 2026-09-19 amendment; its floor and ceiling are verbatim.
+ * Lead and body are given there as ranges (18–22px, 16–17px) rather than
+ * clamps, so the interpolation between the two ends is this issue's to choose
+ * — a refinement of a general higher tier, never a contradiction of it
+ * (CLAUDE.md §1). Both are interpolated across the two verification widths:
+ * exactly the range minimum at 375px and exactly the maximum at 1440px, so
+ * the scale is settled at both widths rather than caught mid-interpolation at
+ * either. That is why they are `intercept + slope·vw` and not a bare `vw` —
+ * a bare `1.5vw` would land lead at 21.6px at 1440 and never reach §14's 22.
+ *
+ * Weight and tracking come from §14's Treatment column exactly. Line heights
+ * are not in §14 and are set here, recorded as decisions rather than defaults:
+ * display and section-head are set tight because a 140px headline at the
+ * browser's 1.5 would break the "density against scale" intent outright; lead
+ * and body keep a reading measure.
+ *
+ * Asserted by tests/type.test.mjs against an independent transcription of the
+ * §14 table.
+ */
+@theme {
+  /* §14 verbatim. */
+  /*
+   * §11.4, amended 2026-09-19: the slope is 9.72vw, not §14's original 8vw.
+   *
+   * 8vw reached the 140px ceiling only at a 1750px viewport, so at 1440px —
+   * the primary verification width — display rendered at 115.2px, 82% of its
+   * ceiling. §12.3a requires display at its ceiling rather than a comfortable
+   * middle, and that was unmeetable at any width anybody verifies.
+   *
+   * It was an oversight rather than a decision: SITE-003 set the lead and body
+   * interpolations to land their maxima at exactly 1440px "so the scale is
+   * settled at both verification widths rather than caught mid-interpolation at
+   * either", and display was carried over verbatim — producing the exact case
+   * that reasoning exists to prevent, in the largest element on the page.
+   *
+   * Floor and ceiling are unchanged. 40px still governs below 411px, so 375px
+   * renders at 40px exactly as before.
+   */
+  --text-display: clamp(40px, 9.72vw, 140px);
+  --text-display--font-weight: 500;
+  --text-display--letter-spacing: -0.04em;
+  --text-display--line-height: 0.92;
+
+  /* §14 verbatim. */
+  --text-section: clamp(32px, 5vw, 88px);
+  --text-section--font-weight: 500;
+  --text-section--letter-spacing: -0.035em;
+  --text-section--line-height: 0.96;
+
+  /* §14 range 18–22px, interpolated 375 → 1440. */
+  --text-lead: clamp(18px, 16.59px + 0.376vw, 22px);
+  --text-lead--font-weight: 400;
+  --text-lead--line-height: 1.45;
+
+  /* §14 range 16–17px, max 62ch, interpolated 375 → 1440. */
+  --text-body: clamp(16px, 15.65px + 0.094vw, 17px);
+  --text-body--font-weight: 400;
+  --text-body--line-height: 1.6;
+
+  /* §14 verbatim: 11px, +0.06em. Not fluid — precise small type stays precise. */
+  --text-meta: 11px;
+  --text-meta--font-weight: 400;
+  --text-meta--letter-spacing: 0.06em;
+  --text-meta--line-height: 1.3;
+
+  /* §14: body is measured, max 62ch. `max-w-measure`. */
+  --container-measure: 62ch;
+}
+
+/*
+ * The metadata primitive.
+ *
+ * §14's metadata row is three properties that always travel together — 11px,
+ * +0.06em, --bone-38 — so it is one named thing rather than three utilities
+ * to remember in the right combination. "Metadata is always real: dates,
+ * occurrence counts, durations, authority tiers. Never decorative numbers."
+ */
+@utility metadata {
+  font-size: var(--text-meta);
+  font-weight: var(--text-meta--font-weight);
+  letter-spacing: var(--text-meta--letter-spacing);
+  line-height: var(--text-meta--line-height);
+  color: var(--color-bone-38);
+}
+
+:root {
+  --void: var(--color-void);
+  --surface: var(--color-surface);
+  --lavender: var(--color-lavender);
+  --lavender-lit: var(--color-lavender-lit);
+  --bone: var(--color-bone);
+  --bone-60: var(--color-bone-60);
+  --bone-38: var(--color-bone-38);
+  --edge: var(--color-edge);
+  --veto: var(--color-veto);
+
+  /*
+   * SITE-003 · The typeface seam.
+   *
+   * One variable, one place to change when the decision lands. The two
+   * candidates are PP Neue Montreal (licensed) and Satoshi (free); neither
+   * ships yet, so this resolves to the system stack. `--font-candidate` is
+   * what the comparison harness sets per column.
+   */
+  --font-system: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-display: var(--font-candidate, var(--font-system));
+}
+
+/*
+ * SITE-005 · Safe areas.
+ *
+ * §9: `env(safe-area-inset-*)` on the wall, the pinned save bar, and the fold.
+ * Declared once here as tokens so every consumer reads the same names rather
+ * than repeating the `env()` call with its own fallback.
+ *
+ * The fallback of `0px` is load-bearing: `env()` with no fallback resolves to
+ * nothing on a browser that does not support it, which invalidates the whole
+ * declaration it sits in rather than contributing zero.
+ *
+ * **These are only non-zero when the viewport is `viewport-fit=cover`**, which
+ * app/layout.tsx sets. Without it iOS reports every inset as 0 and the entire
+ * feature is inert while appearing to be implemented — a thing that looks done
+ * and does nothing.
+ */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /*
+   * The page gutter. 16px at 375px is the §9 leading inset; it opens up on
+   * wider viewports. Side padding always adds the horizontal safe-area inset
+   * on top, so landscape on a notched device never puts text under the notch.
+   */
+  --gutter: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
+html {
+  /* Native scroll. No smooth-scroll override, here or anywhere (PRD §7.5, SITE-070). */
+  -webkit-text-size-adjust: 100%;
+
+  /*
+   * §9: `overflow-x: clip` on root. Set on both the root element and body —
+   * body alone is not enough, because a child that overflows can still extend
+   * the initial containing block and give the document a horizontal scrollbar.
+   * `clip` rather than `hidden`: `hidden` on the root element turns the whole
+   * document into a scroll container, which breaks `position: sticky` and
+   * scroll anchoring. This is not a scroll override; it is a clip (SITE-070).
+   */
+  overflow-x: clip;
+}
+
+body {
+  /* Zero horizontal scroll at 320px is a P0 acceptance criterion (SITE-005, SITE-057). */
+  overflow-x: clip;
+  background: var(--void);
+  color: var(--bone);
+
+  /*
+   * The typeface is undecided (§14, §23 item 3: "decided at P0 item 1,
+   * compared at display scale"). Until it is, the site renders in the system
+   * stack — not in a guess at one of the two candidates. `--font-display` is
+   * the single seam the decision lands on; the comparison harness overrides
+   * it per column and nothing else in the codebase names a family.
+   */
+  font-family: var(--font-display);
+}
+
+/*
+ * SITE-005 · The page gutter as a utility.
+ *
+ * Horizontal padding is the gutter plus that side's safe-area inset, so the
+ * rule holds in portrait (inset 0, gutter only) and in landscape on a notched
+ * device (inset non-zero, content clears the notch) without a second rule.
+ */
+@utility page-x {
+  padding-left: calc(var(--gutter) + var(--safe-left));
+  padding-right: calc(var(--gutter) + var(--safe-right));
+}
+
+/*
+ * Grain — PRD v7.3 §12.3a, P0.
+ *
+ * *"A fine animated grain overlay across the entire page including UI, at
+ * roughly 0.03 strength, 1:1 pixel scale. This is a CSS or small canvas overlay,
+ * **not** the shader pass in v5 §7.4 — it does not wait for WebGL and it renders
+ * in every tier including D."*
+ *
+ * **It lives with the tokens, not with the Peak.** §12.3a pulled it out of the
+ * P1 post chain for a reason: it is what makes a dark surface read as
+ * photographed rather than rendered, and a dark page without it is the most
+ * visible difference between this build and its reference frames. Gating that on
+ * WebGL would withhold the single cheapest quality win from exactly the devices
+ * that get least of everything else.
+ *
+ * **Zero JavaScript, so it costs nothing against the 120 kB ceiling** and cannot
+ * be in the LCP path. The texture is an inline `feTurbulence` data URI: one
+ * decode, no network request, no image file to forget to deploy.
+ *
+ * **1:1 pixel scale** — `background-size` is the tile's own 160px, never
+ * `cover`. Scaling the tile is what turns grain into mottling, and it is the
+ * difference between film and a gradient with texture on it.
+ *
+ * **It steps rather than slides.** `steps(1, end)` on a keyframe set that jumps
+ * the background origin: sliding reads as something moving across the page,
+ * stepping reads as the surface being re-exposed each frame, which is what grain
+ * actually is. Four positions, deliberately not a multiple of the tile, so the
+ * cycle does not visibly repeat.
+ *
+ * **Static under reduced motion**, which is v5 §8.3 verbatim — *"grain renders
+ * statically"* — now inlined at §11.1. The texture is the point; the movement is
+ * atmosphere, and it is the part someone asked not to receive.
+ */
+@keyframes grain-shift {
+  0%,
+  100% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -37px 23px;
+  }
+  50% {
+    background-position: 19px -41px;
+  }
+  75% {
+    background-position: -29px -13px;
+  }
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  /* Never intercepts a click. The overlay covers every control on the page. */
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  background-repeat: repeat;
+  animation: grain-shift 0.6s steps(1, end) infinite;
+  /* Compositing hint: the overlay repaints every 150ms and must not drag the
+     page's own paint with it. */
+  will-change: background-position;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+  }
+}
+
+/*
+ * SITE-043 · The wall's motion, PRD v5 §11 via §11.1's table: *"Dim 240ms,
+ * content fades up. No scale, no bounce. A boundary, not an event."*
+ *
+ * The two are separate animations because they are separate surfaces — the dim
+ * is a full-viewport sibling and the panel sits above it — and because "content
+ * fades up" is a translate, while the dim only changes opacity. A single
+ * animation on a wrapper would move the dim too, which is a wipe rather than a
+ * dim.
+ *
+ * No scale and no bounce, stated here as well as in the component: an eased
+ * overshoot is what the settling spring is for, and the spring is confined to
+ * structure landing (SITE-024). The system stopping must not look like the
+ * system producing.
+ */
+@keyframes wall-dim {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wall-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Reduced motion removes the movement, not the wall. The boundary must still
+ * arrive — it is the one screen whose absence would change what the site says.
+ */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes wall-rise {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/*
+ * The FAQ disclosure marker. Removed rather than restyled: the default triangle
+ * is a browser glyph nobody chose, and §19 bans an arrow appended to a control.
+ * What signals state is the answer being there or not.
+ */
+summary::-webkit-details-marker {
+  display: none;
+}
