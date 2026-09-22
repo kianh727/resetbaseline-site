@@ -2264,6 +2264,35 @@ The PRD itself needed no change — §9 already says 44×44 with no exceptions, 
 every other tier wrong. A grep for `40×40` now returns only the two amendment notes that quote
 the withdrawn number in order to record it.
 
+**The September manifest was refused, and refusing it exposed a defect in my own expiry
+guards** (fixed 2026-09-22, on Kian's ruling). PR #3's `contracts-manifest.json` was pulled and
+put through `verify-manifest-arrival.mjs` before anything was built on it. **All four axes are
+absent** — no `capability_type`, no `authority_tier`, no `belief_tier`, no fourth axis — against
+expected counts of 5/3/5/3. It is the same file as the original delivery:
+`captured_at` `2026-09-19T09:40:52Z`, `app_commit_sha`
+`a776dd7e14745ef900ecbf377c641f66bff830e2`. My own reader was ruled out before the manifest was:
+the nine `capability` occurrences in it are event names (`capability.created`) and one verb
+(`restore_capability`), not a vocabulary list. **Nothing was adapted to it and the file is not in
+the tree.**
+
+**The defect: both exemption guards keyed on the manifest *existing* rather than on the narrowing
+having *happened*.** With that file in the tree, `tests/plan-model.test.ts` demanded deletion of
+`lib/plan/capabilities.ts`'s exemption — the exemption that is load-bearing precisely because
+`CapabilityType` had *not* narrowed. The check was punishing the site for declining a publish it
+was right to decline, and the second guard, which asserted the manifest and the generated file
+*land together*, failed outright on the expected state of a refused delivery.
+
+**Both are now keyed on `lib/contracts/generated.ts`, and the generator is what makes that the
+correct trigger.** `generate-contract-types.mjs` emits **nothing at all** on a partial vocabulary,
+so a manifest the site would reject cannot produce that file — its presence *is* the narrowing.
+The second guard's implication now runs **one way only**: generated types with no manifest still
+fail, because those are a hand-list one build removed with no source for the drift guard, while a
+manifest with no generated types is the ordinary shape of a bad publish and passes.
+
+**Proven by dropping the refused manifest back in.** With it present and the exemption present,
+both guards pass (18/18, exit 0); with guard one re-keyed to the manifest, the same state exits 1.
+Manifest removed again; sweep of eighteen checks run bare, every exit code 0.
+
 **Ship mode, not audit mode** (2026-09-22, Kian). Everything remaining on the implementation
 side waits on an input: the manifest, the typeface files, the target frames, `SITE-5` and
 `SITE-22`'s verdicts, and `SITE-110`/`111`/`112`'s copy. **No new audits or catalogue work**

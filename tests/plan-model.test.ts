@@ -369,18 +369,27 @@ test('the capabilities exemption is deleted the moment SITE-004 lands', () => {
    * indistinguishable from one somebody means to remove. Nothing in the tree
    * would have said otherwise — the exemption would simply keep working.
    *
-   * So the expiry is asserted against the thing that ends it. While
-   * `contracts-manifest.json` is absent, SITE-004 is open and the entry must be
-   * present; the moment the manifest lands, `CapabilityType` narrows, the
-   * compiler checks those two values against the manifest, and the exemption is
-   * not merely unnecessary but wrong — it would hide a real hand-list added
-   * later to the same file.
+   * So the expiry is asserted against the thing that ends it — and the thing
+   * that ends it is the **narrowing**, not the manifest. Keyed on the manifest,
+   * this guard demanded the exemption's removal the moment *any* file appeared
+   * at that path, including a publish the site would refuse: the September
+   * delivery carried none of the four vocabularies, `CapabilityType` did not
+   * narrow, and the exemption was still load-bearing while this assertion said
+   * to delete it. `lib/contracts/generated.ts` cannot exist unless the
+   * vocabulary arrived, because `generate-contract-types.mjs` emits nothing at
+   * all on a partial manifest. So its presence is the narrowing having
+   * happened, which is the condition the exception was bounded by.
+   *
+   * While that file is absent, SITE-004 is open and the entry must be present;
+   * once it exists, `CapabilityType` narrows, the compiler checks those two
+   * values against the manifest, and the exemption is not merely unnecessary
+   * but wrong — it would hide a real hand-list added later to the same file.
    *
    * Its two sources are the exemption list and the filesystem. Neither is
    * derived from the other (§0.3b), and the assertion inverts rather than
    * relaxing — there is no state in which it passes by having nothing to check.
    */
-  const site004Open = !existsSync('contracts-manifest.json')
+  const site004Open = !existsSync('lib/contracts/generated.ts')
   const exempt = HAND_LIST_EXEMPT.includes('lib/plan/capabilities.ts')
 
   if (site004Open) {
@@ -389,13 +398,14 @@ test('the capabilities exemption is deleted the moment SITE-004 lands', () => {
       true,
       'lib/plan/capabilities.ts must stay exempt while SITE-004 is open — the ' +
         'builder has nothing upstream to carry a capability from, and removing ' +
-        'the exemption without the manifest would only move the hand-list.',
+        'the exemption before the types are generated would only move the ' +
+        'hand-list.',
     )
   } else {
     assert.equal(
       exempt,
       false,
-      'contracts-manifest.json has landed, so CapabilityType narrows to the ' +
+      'lib/contracts/generated.ts exists, so CapabilityType narrows to the ' +
         'generated union and the compiler now checks lib/plan/capabilities.ts ' +
         'against the manifest. Delete its exemption in this commit: the ' +
         'exception was bounded by SITE-004 and SITE-004 is closed. Leaving it ' +
@@ -430,14 +440,25 @@ test('the exemption is inert until the generated file exists', () => {
    * currently in the tree: if the file appeared by some other route, the
    * regeneration guard is what would catch it, and that guard is what this
    * exemption is justified by.
+   *
+   * The implication runs one way only, and the direction is the correction.
+   * Generated types with no manifest are types nobody can regenerate — a
+   * hand-list one build removed — so that state fails. A manifest with no
+   * generated types is the *expected* state of a bad publish: the generator
+   * refuses a partial vocabulary, so the file it would have written is absent
+   * on purpose. Asserting the two land together made a refused delivery fail
+   * this test, which is the check punishing the site for declining a manifest
+   * it was right to decline.
    */
-  assert.equal(
-    existsSync('lib/contracts/generated.ts'),
-    existsSync('contracts-manifest.json'),
-    'lib/contracts/generated.ts and contracts-manifest.json land together. One ' +
-      'without the other means either an ungenerated hand-list or types nobody ' +
-      'regenerated.',
-  )
+  if (existsSync('lib/contracts/generated.ts')) {
+    assert.equal(
+      existsSync('contracts-manifest.json'),
+      true,
+      'lib/contracts/generated.ts exists without contracts-manifest.json. The ' +
+        'types are generated from the manifest, so without it they are a ' +
+        'hand-list nobody can regenerate and the drift guard has no source.',
+    )
+  }
 })
 
 test('planDate takes a 0-indexed month, and that is pinned rather than assumed', () => {
