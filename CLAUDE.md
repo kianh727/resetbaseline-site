@@ -2451,6 +2451,17 @@ assertion no text scan can express.
   Playwright's round trip rather than the interaction. It reads the Event Timing API now — the
   same source INP comes from, so the two numbers are commensurable.
 
+**`SITE-016` is satisfied by construction, and that is a report rather than a check.** Its accept
+reads *"with generation stubbed to 3.5s, deadline and domain are visible within 100ms of
+submit"* — and **there is no provider on the client path at all**: the plan is deterministic and
+client-side, and the deadline materialises *mid-typing*, before submit. So the delay the
+criterion guards against cannot occur, and a check asserting it would pass against the absence of
+the thing it measures (§0.3). What *is* asserted, by `check-builder.mjs` with every post-document
+request aborted, is the stronger claim underneath it: the frame renders complete and empty at t=0
+and the deadline surfaces with **zero network requests**. `SITE-016`'s citation is *"§3.1"*, which
+in v7.3 is *"Why this and not a day"* — **the sixth instance of the superseded-numbering problem**,
+after DS-15, §4's table, v5 §8, v5 §14 and v5 §7.
+
 **Still blocked, and each on an input only Kian has:** the regenerated manifest (`SITE-4`), the
 typeface files, the target frames, `SITE-5` and `SITE-22`'s `VIS` verdicts, `SITE-028` and
 `SITE-109`…`SITE-112`'s copy, the Cloudflare Pages project, and Lighthouse's ≥90 line, which is
