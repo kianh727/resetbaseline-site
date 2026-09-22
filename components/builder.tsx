@@ -311,7 +311,19 @@ export default function Builder({
      */
     <div
       data-workspace={workspace ? 'true' : 'false'}
-      className="flex w-full flex-col gap-10"
+      className="relative flex w-full flex-col gap-10"
+      style={
+        headline === undefined
+          ? undefined
+          : {
+              /*
+               * The headline's reserved space. It does not change between hero
+               * and workspace, so nothing reflows; what moves is the block
+               * below it, by transform.
+               */
+              paddingTop: 'var(--headline-space)',
+            }
+      }
     >
       {headline !== undefined && (
         /*
@@ -324,20 +336,55 @@ export default function Builder({
         <div
           aria-hidden={workspace ? 'true' : undefined}
           style={{
+            /*
+             * **Out of flow, not collapsed.** The first version animated
+             * `max-height` to 0, which reflows every sibling below it — that is
+             * layout shift by definition, and `check-perf.mjs` measured CLS at
+             * **0.095 against §11.2's 0.05**. §6.1c asks for the headline to
+             * fade out translating up and for the input to take the top of the
+             * fold; neither requires the document to reflow, and `transform`
+             * and `position` are the two things that move an element without
+             * moving anything else.
+             *
+             * So the headline is absolutely positioned from the start and the
+             * container reserves its height. It fades and translates on submit,
+             * the input rises into the space by transform, and nothing below
+             * moves at all.
+             */
+            position: 'absolute',
+            insetInline: 0,
+            top: 0,
             opacity: workspace ? 0 : 1,
             transform: workspace ? 'translateY(-24px)' : 'none',
-            maxHeight: workspace ? 0 : '40svh',
-            overflow: 'hidden',
             pointerEvents: workspace ? 'none' : undefined,
             transition: reducedMotion
               ? 'none'
-              : 'opacity 240ms ease-out, transform 240ms ease-out, max-height 300ms ease-out',
+              : 'opacity 240ms ease-out, transform 240ms ease-out',
           }}
         >
           {headline}
         </div>
       )}
 
+      {/*
+        * §6.1c: the input translates to the top of the fold and becomes a
+        * persistent bar, and **everything below it comes with it**.
+        *
+        * Translating the input alone left the headline's reserved space sitting
+        * as a hole between the input and the transformation block — no reflow,
+        * which was the point, but a visible gap where the fold was supposed to
+        * have reconfigured. Moving the whole block by one transform closes it
+        * and still shifts nothing: a transform moves an element without moving
+        * anything else, which is the entire reason this is not a height
+        * animation.
+        */}
+      <div
+        className="flex flex-col gap-10"
+        style={{
+          transform: workspace ? 'translateY(calc(-1 * var(--headline-space)))' : 'none',
+          transition: reducedMotion ? 'none' : 'transform 240ms 60ms ease-out',
+        }}
+      >
       <AskInput
         value={text}
         onChange={(v) => {
@@ -418,6 +465,8 @@ export default function Builder({
           )}
         </>
       )}
+
+      </div>
 
       <Wall
         open={state === 'walled'}

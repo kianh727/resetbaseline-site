@@ -82,16 +82,38 @@ try {
     const requests = []
     page.on('request', (r) => requests.push(r.url()))
 
-    const durations = []
+    /*
+     * **Timed in the page, not around the round trip.**
+     *
+     * The first version wrapped `Date.now()` around Playwright's `.click()`,
+     * which includes actionability checks, scrolling into view and two rounds
+     * of CDP — none of which is the tune operation. It read 455ms against
+     * SITE-EVAL-013's 400ms ceiling on a machine running twenty-three other
+     * checks, and passed on a rerun. **A check that fails under load and passes
+     * alone is worse than no check**: it teaches whoever hits it to press the
+     * button again, and after that it is not a gate.
+     *
+     * The Event Timing API measures what the ceiling is about — the browser's
+     * own processing of the interaction, from input to the next paint — and it
+     * is the same source INP is read from, so the two numbers are commensurable.
+     */
+    await page.evaluate(() => {
+      window.__tuneMax = 0
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          window.__tuneMax = Math.max(window.__tuneMax, entry.duration)
+        }
+      }).observe({ type: 'event', durationThreshold: 16 })
+    })
+
     let performed = 0
     for (let i = 0; i < TUNE_OPERATIONS && controlCount > 0; i++) {
       const target = controls.nth(i % controlCount)
-      const started = Date.now()
       await target.click({ timeout: 2000 }).catch(() => {})
-      await page.waitForTimeout(0)
-      durations.push(Date.now() - started)
       performed++
     }
+    await page.waitForTimeout(120)
+    const slowest = await page.evaluate(() => window.__tuneMax)
 
     if (performed < TUNE_OPERATIONS) {
       fail(`only ${performed} of ${TUNE_OPERATIONS} tune operations ran`)
@@ -139,9 +161,17 @@ try {
       )
     }
 
-    const slowest = Math.max(...durations)
+    if (slowest === 0) {
+      fail(
+        'no interaction entries were recorded for the tune operations, so the ' +
+          'timing below is "not measured" rather than "fast".',
+      )
+    }
     if (slowest >= 400) {
-      fail(`SITE-EVAL-013: slowest tune operation ${slowest}ms, against a 400ms ceiling`)
+      fail(
+        `SITE-EVAL-013: slowest tune interaction ${slowest.toFixed(0)}ms, against a ` +
+          '400ms ceiling (measured in-page via Event Timing)',
+      )
     }
 
     /*
@@ -238,7 +268,15 @@ try {
               if (parentText.length > ownText.length + 10) return false
             }
 
-            return r.width < min || r.height < min
+            /*
+             * **Rounded, because `getBoundingClientRect` is subpixel.** §9's
+             * floor is 44 CSS pixels and that is what a person reads and what
+             * the browser hit-tests; a rect measuring 43.998 because a
+             * fractional transform sits on an ancestor is 44. This is not
+             * slack in the budget — a genuinely 43px target still rounds to
+             * 43 and still fails, which is proven by planting one.
+             */
+            return Math.round(r.width) < min || Math.round(r.height) < min
           })
           .map((el) => `${el.tagName}[${(el.textContent ?? '').trim().slice(0, 16)}] ${Math.round(el.getBoundingClientRect().width)}×${Math.round(el.getBoundingClientRect().height)}`)
           .slice(0, 6),
