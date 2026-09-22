@@ -1,0 +1,156 @@
+/*
+ * SITE-022 · `FlatLayout` — the reference implementation.
+ *
+ * **Not a degraded mode.** PRD §6 and CLAUDE.md §3: a beautiful Peak with a
+ * mediocre builder is a failed implementation; a great builder with a simplified
+ * Peak is a launchable one. This is the composition the product demo is made of,
+ * and it must stand as one with zero 3D and zero LLM.
+ *
+ * It satisfies `PlanLayout` (SITE-021) and computes the geometry §6.3b's grammar
+ * implies. Every number below is a pure function of the plan and the frame size,
+ * so the same plan at the same width composes identically every time — which is
+ * this issue's one automated criterion, and also what lets a screenshot be
+ * evidence of anything.
+ *
+ * **The grammar's geometry, and why each is a constant here rather than a prop:**
+ *
+ * - **Bands are level.** `y` depends on band index and nothing else. There is no
+ *   slope term to set to zero, so §6.3b's question 12 — *does any band read as
+ *   climbing, tilting, tapering?* — has no code path that could answer yes.
+ * - **Bands bleed off both frame edges.** They are drawn from `-OVERHANG` to
+ *   `width + OVERHANG`. Not clipped at the edge with a square cap: extended past
+ *   it, so no end exists to be seen.
+ * - **Days map to x by calendar position**, evenly, across the plan's whole span.
+ *   A lit day and a dark day occupy the same slot width — an unscheduled day is
+ *   not compressed away, because compressing it is how a sparse plan starts
+ *   looking full.
+ *
+ * **Horizontal position is a fraction, not a pixel**, and that is a correction
+ * rather than a preference. The first version composed at a fixed width and let
+ * the renderer scale to fit, which at 375px — **the primary target** — shrank
+ * 11px metadata to about 3px. Scaling a composition down is not responsiveness;
+ * it is the same composition, unreadable. Fractions let the renderer lay the
+ * band out at the real width with type at its real size, and let the adapter
+ * turn the same fraction into a pixel for whatever frame it is asked about.
+ *
+ * **One fraction, two consumers.** The component and `anchorFor` both read
+ * `xFraction`; neither recomputes it. Two derivations of one position can
+ * disagree silently (§0.3c), and the disagreement here would be an overlay
+ * drifting off the mark it labels.
+ */
+
+import type { Plan, PlanNode } from '../plan/model.ts'
+import type { Anchor, PlanLayout } from '../plan/layout.ts'
+import { bandsFor, type Band } from './bands.ts'
+
+/** Vertical rhythm. A window band, its marks, and the gap to the next. */
+export const BAND_HEIGHT = 44
+
+/**
+ * **The protection band is shorter — that is what "denser" means here.**
+ *
+ * §6.3b calls protection *"a second, denser band below"* and does not define
+ * density. **Decided in this adapter and flagged provisional** (SITE-026): a
+ * band compressed to two-thirds the height, at higher opacity, with a hard edge
+ * on both boundaries rather than a lit line on one.
+ *
+ * The alternative readings were a texture and a darker fill alone. Height was
+ * chosen because it is the one that survives §12.4a question 13 — *does
+ * lavender appear as fill anywhere* — and because a protection band that is the
+ * same size as a window band, only darker, reads as a second schedule rather
+ * than as a different kind of thing.
+ */
+export const PROTECTION_HEIGHT = 28
+
+const BAND_GAP = 16
+const TOP_PAD = 24
+const SIDE_PAD = 24
+
+export interface BandMark {
+  /**
+   * Position across the band's track, 0–1. Width-independent by construction,
+   * so the same number serves a 375px column and a 1440px frame.
+   */
+  readonly xFraction: number
+  readonly lit: boolean
+  readonly date: Date
+}
+
+export interface BandGeometry {
+  readonly band: Band
+  /** Top edge of the band, in layout space. Vertical rhythm is fixed, not fluid. */
+  readonly y: number
+  readonly height: number
+  readonly marks: readonly BandMark[]
+}
+
+export interface FlatComposition {
+  readonly height: number
+  readonly bands: readonly BandGeometry[]
+}
+
+/**
+ * Compose a plan.
+ *
+ * Pure, and **takes no width** — it reads no DOM, returns fractions for anything
+ * horizontal, and is therefore testable without a browser and identical in one.
+ */
+export function compose(plan: Plan): FlatComposition {
+  const bands = bandsFor(plan)
+
+  let y = TOP_PAD
+  const geometry = bands.map((band) => {
+    const height = band.kind === 'protection' ? PROTECTION_HEIGHT : BAND_HEIGHT
+    const top = y
+    y += height + BAND_GAP
+    return {
+      band,
+      y: top,
+      height,
+      marks: band.days.map((day, d) => ({
+        // Centred in its slot, so the first and last marks sit inside the track
+        // rather than on its edges — a mark at 0 would touch the gutter and read
+        // as the band starting there.
+        xFraction: (d + 0.5) / band.days.length,
+        lit: day.lit,
+        date: day.date,
+      })),
+    }
+  })
+
+  const height = bands.length === 0 ? 0 : y - BAND_GAP + TOP_PAD
+
+  return { height, bands: geometry }
+}
+
+/**
+ * The adapter.
+ *
+ * `anchorFor` returns **`null` for any node this composition does not draw**,
+ * which after §6.3b's 2026-09-19 ruling is a real and expected case rather than
+ * an error: a **timer** and a **tracker** have no recurring window, so they get
+ * no band, and this layout has no position for them. `null` is the interface's
+ * word for exactly that. **Do not add a fallback position** — an object placed
+ * somewhere nobody chose is worse than an object not drawn, and inventing a
+ * treatment here is the thing SITE-026's ruling reserves.
+ */
+export function flatLayout(plan: Plan, width: number): PlanLayout {
+  const { bands } = compose(plan)
+  const byNode = new Map(bands.map((g) => [g.band.nodeId, g]))
+  const track = Math.max(0, width - SIDE_PAD * 2)
+
+  return {
+    anchorFor(node: PlanNode): Anchor | null {
+      const g = byNode.get(node.id)
+      if (g === undefined) return null
+      const first = g.marks[0]
+      return {
+        // A band with no marks — protection — anchors at the frame's centre,
+        // which is the only honest point for something that bleeds off both
+        // edges and occupies no particular day.
+        x: first === undefined ? width / 2 : SIDE_PAD + first.xFraction * track,
+        y: g.y + g.height / 2,
+      }
+    },
+  }
+}

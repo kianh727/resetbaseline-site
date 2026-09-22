@@ -1,0 +1,51 @@
+/*
+ * SITE-003 · The two candidate faces, for the comparison harness only.
+ *
+ * PRD §14: "PP Neue Montreal (licensed) or Satoshi (free). Decided at P0
+ * item 1, compared at display scale." §23 item 3 repeats it: the decision is
+ * made on real display-scale type, not from description.
+ *
+ * These @font-face rules are imported by app/type/page.dev.tsx and by nothing
+ * else, so they exist on the development-only comparison route and never in
+ * the production export. That is deliberate: the decision is unmade, so
+ * neither face ships, and a site that quietly loaded one of the candidates
+ * would have made the decision by accident.
+ *
+ * The .woff2 files are not in this repository. docs/typeface-decision.md says
+ * what to drop in and why neither could be fetched from a session. Until they
+ * are present both columns render in the fallback stack, which is visibly not
+ * a comparison — the harness says so on the page rather than letting two
+ * identical columns read as "the faces are the same".
+ */
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/pp-neue-montreal-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/pp-neue-montreal-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

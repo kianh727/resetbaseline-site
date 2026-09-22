@@ -1,0 +1,11 @@
+{
+  "_note": "SITE-004 fixture carrying all four contract axes at the counts PRD §6.3 states — 5/3/5/3. Values are deliberately synthetic: §6.2 forbids the real vocabulary hand-listed in the site, and a fixture holding it would be that one copy removed. What is under test is the generator's shape, which does not depend on what the strings say.",
+  "captured_at": "2026-09-19T00:00:00Z",
+  "app_commit_sha": "0000000000000000000000000000000000000000",
+  "manifest": {
+    "capability_type": ["alpha", "beta", "gamma", "delta", "epsilon"],
+    "authority_tier": ["tier_one", "tier_two", "tier_three"],
+    "outcome": ["out_a", "out_b", "out_c", "out_d", "out_e"],
+    "belief_tier": ["belief_one", "belief_two", "belief_three"]
+  }
+}

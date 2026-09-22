@@ -1,0 +1,48 @@
+{
+  "name": "resetbaseline-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test 'tests/**/*.test.mjs' 'tests/**/*.test.ts'",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "check:dev-routes": "node scripts/check-dev-routes.mjs",
+    "check:manifest": "node scripts/check-manifest.mjs",
+    "check:layout-rules": "node scripts/check-layout-rules.mjs",
+    "check:generated-contracts": "node scripts/check-generated-contracts.mjs",
+    "generate:contracts": "node scripts/generate-contract-types.mjs",
+    "verify:manifest-arrival": "node scripts/verify-manifest-arrival.mjs",
+    "check:overflow": "node scripts/check-overflow.mjs",
+    "check:builder": "node scripts/check-builder.mjs",
+    "check:lcp": "node scripts/check-lcp.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "check:app-names": "node scripts/check-app-names.mjs",
+    "check:eval-stubs": "node scripts/check-eval-stubs.mjs",
+    "check:divergences": "node scripts/check-divergences.mjs",
+    "check:lavender": "node scripts/check-lavender.mjs",
+    "check:predicates": "node scripts/check-predicates.mjs",
+    "check:timezones": "node scripts/check-timezones.mjs",
+    "check:motion": "node scripts/check-motion.mjs"
+  },
+  "dependencies": {
+    "next": "15.5.25",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "22.19.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "15.5.25",
+    "playwright-core": "^1.56.1",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}
