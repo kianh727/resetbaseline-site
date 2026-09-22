@@ -158,15 +158,36 @@ export function FlatPlan({ plan }: { plan: Plan }) {
   if (bands.length === 0) return null
 
   return (
-    <div ref={root} role="img" aria-label="Execution plan">
+    /*
+     * **`overflow-x: clip` here, and not only on the root.**
+     *
+     * The bands bleed off both frame edges by design (§6.3b), which they do
+     * with `margin-inline: -100vw`. The root's clip (SITE-005) hid the
+     * consequence, so nothing looked wrong — but the *document* was extending
+     * to roughly twice the viewport in the plan state: 2848px against 1440,
+     * 734px against 375. `check-overflow.mjs` never saw it because it measures
+     * the idle page and a band only exists once a plan does.
+     *
+     * That is §0.3a with the guard the PRD requires as the thing doing the
+     * hiding, and the fix is for the bleed to be clipped by **its own
+     * container** rather than by the page's safety net: the band still has no
+     * left or right end, the document no longer extends, and the root clip goes
+     * back to being a net rather than load-bearing.
+     *
+     * `clip` and not `hidden`, for the same reason SITE-005 gives: `hidden`
+     * makes this a scroll container and would break sticky positioning inside
+     * it.
+     */
+    <div ref={root} role="img" aria-label="Execution plan" style={{ overflowX: 'clip' }}>
       {bands.map((g) => {
         const protection = g.band.kind === 'protection'
         return (
           <div key={g.band.nodeId} style={{ paddingBottom: 20 }}>
             {/*
               The band. `margin-inline: -100vw` with matching padding puts its
-              edges far outside any viewport, and the page's `overflow-x: clip`
-              (SITE-005) hides them — §6.3b's "no left end, no right end".
+              edges far outside any viewport, and the **plan container's** own
+              `overflow-x: clip` hides them — §6.3b's "no left end, no right
+              end", without the document extending past the viewport.
             */}
             <div
               style={{

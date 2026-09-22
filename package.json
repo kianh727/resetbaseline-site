@@ -32,7 +32,8 @@
     "check:pii": "node scripts/check-analytics-pii.mjs",
     "build:headers": "node scripts/build-headers.ts",
     "check:csp": "node scripts/check-csp.mjs",
-    "check:perf": "node scripts/check-perf.mjs"
+    "check:perf": "node scripts/check-perf.mjs",
+    "check:degradation": "node scripts/check-degradation.mjs"
   },
   "dependencies": {
     "next": "15.5.25",
