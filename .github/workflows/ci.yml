@@ -158,5 +158,15 @@ jobs:
       - name: Every route has metadata, an OG card and icons that resolve
         run: npm run check:metadata
 
+      # SITE-051 / SITE-EVAL-039. Compiles a fixture that MUST fail and fails
+      # the build if it succeeds -- a compile-time rule with no failing case
+      # rejects nothing, and its absence is indistinguishable from its working.
+      # The rejection count is derived from the fixture, not a literal: an
+      # earlier threshold of five against six attempts hid the one attempt the
+      # guard did not catch. Also scans real payloads for any substring of a
+      # goal containing a name, a place and a health term.
+      - name: No free-form user text can reach an analytics event
+        run: npm run check:pii
+
       - name: Reduced motion in both settings, and locale independence
         run: npm run check:motion

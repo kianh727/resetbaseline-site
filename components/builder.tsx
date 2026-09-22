@@ -28,7 +28,7 @@
  * than on mount.
  */
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import AskInput from '@/components/ask-input'
 import TransformationBlock from '@/components/transformation-block'
@@ -44,6 +44,12 @@ import { downloadPlan } from '@/lib/plan/download'
 import { DEFAULT_WINDOW_ID, WINDOW_OPTIONS } from '@/lib/copy/builder-controls'
 import { ACTIVATE_LABEL, RUN_AGAIN_LABEL } from '@/lib/copy/builder-controls'
 import type { RowValues } from '@/lib/builder/rows'
+import { createAnalytics, NULL_SINK, type AnalyticsSink } from '@/lib/analytics/client'
+import type { EventName, EventPayloads, EventProperties } from '@/lib/analytics/events'
+import { classifyInput } from '@/lib/parse/input-class'
+import { occurrences } from '@/lib/plan/model'
+import { useRenderTier } from '@/lib/hooks/use-render-tier'
+import { useReducedMotion } from '@/lib/hooks/use-reduced-motion'
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -67,12 +73,76 @@ function formatWindow(startMinute: number, endMinute: number): string {
 
 const FALLBACK_WINDOW = WINDOW_OPTIONS[0]!
 
-export default function Builder() {
+/**
+ * SITE-050 · Where the fifteen events fire.
+ *
+ * **Each fires at the moment the thing it names happens**, not at the render
+ * that follows it: `goal_input_started` on the first keystroke and not on every
+ * one, `wall_reached` when the machine enters `walled` and not when the wall
+ * paints. An event fired from a render effect counts renders, which is a
+ * different measurement wearing the same name.
+ *
+ * **Nothing the visitor typed reaches a payload**, and that is not a discipline
+ * applied here — `Analytics.track` admits no free-form string at all, so there
+ * is no argument this component could pass one through (SITE-051).
+ *
+ * **The sink is injected and defaults to `NULL_SINK`.** The PRD names no
+ * provider, so this measures nothing until Kian chooses one; the seam is what
+ * makes that a one-argument change rather than an instrumentation pass.
+ */
+export default function Builder({ sink = NULL_SINK }: { sink?: AnalyticsSink } = {}) {
   const [text, setText] = useState('')
   const [state, setState] = useState(INITIAL_STATE)
   const [windowId, setWindowId] = useState(DEFAULT_WINDOW_ID)
   const [days, setDays] = useState<readonly Weekday[] | null>(null)
   const [apps, setApps] = useState<readonly string[]>([])
+
+  /*
+   * The tier is read once and attached to every event (§10.2). Reading it per
+   * event would attribute a session that changed tier mid-way to whichever tier
+   * it happened to be in at each moment, and SITE-EVAL-040's K-1 comparison
+   * would be measuring something other than the cohort.
+   */
+  const tier = useRenderTier()
+  const reducedMotion = useReducedMotion()
+  const analytics = useMemo(() => createAnalytics(sink, tier), [sink, tier])
+
+  /*
+   * Refs, not state: these gate one-shot events and must not cause a render.
+   * `submittedAt` is what `wall_reached` measures against, and it is a ref for
+   * the same reason — a timestamp in state re-renders the builder at the moment
+   * the visitor is typing.
+   */
+  const fired = useRef<Set<string>>(new Set())
+  const submittedAt = useRef<number | null>(null)
+  const walledAt = useRef<number | null>(null)
+
+  /**
+   * Fire at most once per session — `hero_view`, `builder_engaged` and
+   * `goal_input_started` are all "the first time", not "every time".
+   *
+   * **Keyed on the event name itself** rather than on a separate string. An
+   * arbitrary key is a second name for the same thing, and it drifts from the
+   * event the first time somebody renames one and not the other.
+   */
+  const trackOnce = useCallback(
+    <K extends EventName>(name: K, properties: Omit<EventPayloads[K], 'tier'> & EventProperties) => {
+      if (fired.current.has(name)) return
+      fired.current.add(name)
+      analytics.track(name, properties)
+    },
+    [analytics],
+  )
+
+  /*
+   * `hero_view` is the one event that legitimately fires from an effect: it
+   * names a view, and mount is when the view happens. The `once` guard makes a
+   * remount — a fast refresh, a tier upgrade re-running the memo — count one
+   * view rather than two, which is the failure this event has by default.
+   */
+  useEffect(() => {
+    trackOnce('hero_view', { reduced_motion: reducedMotion })
+  }, [trackOnce, reducedMotion])
 
   /**
    * The only way state moves. `next()` returns `null` for a transition that is
@@ -80,9 +150,30 @@ export default function Builder() {
    * a component that could not make a transition happen must not get one by
    * writing the state itself.
    */
-  const send = useCallback((event: BuilderEvent) => {
-    setState((current) => next(current, event) ?? current)
-  }, [])
+  const send = useCallback(
+    (event: BuilderEvent) => {
+      setState((current) => {
+        const moved = next(current, event)
+        if (moved === null) return current
+
+        /*
+         * `wall_reached` fires on the **transition**, which is the only place
+         * it can be correct: the wall is reachable by exactly one event
+         * (SITE-012), so firing it here means the event and the guarantee have
+         * the same single source. Fired from the wall's own mount it would
+         * count paints, and a remount would count two.
+         */
+        if (moved === 'walled' && current !== 'walled') {
+          walledAt.current = Date.now()
+          analytics.track('wall_reached', {
+            ms_since_submit: submittedAt.current === null ? 0 : Date.now() - submittedAt.current,
+          })
+        }
+        return moved
+      })
+    },
+    [analytics],
+  )
 
   const option = WINDOW_OPTIONS.find((o) => o.id === windowId) ?? FALLBACK_WINDOW
   const planWindow = { startMinute: option.startMinute, endMinute: option.endMinute }
@@ -130,9 +221,34 @@ export default function Builder() {
 
   const submit = () => {
     if (text.trim().length === 0) return
+
+    const startedAt = Date.now()
+    submittedAt.current = startedAt
+
+    analytics.track('goal_submitted', {
+      // A length, never the text. A length cannot be read back into words.
+      length: text.trim().length,
+      input_class: classifyInput(text.trim()),
+      has_deadline: match !== null,
+    })
+
     send('submit')
     send('build')
     send('plan_ready')
+
+    /*
+     * Measured from the same `buildPlan` the render uses, so the number is the
+     * plan's cost rather than React's. It is deterministic and client-side, so
+     * this is honest: there is no request in it.
+     */
+    const built = buildPlan({ text, window: planWindow, days, appCount: apps.length })
+    if (built !== null) {
+      analytics.track('plan_generated', {
+        node_count: built.nodes.length,
+        occurrence_count: occurrences(built).length,
+        ms_to_plan: Date.now() - startedAt,
+      })
+    }
   }
 
   return (
@@ -140,8 +256,10 @@ export default function Builder() {
       <AskInput
         value={text}
         onChange={(v) => {
+          if (v.trim().length > 0) trackOnce('goal_input_started', {})
           setText(v)
           send('engage')
+          trackOnce('builder_engaged', {})
         }}
         onSubmit={submit}
       />
@@ -157,6 +275,7 @@ export default function Builder() {
             <TimeControl
               value={option}
               onChange={(o) => {
+                analytics.track('plan_tuned', { control: 'window' })
                 setWindowId(o.id)
                 send('tune')
               }}
@@ -164,6 +283,7 @@ export default function Builder() {
             <DaysControl
               value={activeDays}
               onChange={(d) => {
+                analytics.track('plan_tuned', { control: 'days' })
                 setDays(d.length === 0 ? [] : WEEKDAYS.filter((w) => d.includes(w)))
                 send('tune')
               }}
@@ -171,6 +291,9 @@ export default function Builder() {
             <ProtectControl
               value={apps}
               onChange={(a) => {
+                trackOnce('protect_started', {})
+                /* A count, never a name (§6.3a) — and the type cannot carry one. */
+                analytics.track('protect_selected', { app_count: a.length })
                 setApps(a)
                 send('protect')
               }}
@@ -189,7 +312,10 @@ export default function Builder() {
           {apps.length === 0 ? null : (
             <button
               type="button"
-              onClick={() => send('activation_attempted')}
+              onClick={() => {
+                analytics.track('activation_attempted', {})
+                send('activation_attempted')
+              }}
               className="text-body"
               style={{
                 alignSelf: 'flex-start',
@@ -210,9 +336,26 @@ export default function Builder() {
 
       <Wall
         open={state === 'walled'}
-        onDismiss={() => send('dismiss_wall')}
+        onDismiss={() => {
+          analytics.track('wall_dismissed', {
+            dwell_ms: walledAt.current === null ? 0 : Date.now() - walledAt.current,
+          })
+          send('dismiss_wall')
+        }}
+        onSubmit={() => analytics.track('email_submitted', {})}
         onDownload={() => {
-          if (plan !== null) downloadPlan(plan)
+          if (plan !== null) {
+            /*
+             * The download **is** the share artifact today: the card is a
+             * server-side render and the wall's control hands over a plain-text
+             * plan (§11.5). Firing `share_card_created` here rather than at
+             * some future share button is the honest reading — the event names
+             * the moment a visitor takes the plan away with them, and that is
+             * this one.
+             */
+            analytics.track('share_card_created', {})
+            downloadPlan(plan)
+          }
         }}
       />
     </div>

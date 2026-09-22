@@ -1,0 +1,62 @@
+/*
+ * SITE-EVAL-039's negative fixture. **This file must not compile.**
+ *
+ * Its extension is `.ts.fixture`, so `tsc --noEmit` over the project never sees
+ * it — a file that must fail to compile cannot live where the build compiles
+ * things. `scripts/check-analytics-pii.mjs` copies it to a `.ts` in a temporary
+ * directory, runs `tsc` on it, and asserts a **non-zero** exit.
+ *
+ * *"A compile-time rule with no failing case rejects nothing, and its absence
+ * is indistinguishable from its working."* Each attempt below is a different
+ * name for the same mistake, because a guard that only knows `raw_goal` catches
+ * the one field somebody thought of.
+ */
+
+import { createAnalytics, NULL_SINK } from '../../lib/analytics/client.ts'
+
+const analytics = createAnalytics(NULL_SINK, 'A')
+declare const rawGoal: string
+
+// 1. The field the accept criterion names.
+analytics.track('goal_submitted', {
+  length: rawGoal.length,
+  input_class: 'actionable',
+  has_deadline: false,
+  raw_goal: rawGoal,
+})
+
+// 2. The commitment title, which the accept criterion also names.
+analytics.track('plan_generated', {
+  node_count: 1,
+  occurrence_count: 4,
+  ms_to_plan: 120,
+  title: 'whatever the model produced',
+})
+
+// 3. The same text under a name nobody would think to ban.
+analytics.track('goal_submitted', {
+  length: rawGoal.length,
+  input_class: 'actionable',
+  has_deadline: false,
+  context: rawGoal,
+})
+
+// 4. An app name, which §6.3a forbids everywhere.
+analytics.track('protect_selected', { app_count: 3, app: 'Instagram' })
+
+// 5. A free-form value in a property that legitimately exists.
+analytics.track('plan_generation_fallback', { reason: rawGoal })
+
+/*
+ * 6. **The one that matters most.** TypeScript's excess-property check only
+ * applies to a *fresh object literal*, so assigning through a variable slips
+ * past it. If this attempt compiles, the guard catches only the careless form
+ * of the mistake and not the ordinary one.
+ */
+const viaVariable = {
+  length: rawGoal.length,
+  input_class: 'actionable' as const,
+  has_deadline: false,
+  raw_goal: rawGoal,
+}
+analytics.track('goal_submitted', viaVariable)

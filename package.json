@@ -28,7 +28,8 @@
     "check:timezones": "node scripts/check-timezones.mjs",
     "check:motion": "node scripts/check-motion.mjs",
     "build:assets": "node scripts/build-assets.ts",
-    "check:metadata": "node scripts/check-metadata.mjs"
+    "check:metadata": "node scripts/check-metadata.mjs",
+    "check:pii": "node scripts/check-analytics-pii.mjs"
   },
   "dependencies": {
     "next": "15.5.25",
